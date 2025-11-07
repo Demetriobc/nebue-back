@@ -1,10 +1,10 @@
 # Design System
 
-Este documento define o sistema de design do Finanpy, incluindo paleta de cores, tipografia, componentes e padrões visuais.
+Este documento define o sistema de design do Nebue, incluindo paleta de cores, tipografia, componentes e padrões visuais.
 
 ## Visão Geral
 
-O Finanpy utiliza um design moderno com tema escuro e gradientes harmônicos, criando uma experiência visual agradável e profissional. O sistema é construído com TailwindCSS, garantindo responsividade e consistência.
+O Nebue utiliza um design moderno com tema escuro e gradientes harmônicos, criando uma experiência visual agradável e profissional. O sistema é construído com TailwindCSS, garantindo responsividade e consistência.
 
 ## Paleta de Cores
 
@@ -267,7 +267,7 @@ font-bold: 700        /* Títulos principais, valores */
         <div class="flex items-center justify-between h-16">
             <div class="flex items-center">
                 <span class="text-2xl font-bold bg-gradient-to-r from-primary-500 to-accent-500 bg-clip-text text-transparent">
-                    Finanpy
+                    Nebue
                 </span>
             </div>
             <div class="flex items-center space-x-4">
@@ -288,7 +288,7 @@ font-bold: 700        /* Títulos principais, valores */
 <aside class="w-64 bg-bg-secondary h-screen fixed left-0 top-0 border-r border-bg-tertiary p-6">
     <div class="mb-8">
         <span class="text-2xl font-bold bg-gradient-to-r from-primary-500 to-accent-500 bg-clip-text text-transparent">
-            Finanpy
+            Nebue
         </span>
     </div>
     <nav class="space-y-2">

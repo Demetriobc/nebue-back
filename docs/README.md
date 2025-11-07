@@ -1,6 +1,6 @@
-# Documentação Finanpy
+# Documentação Nebue
 
-Bem-vindo à documentação do Finanpy, um sistema de gestão de finanças pessoais desenvolvido com Django.
+Bem-vindo à documentação do Nebue, um sistema de gestão de finanças pessoais desenvolvido com Django.
 
 ## Índice da Documentação
 
@@ -26,7 +26,7 @@ Instruções de segurança da aplicação.
 
 ## Visão Geral do Projeto
 
-O Finanpy é um sistema de gestão de finanças pessoais que permite:
+O Nebue é um sistema de gestão de finanças pessoais que permite:
 - Gerenciar múltiplas contas bancárias
 - Categorizar transações financeiras
 - Visualizar entradas e saídas

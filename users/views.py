@@ -104,7 +104,7 @@ class SignupView(CreateView):
         # Display success message
         messages.success(
             self.request,
-            f'Bem-vindo ao Finanpy, {self.object.email}! Sua conta foi criada com sucesso.'
+            f'Bem-vindo ao Nebue, {self.object.email}! Sua conta foi criada com sucesso.'
         )
 
         return response

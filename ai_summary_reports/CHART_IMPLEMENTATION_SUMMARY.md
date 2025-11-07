@@ -1,12 +1,12 @@
 # Chart.js Implementation Summary - Tarefa 6.4
 
 ## Overview
-Successfully implemented Chart.js visualizations in the Finanpy dashboard, adding interactive pie and line charts with dark theme styling matching the design system.
+Successfully implemented Chart.js visualizations in the Nebue dashboard, adding interactive pie and line charts with dark theme styling matching the design system.
 
 ## Completed Subtasks
 
 ### 6.4.1: Add Chart.js to Project ✅
-**File Modified**: `/Users/azambuja/projects/finanpy/templates/base.html`
+**File Modified**: `/Users/azambuja/projects/Nebue/templates/base.html`
 
 Added Chart.js 4.4.1 CDN link in the head section:
 ```html
@@ -19,7 +19,7 @@ Added Chart.js 4.4.1 CDN link in the head section:
 ---
 
 ### 6.4.2: Create Pie Chart for Categories ✅
-**File Modified**: `/Users/azambuja/projects/finanpy/templates/dashboard.html`
+**File Modified**: `/Users/azambuja/projects/Nebue/templates/dashboard.html`
 
 Implemented doughnut chart (modern alternative to pie chart) showing expense distribution by category:
 - **Data Source**: Top 5 expense categories from current month
@@ -46,7 +46,7 @@ data: {
 ---
 
 ### 6.4.3: Create Line Chart for Monthly Evolution ✅
-**File Modified**: `/Users/azambuja/projects/finanpy/templates/dashboard.html`
+**File Modified**: `/Users/azambuja/projects/Nebue/templates/dashboard.html`
 
 Implemented dual-line chart showing income vs expense over last 6 months:
 - **Income Line**: Green (#10b981 - emerald-500) with filled area
@@ -72,9 +72,9 @@ for i in range(5, -1, -1):
 
 ### 6.4.4: Style Charts with Dark Theme ✅
 **Files Modified**:
-- `/Users/azambuja/projects/finanpy/templates/dashboard.html`
+- `/Users/azambuja/projects/Nebue/templates/dashboard.html`
 
-Applied Finanpy dark theme to all chart components:
+Applied Nebue dark theme to all chart components:
 
 **Global Chart.js Defaults**:
 ```javascript
@@ -103,7 +103,7 @@ Chart.defaults.backgroundColor = 'rgba(99, 102, 241, 0.1)';
 ---
 
 ### 6.4.5: Add Responsiveness to Charts ✅
-**File Modified**: `/Users/azambuja/projects/finanpy/templates/dashboard.html`
+**File Modified**: `/Users/azambuja/projects/Nebue/templates/dashboard.html`
 
 Implemented comprehensive responsive behavior:
 
@@ -139,7 +139,7 @@ options: {
 ## Backend Implementation
 
 ### Updated DashboardView
-**File Modified**: `/Users/azambuja/projects/finanpy/users/views.py`
+**File Modified**: `/Users/azambuja/projects/Nebue/users/views.py`
 
 Added two new context variables with chart data:
 
@@ -238,7 +238,7 @@ context['monthly_chart_data'] = json.dumps(monthly_chart_data)
 - [X] Empty state shows when no expense data
 - [X] Line chart always displays (even with zero values)
 - [X] Charts are responsive on mobile, tablet, and desktop
-- [X] Dark theme matches Finanpy design system
+- [X] Dark theme matches Nebue design system
 - [X] Tooltips show correct currency formatting
 - [X] Category colors from database render correctly
 - [X] 6-month data calculation is accurate
@@ -307,22 +307,22 @@ ticks: {
 
 ## Files Modified
 
-1. `/Users/azambuja/projects/finanpy/templates/base.html`
+1. `/Users/azambuja/projects/Nebue/templates/base.html`
    - Added Chart.js CDN link
 
-2. `/Users/azambuja/projects/finanpy/users/views.py`
+2. `/Users/azambuja/projects/Nebue/users/views.py`
    - Enhanced `DashboardView.get_context_data()`
    - Added chart data preparation logic
    - Added necessary imports
 
-3. `/Users/azambuja/projects/finanpy/templates/dashboard.html`
+3. `/Users/azambuja/projects/Nebue/templates/dashboard.html`
    - Complete redesign with statistics cards
    - Added pie chart for category breakdown
    - Added line chart for monthly evolution
    - Implemented responsive layout
    - Applied dark theme styling
 
-4. `/Users/azambuja/projects/finanpy/TASKS.md`
+4. `/Users/azambuja/projects/Nebue/TASKS.md`
    - Marked all 6.4.x subtasks as completed
 
 ---
@@ -333,7 +333,7 @@ All 5 subtasks of Tarefa 6.4 have been successfully completed:
 - ✅ Chart.js integrated (v4.4.1)
 - ✅ Pie chart for category expenses with dynamic colors
 - ✅ Line chart for 6-month income vs expense evolution
-- ✅ Dark theme styling matching Finanpy design system
+- ✅ Dark theme styling matching Nebue design system
 - ✅ Fully responsive charts with mobile optimization
 
 The dashboard now provides rich visual insights into user finances while maintaining the project's design consistency and coding standards.

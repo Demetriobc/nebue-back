@@ -1,6 +1,6 @@
-# Security Documentation - Finanpy
+# Security Documentation - Nebue
 
-This document outlines the security measures implemented in the Finanpy application and provides guidance for secure deployment.
+This document outlines the security measures implemented in the Nebue application and provides guidance for secure deployment.
 
 ## Sprint 6 - Tarefa 6.9: Security Implementation Summary
 
@@ -20,7 +20,7 @@ All security subtasks have been completed and verified:
 
 ### Implementation
 
-**Location**: `/Users/azambuja/projects/finanpy/core/settings.py` (lines 154-157)
+**Location**: `/Users/azambuja/projects/Nebue/core/settings.py` (lines 154-157)
 
 ```python
 if not DEBUG:
@@ -50,7 +50,7 @@ if not DEBUG:
 
 ### Implementation
 
-**Location**: `/Users/azambuja/projects/finanpy/core/settings.py` (lines 159-161)
+**Location**: `/Users/azambuja/projects/Nebue/core/settings.py` (lines 159-161)
 
 ```python
 if not DEBUG:
@@ -80,7 +80,7 @@ Without this setting, an attacker on the same network could:
 
 ### Implementation
 
-**Location**: `/Users/azambuja/projects/finanpy/core/settings.py` (lines 163-165)
+**Location**: `/Users/azambuja/projects/Nebue/core/settings.py` (lines 163-165)
 
 ```python
 if not DEBUG:
@@ -109,7 +109,7 @@ if not DEBUG:
 
 ### Implementation
 
-**Location**: `/Users/azambuja/projects/finanpy/core/settings.py` (lines 167-177)
+**Location**: `/Users/azambuja/projects/Nebue/core/settings.py` (lines 167-177)
 
 ```python
 if not DEBUG:
@@ -294,12 +294,12 @@ All database queries use Django ORM exclusively:
 Django automatically escapes and parameterizes all values:
 
 ```python
-# SECURE: Django ORM (used throughout Finanpy)
+# SECURE: Django ORM (used throughout Nebue)
 Account.objects.filter(name=user_input)
 # Generates: SELECT * FROM accounts WHERE name = %s
 # Parameters: [user_input]  -- safely escaped
 
-# DANGEROUS: Raw SQL (NOT USED in Finanpy)
+# DANGEROUS: Raw SQL (NOT USED in Nebue)
 cursor.execute(f"SELECT * FROM accounts WHERE name = '{user_input}'")
 # Vulnerable to: ' OR '1'='1
 ```
@@ -337,18 +337,18 @@ Searched entire codebase for:
 Django automatically escapes all variables in templates:
 
 ```django
-{# SECURE: Automatic escaping (used throughout Finanpy) #}
+{# SECURE: Automatic escaping (used throughout Nebue) #}
 {{ account.name }}
 {# If name = "<script>alert('xss')</script>" #}
 {# Renders as: &lt;script&gt;alert('xss')&lt;/script&gt; #}
 
-{# DANGEROUS: Manual bypass (NOT USED in Finanpy) #}
+{# DANGEROUS: Manual bypass (NOT USED in Nebue) #}
 {{ account.name|safe }}
 {# Would render actual <script> tag - VULNERABLE #}
 ```
 
 #### Settings Verification
-**Location**: `/Users/azambuja/projects/finanpy/core/settings.py` (lines 67-80)
+**Location**: `/Users/azambuja/projects/Nebue/core/settings.py` (lines 67-80)
 
 Template configuration includes:
 ```python
@@ -372,13 +372,13 @@ TEMPLATES = [
 
 ### Templates Verified
 All templates audited:
-- `/Users/azambuja/projects/finanpy/templates/base.html`
-- `/Users/azambuja/projects/finanpy/templates/dashboard.html`
-- `/Users/azambuja/projects/finanpy/templates/auth/*.html`
-- `/Users/azambuja/projects/finanpy/templates/accounts/*.html`
-- `/Users/azambuja/projects/finanpy/templates/categories/*.html`
-- `/Users/azambuja/projects/finanpy/templates/transactions/*.html`
-- `/Users/azambuja/projects/finanpy/templates/profiles/*.html`
+- `/Users/azambuja/projects/Nebue/templates/base.html`
+- `/Users/azambuja/projects/Nebue/templates/dashboard.html`
+- `/Users/azambuja/projects/Nebue/templates/auth/*.html`
+- `/Users/azambuja/projects/Nebue/templates/accounts/*.html`
+- `/Users/azambuja/projects/Nebue/templates/categories/*.html`
+- `/Users/azambuja/projects/Nebue/templates/transactions/*.html`
+- `/Users/azambuja/projects/Nebue/templates/profiles/*.html`
 
 ### Additional XSS Protections
 
@@ -401,7 +401,7 @@ Prevents browsers from MIME-sniffing responses, which could lead to XSS.
 Beyond the Sprint 6.9 requirements, additional security headers are configured:
 
 ### X-Frame-Options: DENY
-**Location**: `/Users/azambuja/projects/finanpy/core/settings.py` (line 187)
+**Location**: `/Users/azambuja/projects/Nebue/core/settings.py` (line 187)
 
 ```python
 X_FRAME_OPTIONS = 'DENY'
@@ -412,7 +412,7 @@ X_FRAME_OPTIONS = 'DENY'
 **Impact**: Site cannot be embedded in frames on other domains
 
 ### Content-Type Nosniff
-**Location**: `/Users/azambuja/projects/finanpy/core/settings.py` (line 181)
+**Location**: `/Users/azambuja/projects/Nebue/core/settings.py` (line 181)
 
 ```python
 SECURE_CONTENT_TYPE_NOSNIFF = True
@@ -428,7 +428,7 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 
 The following middleware provides additional security:
 
-**Location**: `/Users/azambuja/projects/finanpy/core/settings.py` (lines 55-63)
+**Location**: `/Users/azambuja/projects/Nebue/core/settings.py` (lines 55-63)
 
 ```python
 MIDDLEWARE = [

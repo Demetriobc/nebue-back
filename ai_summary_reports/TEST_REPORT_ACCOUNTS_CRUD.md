@@ -1,4 +1,4 @@
-# Finanpy - Accounts CRUD Manual Testing Report
+# Nebue - Accounts CRUD Manual Testing Report
 **Sprint 2, Task 2.13 - Comprehensive Test Execution**
 
 **Test Date:** 2025-10-25
@@ -29,8 +29,8 @@ All core CRUD functionality for Accounts is working correctly. Data isolation be
 ## Test Environment Setup
 
 ### Test Users Created
-1. **User 1:** testuser1@finanpy.com / Test@1234
-2. **User 2:** testuser2@finanpy.com / Test@1234
+1. **User 1:** testuser1@Nebue.com / Test@1234
+2. **User 2:** testuser2@Nebue.com / Test@1234
 
 ### Server Status
 - Django development server running on http://127.0.0.1:8000
@@ -48,7 +48,7 @@ All core CRUD functionality for Accounts is working correctly. Data isolation be
 
 **Steps Executed:**
 1. Navigated to login page (http://127.0.0.1:8000/auth/login/)
-2. Filled email field: testuser1@finanpy.com
+2. Filled email field: testuser1@Nebue.com
 3. Filled password field: Test@1234
 4. Clicked "Entrar" button
 5. Verified redirect to dashboard
@@ -57,7 +57,7 @@ All core CRUD functionality for Accounts is working correctly. Data isolation be
 - ✅ Login page loads correctly
 - ✅ Form accepts email (not username)
 - ✅ Successful login redirects to dashboard
-- ✅ Dashboard displays user email: "Bem-vindo, testuser1@finanpy.com!"
+- ✅ Dashboard displays user email: "Bem-vindo, testuser1@Nebue.com!"
 - ✅ No JavaScript errors in console (excluding 404s for static resources)
 
 **Evidence:**
@@ -288,15 +288,15 @@ All core CRUD functionality for Accounts is working correctly. Data isolation be
 **Status:** ✅ PASSED
 
 **Steps Executed:**
-1. Logged out from User 1 (testuser1@finanpy.com)
-2. Logged in as User 2 (testuser2@finanpy.com)
+1. Logged out from User 1 (testuser1@Nebue.com)
+2. Logged in as User 2 (testuser2@Nebue.com)
 3. Navigated to accounts page
 4. Verified User 2 sees empty state
 5. Confirmed User 2 CANNOT see User 1's accounts
 
 **Results:**
 - ✅ User 2 login successful
-- ✅ Dashboard displays: "Bem-vindo, testuser2@finanpy.com!"
+- ✅ Dashboard displays: "Bem-vindo, testuser2@Nebue.com!"
 - ✅ Accounts page shows empty state for User 2
 - ✅ User 2 CANNOT see User 1's accounts (Conta Corrente BB Principal, Poupança Investimentos)
 - ✅ **CRITICAL SECURITY VERIFICATION: Data isolation working correctly**

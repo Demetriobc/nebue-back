@@ -2,11 +2,11 @@
 
 ## Overview
 
-The `base.html` template is the foundation for all pages in the Finanpy application. It implements the complete Finanpy Design System with TailwindCSS and provides a consistent, responsive layout.
+The `base.html` template is the foundation for all pages in the Nebue application. It implements the complete Nebue Design System with TailwindCSS and provides a consistent, responsive layout.
 
 ## File Location
 
-`/Users/azambuja/projects/finanpy/templates/base.html`
+`/Users/azambuja/projects/Nebue/templates/base.html`
 
 ## Features Implemented
 
@@ -26,7 +26,7 @@ The `base.html` template is the foundation for all pages in the Finanpy applicat
 - `{% tailwind_css %}` tag loads compiled Tailwind styles
 - Custom animation added to Tailwind config: `animate-slide-in-right`
 
-### 4. Finanpy Design System Colors
+### 4. Nebue Design System Colors
 
 #### Background Colors
 - Primary: `bg-slate-900` (#0f172a)
@@ -76,10 +76,10 @@ Fully styled messages with:
 #### Available Blocks for Extension
 
 ```django
-{% block title %}Finanpy - Gestão Financeira Pessoal{% endblock %}
+{% block title %}Nebue - Gestão Financeira Pessoal{% endblock %}
 ```
 - Override to customize page title
-- Default: "Finanpy - Gestão Financeira Pessoal"
+- Default: "Nebue - Gestão Financeira Pessoal"
 
 ```django
 {% block extra_css %}{% endblock %}
@@ -99,7 +99,7 @@ Fully styled messages with:
 {% block footer %}
 <footer class="bg-slate-800 border-t border-slate-700 py-6 mt-auto">
     <div class="container mx-auto px-4 text-center text-slate-400 text-sm">
-        <p>&copy; {% now 'Y' %} Finanpy. Todos os direitos reservados.</p>
+        <p>&copy; {% now 'Y' %} Nebue. Todos os direitos reservados.</p>
     </div>
 </footer>
 {% endblock %}
@@ -141,7 +141,7 @@ background: linear-gradient(135deg, #5568d3 0%, #65408a 100%);
 ```django
 {% extends 'base.html' %}
 
-{% block title %}My Page - Finanpy{% endblock %}
+{% block title %}My Page - Nebue{% endblock %}
 
 {% block content %}
 <div class="container mx-auto px-4 py-8">
@@ -158,7 +158,7 @@ background: linear-gradient(135deg, #5568d3 0%, #65408a 100%);
 ```django
 {% extends 'base.html' %}
 
-{% block title %}Custom Page - Finanpy{% endblock %}
+{% block title %}Custom Page - Nebue{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -178,7 +178,7 @@ background: linear-gradient(135deg, #5568d3 0%, #65408a 100%);
 ```django
 {% extends 'base.html' %}
 
-{% block title %}Interactive Page - Finanpy{% endblock %}
+{% block title %}Interactive Page - Nebue{% endblock %}
 
 {% block content %}
 <!-- Content -->
@@ -197,7 +197,7 @@ background: linear-gradient(135deg, #5568d3 0%, #65408a 100%);
 ```django
 {% extends 'base.html' %}
 
-{% block title %}No Footer - Finanpy{% endblock %}
+{% block title %}No Footer - Nebue{% endblock %}
 
 {% block content %}
 <!-- Content -->

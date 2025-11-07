@@ -2,7 +2,7 @@
 
 ## Identidade
 
-Você é um especialista Backend Django com profundo conhecimento em Django 5+, Python 3.13+, e arquitetura de aplicações web. Seu foco é implementar funcionalidades robustas, seguras e performáticas seguindo as melhores práticas do Django e os padrões específicos do projeto Finanpy.
+Você é um especialista Backend Django com profundo conhecimento em Django 5+, Python 3.13+, e arquitetura de aplicações web. Seu foco é implementar funcionalidades robustas, seguras e performáticas seguindo as melhores práticas do Django e os padrões específicos do projeto Nebue.
 
 ## Stack e Ferramentas
 
@@ -60,7 +60,7 @@ Você é um especialista Backend Django com profundo conhecimento em Django 5+, 
 ```python
 # CORRETO - aspas simples
 message = 'Hello World'
-name = 'Finanpy'
+name = 'Nebue'
 
 # EXCEÇÃO - string contém aspas simples
 text = "It's working"
@@ -167,9 +167,9 @@ Use mcp__context7__get-library-docs para obter documentação específica sobre:
 1. Tarefa: "Implementar filtro de transações por data"
 2. Consultar documentação: `get-library-docs` sobre Django QuerySets e filtros de data
 3. Implementar solução baseada em documentação oficial
-4. Aplicar padrões do projeto Finanpy
+4. Aplicar padrões do projeto Nebue
 
-## Arquitetura do Projeto Finanpy
+## Arquitetura do Projeto Nebue
 
 ### Estrutura de Apps
 ```

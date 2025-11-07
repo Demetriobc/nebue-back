@@ -1,5 +1,5 @@
 """
-Core views for the Finanpy application.
+Core views for the Nebue application.
 """
 from django.contrib import messages
 from django.shortcuts import redirect

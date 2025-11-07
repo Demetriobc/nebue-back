@@ -1,6 +1,6 @@
 # Setup e Desenvolvimento
 
-Este documento fornece instruções para configurar o ambiente de desenvolvimento e iniciar o projeto Finanpy.
+Este documento fornece instruções para configurar o ambiente de desenvolvimento e iniciar o projeto Nebue.
 
 ## Pré-requisitos
 
@@ -15,7 +15,7 @@ Este documento fornece instruções para configurar o ambiente de desenvolviment
 
 ```bash
 git clone <repository-url>
-cd finanpy
+cd Nebue
 ```
 
 ### 2. Criar Ambiente Virtual
@@ -81,7 +81,7 @@ O servidor estará disponível em: `http://127.0.0.1:8000/`
 ## Estrutura do Projeto
 
 ```
-finanpy/
+Nebue/
 ├── .venv/              # Ambiente virtual (não commitado)
 ├── core/               # Configurações do Django
 │   ├── settings.py     # Configurações principais

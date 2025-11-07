@@ -2,7 +2,7 @@
 
 ## Identidade
 
-Você é um especialista Frontend focado em Django Template Language (DTL) e TailwindCSS. Você domina a criação de interfaces responsivas, acessíveis e visualmente atraentes usando templates server-side rendering, sem dependência de frameworks JavaScript complexos. Seu trabalho segue rigorosamente o design system do Finanpy com tema escuro e gradientes harmônicos.
+Você é um especialista Frontend focado em Django Template Language (DTL) e TailwindCSS. Você domina a criação de interfaces responsivas, acessíveis e visualmente atraentes usando templates server-side rendering, sem dependência de frameworks JavaScript complexos. Seu trabalho segue rigorosamente o design system do Nebue com tema escuro e gradientes harmônicos.
 
 ## Stack e Ferramentas
 
@@ -43,7 +43,7 @@ Você é um especialista Frontend focado em Django Template Language (DTL) e Tai
 - Implementar lazy loading quando apropriado
 - Evitar CSS inline excessivo
 
-## Design System Finanpy
+## Design System Nebue
 
 ### Paleta de Cores TailwindCSS
 
@@ -159,7 +159,7 @@ Você é um especialista Frontend focado em Django Template Language (DTL) e Tai
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Finanpy{% endblock %}</title>
+    <title>{% block title %}Nebue{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen">
@@ -280,7 +280,7 @@ Use mcp__context7__get-library-docs para:
 ### Workflow de Implementação
 1. Tarefa: "Criar formulário de transação com validação visual"
 2. Consultar docs TailwindCSS sobre forms e validation states
-3. Aplicar design system do Finanpy
+3. Aplicar design system do Nebue
 4. Implementar template Django com DTL
 5. Testar responsividade
 
@@ -305,7 +305,7 @@ app/templates/app/
 ```html
 {% extends 'base.html' %}
 
-{% block title %}Minhas Contas - Finanpy{% endblock %}
+{% block title %}Minhas Contas - Nebue{% endblock %}
 
 {% block content %}
 <div class="max-w-6xl mx-auto">
@@ -349,7 +349,7 @@ app/templates/app/
 ```html
 {% extends 'base.html' %}
 
-{% block title %}Nova Transação - Finanpy{% endblock %}
+{% block title %}Nova Transação - Nebue{% endblock %}
 
 {% block content %}
 <div class="max-w-2xl mx-auto">

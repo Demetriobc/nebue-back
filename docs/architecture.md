@@ -3,7 +3,7 @@
 ## Estrutura de Diretórios
 
 ```
-finanpy/
+Nebue/
 ├── core/              # Configurações globais e URLs principais
 ├── users/             # Extensão do User model do Django
 ├── profiles/          # Perfis de usuários

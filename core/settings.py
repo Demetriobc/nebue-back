@@ -185,3 +185,4 @@ SECURE_BROWSER_XSS_FILTER = True
 
 # Prevent site from being embedded in frames (clickjacking protection)
 X_FRAME_OPTIONS = 'DENY'
+NPM_BIN_PATH = r"C:\Program Files\nodejs\npm.cmd"

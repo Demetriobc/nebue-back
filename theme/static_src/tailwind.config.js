@@ -1,8 +1,6 @@
 /**
- * This is a minimal config.
- *
- * If you need the full config, get it from here:
- * https://unpkg.com/browse/tailwindcss@latest/stubs/defaultConfig.stub.js
+ * Nebue - Tailwind Configuration
+ * Paleta de cores douradas para gestão financeira premium
  */
 
 module.exports = {
@@ -43,6 +41,54 @@ module.exports = {
     ],
     theme: {
         extend: {
+            // 🟡 CORES DOURADAS NEBUE
+            colors: {
+                // Cores Primárias (Dourado)
+                'primary': {
+                    50: '#FFFBF0',
+                    100: '#FFF5DC',
+                    200: '#FFEAB8',
+                    300: '#FFE094',
+                    400: '#F4E4BC',
+                    500: '#D4AF37',  // Dourado Principal
+                    600: '#B8941E',  // Dourado Escuro
+                    700: '#A67C00',  // Dourado Profundo
+                    800: '#8A6600',
+                    900: '#6E5200',
+                },
+                
+                // Cores de Accent (Dourado Claro)
+                'accent': {
+                    50: '#FFFEF9',
+                    100: '#FFFCF0',
+                    200: '#FFF9E0',
+                    300: '#FFF5D1',
+                    400: '#FFF0C2',
+                    500: '#F4E4BC',  // Dourado Claro
+                    600: '#E6C75A',  // Dourado Médio
+                    700: '#C5A028',
+                    800: '#A38320',
+                    900: '#826818',
+                },
+
+                // Fundos Escuros (manter)
+                'bg-primary': '#0f172a',
+                'bg-secondary': '#1e293b',
+                'bg-tertiary': '#334155',
+
+                // Textos (manter)
+                'text-primary': '#f1f5f9',
+                'text-secondary': '#cbd5e1',
+                'text-muted': '#64748b',
+
+                // Estados (manter)
+                'success': '#10b981',
+                'error': '#ef4444',
+                'warning': '#f59e0b',
+                'info': '#3b82f6',
+            },
+
+            // Animações
             keyframes: {
                 'slide-in-right': {
                     '0%': {

@@ -1,4 +1,4 @@
-# Finanpy Design System - Quick Reference
+# Nebue Design System - Quick Reference
 
 ## Color Palette
 
@@ -354,7 +354,7 @@ Icon sizes:
 ```django
 {% extends 'base.html' %}
 
-{% block title %}Page Title - Finanpy{% endblock %}
+{% block title %}Page Title - Nebue{% endblock %}
 
 {% block content %}
 <div class="container mx-auto px-4 py-8">
@@ -372,4 +372,4 @@ Icon sizes:
 
 ---
 
-**Note**: Always use these exact color classes and component patterns to maintain visual consistency across the Finanpy application.
+**Note**: Always use these exact color classes and component patterns to maintain visual consistency across the Nebue application.

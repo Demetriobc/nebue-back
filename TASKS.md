@@ -6,7 +6,7 @@
 **Descrição**: Preparar ambiente local para desenvolvimento do projeto
 
 **Subtarefas**:
-- [X] 0.1.1: Criar diretório do projeto `finanpy`
+- [X] 0.1.1: Criar diretório do projeto `Nebue`
 - [X] 0.1.2: Criar ambiente virtual Python: `python -m venv venv`
 - [X] 0.1.3: Ativar ambiente virtual
 - [X] 0.1.4: Criar arquivo `requirements.txt` com dependências iniciais:
@@ -244,7 +244,7 @@
 - [X] 1.9.2: Extender base.html
 - [X] 1.9.3: Adicionar título da página no block title
 - [X] 1.9.4: Criar container centralizado com max-width
-- [X] 1.9.5: Adicionar logo/nome Finanpy com gradiente
+- [X] 1.9.5: Adicionar logo/nome Nebue com gradiente
 - [X] 1.9.6: Criar card com bg-bg-secondary e border
 - [X] 1.9.7: Adicionar título "Criar Conta"
 - [X] 1.9.8: Criar formulário com method POST e csrf_token
@@ -279,7 +279,7 @@
 - [X] 1.11.2: Extender base.html
 - [X] 1.11.3: Adicionar título da página
 - [X] 1.11.4: Criar container centralizado
-- [X] 1.11.5: Adicionar logo/nome Finanpy com gradiente
+- [X] 1.11.5: Adicionar logo/nome Nebue com gradiente
 - [X] 1.11.6: Criar card de login estilizado
 - [X] 1.11.7: Adicionar título "Entrar"
 - [X] 1.11.8: Criar formulário de login
@@ -325,7 +325,7 @@
 - [X] 1.14.5: Criar arquivo `templates/home.html`
 - [X] 1.14.6: Extender base.html
 - [X] 1.14.7: Criar seção hero com gradiente
-- [X] 1.14.8: Adicionar logo e nome Finanpy
+- [X] 1.14.8: Adicionar logo e nome Nebue
 - [X] 1.14.9: Adicionar tagline/descrição do produto
 - [X] 1.14.10: Adicionar botões de Cadastrar e Entrar estilizados
 - [X] 1.14.11: Criar seção de features/funcionalidades
@@ -957,7 +957,7 @@
 **Subtarefas**:
 - [X] 5.3.1: Criar arquivo `templates/includes/navbar.html`
 - [X] 5.3.2: Criar estrutura de navbar com TailwindCSS
-- [X] 5.3.3: Adicionar logo/nome Finanpy à esquerda
+- [X] 5.3.3: Adicionar logo/nome Nebue à esquerda
 - [X] 5.3.4: Adicionar links de navegação no centro
 - [X] 5.3.5: Link para Dashboard
 - [X] 5.3.6: Link para Contas

@@ -1,6 +1,6 @@
-# Agentes de IA - Finanpy
+# Agentes de IA - Nebue
 
-Este diretório contém os agentes especializados de IA para o desenvolvimento do projeto Finanpy. Cada agente representa um papel específico em um time de desenvolvimento de software, com expertise na stack tecnológica do projeto e responsabilidades bem definidas.
+Este diretório contém os agentes especializados de IA para o desenvolvimento do projeto Nebue. Cada agente representa um papel específico em um time de desenvolvimento de software, com expertise na stack tecnológica do projeto e responsabilidades bem definidas.
 
 ## 📋 Índice de Agentes
 
@@ -116,7 +116,7 @@ Este diretório contém os agentes especializados de IA para o desenvolvimento d
 - Priorizar features e roadmap
 
 **Conhecimento**:
-- PRD completo do Finanpy
+- PRD completo do Nebue
 - Requisitos funcionais (RF001-RF041)
 - User journeys e personas
 - Objetivos de negócio e usuário
@@ -300,7 +300,7 @@ Todos os agentes devem seguir estes princípios:
 
 ### No Claude Code
 
-Quando trabalhar no projeto Finanpy, você pode assumir o papel de um agente específico:
+Quando trabalhar no projeto Nebue, você pode assumir o papel de um agente específico:
 
 ```
 Exemplo 1:
@@ -372,7 +372,7 @@ Muitas tarefas requerem múltiplos agentes trabalhando juntos:
 
 **Versão**: 1.0
 **Data**: Janeiro 2025
-**Projeto**: Finanpy
+**Projeto**: Nebue
 **Stack**: Python 3.13+ | Django 5+ | TailwindCSS 3+
 
 ---

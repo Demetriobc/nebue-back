@@ -43,8 +43,8 @@ Tanto `SignupView` quanto `LoginView` tentam redirecionar usuários autenticados
 
 ### Arquivos Afetados
 ```
-/Users/azambuja/projects/finanpy/users/views.py (linhas 21, 75)
-/Users/azambuja/projects/finanpy/core/urls.py (rota ausente)
+/Users/azambuja/projects/Nebue/users/views.py (linhas 21, 75)
+/Users/azambuja/projects/Nebue/core/urls.py (rota ausente)
 ```
 
 ### Código Problemático
@@ -146,7 +146,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 ```html
 {% extends 'base.html' %}
 
-{% block title %}Dashboard - Finanpy{% endblock %}
+{% block title %}Dashboard - Nebue{% endblock %}
 
 {% block content %}
 <div class="min-h-screen bg-bg-primary py-8">

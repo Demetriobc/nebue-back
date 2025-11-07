@@ -1,7 +1,7 @@
 # Query Optimization Summary - Task 6.5
 
 ## Overview
-This document summarizes the database query optimizations implemented in Task 6.5 to improve performance across the Finanpy application.
+This document summarizes the database query optimizations implemented in Task 6.5 to improve performance across the Nebue application.
 
 ## Performance Results
 
@@ -173,12 +173,12 @@ indexes = [
 ## Testing Methodology
 
 ### Test Script Created
-- **File:** `/Users/azambuja/projects/finanpy/test_query_optimization.py`
+- **File:** `/Users/azambuja/projects/Nebue/test_query_optimization.py`
 - **Purpose:** Measures query count before and after optimization
 - **Method:** Uses Django's `connection.queries` with `DEBUG=True`
 
 ### Test Data Created
-- **File:** `/Users/azambuja/projects/finanpy/create_test_data.py`
+- **File:** `/Users/azambuja/projects/Nebue/create_test_data.py`
 - **Data Created:**
   - 1 test user
   - 3 bank accounts
@@ -246,23 +246,23 @@ python test_query_optimization.py
 ## Files Modified
 
 ### Views
-- `/Users/azambuja/projects/finanpy/accounts/views.py` - Added select_related to all querysets
-- `/Users/azambuja/projects/finanpy/categories/views.py` - Added select_related to all querysets
-- `/Users/azambuja/projects/finanpy/transactions/views.py` - Enhanced context queries with select_related
-- `/Users/azambuja/projects/finanpy/profiles/views.py` - Added select_related to get_object methods
-- `/Users/azambuja/projects/finanpy/users/views.py` - Added select_related to dashboard queries
+- `/Users/azambuja/projects/Nebue/accounts/views.py` - Added select_related to all querysets
+- `/Users/azambuja/projects/Nebue/categories/views.py` - Added select_related to all querysets
+- `/Users/azambuja/projects/Nebue/transactions/views.py` - Enhanced context queries with select_related
+- `/Users/azambuja/projects/Nebue/profiles/views.py` - Added select_related to get_object methods
+- `/Users/azambuja/projects/Nebue/users/views.py` - Added select_related to dashboard queries
 
 ### Models
-- `/Users/azambuja/projects/finanpy/categories/models.py` - Added composite indexes
-- `/Users/azambuja/projects/finanpy/profiles/models.py` - Added user index
+- `/Users/azambuja/projects/Nebue/categories/models.py` - Added composite indexes
+- `/Users/azambuja/projects/Nebue/profiles/models.py` - Added user index
 
 ### Test Files
-- `/Users/azambuja/projects/finanpy/test_query_optimization.py` - New test script
-- `/Users/azambuja/projects/finanpy/create_test_data.py` - New data creation script
+- `/Users/azambuja/projects/Nebue/test_query_optimization.py` - New test script
+- `/Users/azambuja/projects/Nebue/create_test_data.py` - New data creation script
 
 ## Summary
 
-Task 6.5 successfully optimized database queries across the entire Finanpy application:
+Task 6.5 successfully optimized database queries across the entire Nebue application:
 
 1. **97.5% query reduction** in transaction list views (41 → 1 query)
 2. **95.2% query reduction** in dashboard (21 → 1 query)

@@ -1,6 +1,6 @@
 # Modelos de Dados
 
-Este documento descreve a estrutura dos models Django e os relacionamentos entre as entidades do Finanpy.
+Este documento descreve a estrutura dos models Django e os relacionamentos entre as entidades do Nebue.
 
 ## Diagrama de Relacionamentos
 

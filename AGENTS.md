@@ -1,7 +1,7 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-Finanpy follows a classic Django layout. `core/` hosts global settings, URLs, and ASGI/WSGI entry points. Domain logic lives in app directories (`users/`, `profiles/`, `accounts/`, `categories/`, `transactions/`), each expected to expose `models.py`, `views.py`, `forms.py`, and `tests/`. Shared templates reside in `templates/`, static assets in `static/`, and Tailwind sources under `theme/static_src/` (compiled output is written to `theme/static/css/dist/`). Consult `docs/` for architecture, data models, and coding standards, and use `agents/` when invoking role-specific automation guidelines.
+Nebue follows a classic Django layout. `core/` hosts global settings, URLs, and ASGI/WSGI entry points. Domain logic lives in app directories (`users/`, `profiles/`, `accounts/`, `categories/`, `transactions/`), each expected to expose `models.py`, `views.py`, `forms.py`, and `tests/`. Shared templates reside in `templates/`, static assets in `static/`, and Tailwind sources under `theme/static_src/` (compiled output is written to `theme/static/css/dist/`). Consult `docs/` for architecture, data models, and coding standards, and use `agents/` when invoking role-specific automation guidelines.
 
 ## Build, Test, and Development Commands
 - `python manage.py runserver` — Start the development server at `http://127.0.0.1:8000`.

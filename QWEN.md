@@ -1,8 +1,8 @@
-# Finanpy - Financial Management System
+# Nebue - Financial Management System
 
 ## Project Overview
 
-Finanpy is a personal finance management system built with Python and Django. It's designed to provide users with a simple, efficient, and accessible tool to organize their personal finances, track income and expenses, categorize transactions, and make more conscious financial decisions through clear visualizations. The application features a modern, dark-themed UI with TailwindCSS and follows a full-stack approach using Django Template Language.
+Nebue is a personal finance management system built with Python and Django. It's designed to provide users with a simple, efficient, and accessible tool to organize their personal finances, track income and expenses, categorize transactions, and make more conscious financial decisions through clear visualizations. The application features a modern, dark-themed UI with TailwindCSS and follows a full-stack approach using Django Template Language.
 
 ### Key Features
 - User authentication with email-based login
@@ -25,7 +25,7 @@ Finanpy is a personal finance management system built with Python and Django. It
 ## Project Structure
 
 ```
-finanpy/
+Nebue/
 ├── accounts/           # Bank account management module
 ├── agents/             # AI agent functionality
 ├── ai_summary_reports/ # AI-generated financial reports

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Finanpy is a personal finance management system built with Django 5+ and Python 3.13+. The system uses Django Template Language with TailwindCSS for the frontend, following a full-stack monolithic architecture focused on simplicity and avoiding over-engineering.
+Nebue is a personal finance management system built with Django 5+ and Python 3.13+. The system uses Django Template Language with TailwindCSS for the frontend, following a full-stack monolithic architecture focused on simplicity and avoiding over-engineering.
 
 **Core Functionality**: Users manage bank accounts, categorize transactions (income/expense), and view consolidated financial data through a dashboard.
 

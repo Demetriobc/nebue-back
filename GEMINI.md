@@ -1,6 +1,6 @@
 # Project Overview
 
-This is a personal finance application named **finanpy**. It is built with Django and styled with Tailwind CSS. The project is structured into several Django apps: `accounts`, `categories`, `profiles`, `transactions`, and `users`.
+This is a personal finance application named **Nebue**. It is built with Django and styled with Tailwind CSS. The project is structured into several Django apps: `accounts`, `categories`, `profiles`, `transactions`, and `users`.
 
 ## Main Technologies
 

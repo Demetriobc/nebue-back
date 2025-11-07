@@ -6,7 +6,7 @@ Data: 23 de Outubro de 2025
 
 ## Objetivo
 
-Criar template base com estrutura HTML e TailwindCSS seguindo o design system do Finanpy.
+Criar template base com estrutura HTML e TailwindCSS seguindo o design system do Nebue.
 
 ## Arquivos Criados
 
@@ -17,7 +17,7 @@ Template base completo com:
 - Google Fonts (Inter) configurado
 - Sistema de mensagens Django estilizado
 - Blocos para extensão (title, content, footer, extra_css, extra_js)
-- Cores do design system Finanpy
+- Cores do design system Nebue
 - Responsivo (mobile-first)
 - Acessível (WCAG AA)
 
@@ -74,7 +74,7 @@ Executado `npm run build` para compilar nova configuração
 
 ## Design System Implementado
 
-### Cores Finanpy
+### Cores Nebue
 
 #### Backgrounds
 - Primary: `bg-slate-900` (#0f172a) ✓
@@ -215,7 +215,7 @@ Conforme CLAUDE.md:
 - ✓ Django patterns: Template inheritance, blocks, load tags
 - ✓ Responsive: Mobile-first approach
 - ✓ Accessibility: Semantic HTML, proper labels
-- ✓ Design System: Cores exatas do Finanpy
+- ✓ Design System: Cores exatas do Nebue
 
 ## Referências
 
@@ -226,7 +226,7 @@ Conforme CLAUDE.md:
 ## Conclusão
 
 O template base está completamente implementado e testado, seguindo rigorosamente:
-1. Design system Finanpy
+1. Design system Nebue
 2. Padrões de código do CLAUDE.md
 3. Best practices do Django Template Language
 4. TailwindCSS utility-first approach

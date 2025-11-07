@@ -1,12 +1,12 @@
-# Product Requirements Document (PRD) - Finanpy
+# Product Requirements Document (PRD) - Nebue
 
 ## 1. Visão Geral
 
-O Finanpy é um sistema de gestão de finanças pessoais desenvolvido com Python e Django, focado em simplicidade e eficiência. O projeto adota uma abordagem full-stack utilizando Django Template Language com TailwindCSS para o frontend, proporcionando uma experiência moderna e responsiva sem over-engineering.
+O Nebue é um sistema de gestão de finanças pessoais desenvolvido com Python e Django, focado em simplicidade e eficiência. O projeto adota uma abordagem full-stack utilizando Django Template Language com TailwindCSS para o frontend, proporcionando uma experiência moderna e responsiva sem over-engineering.
 
 ## 2. Sobre o Produto
 
-O Finanpy é uma aplicação web que permite aos usuários gerenciar suas finanças pessoais de forma intuitiva e organizada. O sistema oferece controle de contas bancárias, categorização de transações, visualização de entradas e saídas, e um dashboard centralizado para análise financeira. Com design moderno em tema escuro e gradientes harmônicos, o produto equilibra funcionalidade e estética.
+O Nebue é uma aplicação web que permite aos usuários gerenciar suas finanças pessoais de forma intuitiva e organizada. O sistema oferece controle de contas bancárias, categorização de transações, visualização de entradas e saídas, e um dashboard centralizado para análise financeira. Com design moderno em tema escuro e gradientes harmônicos, o produto equilibra funcionalidade e estética.
 
 ## 3. Propósito
 
@@ -292,7 +292,7 @@ erDiagram
 ### 8.3 Estrutura de Apps Django
 
 ```
-finanpy/
+Nebue/
 ├── core/           # Configurações globais e URLs principais
 ├── users/          # Extensão do User model do Django
 ├── profiles/       # Perfis de usuários
@@ -487,7 +487,7 @@ font-bold: 700
         <div class="flex items-center justify-between h-16">
             <div class="flex items-center">
                 <span class="text-2xl font-bold bg-gradient-to-r from-primary-500 to-accent-500 bg-clip-text text-transparent">
-                    Finanpy
+                    Nebue
                 </span>
             </div>
             <div class="flex items-center space-x-4">
@@ -506,7 +506,7 @@ font-bold: 700
 <aside class="w-64 bg-bg-secondary h-screen fixed left-0 top-0 border-r border-bg-tertiary p-6">
     <div class="mb-8">
         <span class="text-2xl font-bold bg-gradient-to-r from-primary-500 to-accent-500 bg-clip-text text-transparent">
-            Finanpy
+            Nebue
         </span>
     </div>
     <nav class="space-y-2">
@@ -887,7 +887,7 @@ rounded-2xl: 1rem      /* 16px */
 **Para** decidir se quero me cadastrar
 
 **Critérios de Aceite:**
-- [ ] Página deve apresentar o Finanpy
+- [ ] Página deve apresentar o Nebue
 - [ ] Página deve listar principais funcionalidades
 - [ ] Página deve ter design atrativo e moderno
 - [ ] Deve haver botão de cadastro destacado
@@ -1103,7 +1103,7 @@ rounded-2xl: 1rem      /* 16px */
 
 ## Conclusão
 
-Este PRD fornece uma estrutura completa e detalhada para o desenvolvimento do Finanpy. As sprints estão organizadas de forma lógica, começando pela infraestrutura básica e autenticação, passando pelas funcionalidades core (contas, categorias, transações), e finalizando com dashboard, refinamentos e preparação para produção.
+Este PRD fornece uma estrutura completa e detalhada para o desenvolvimento do Nebue. As sprints estão organizadas de forma lógica, começando pela infraestrutura básica e autenticação, passando pelas funcionalidades core (contas, categorias, transações), e finalizando com dashboard, refinamentos e preparação para produção.
 
 Cada tarefa está quebrada em subtarefas específicas e granulares, facilitando o acompanhamento do progresso e a implementação incremental do sistema. A arquitetura proposta é simples, mantém as responsabilidades bem separadas, e segue as melhores práticas do Django.
 

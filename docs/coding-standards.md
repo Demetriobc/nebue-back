@@ -1,6 +1,6 @@
 # Padrões de Código
 
-Este documento define os guidelines e convenções de código do projeto Finanpy.
+Este documento define os guidelines e convenções de código do projeto Nebue.
 
 ## Princípios Gerais
 
@@ -280,7 +280,7 @@ accounts/
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Finanpy{% endblock %}</title>
+    <title>{% block title %}Nebue{% endblock %}</title>
 </head>
 <body>
     {% block content %}
