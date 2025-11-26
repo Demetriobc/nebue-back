@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if credit_card %}Editar{% else %}Novo{% endif %} Cartão - Nebue{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-credit-card"></i> {% if credit_card %}Editar{% else %}Novo{% endif %} Cartão de Crédito
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="account">Conta Vinculada: *</label>
+            <select name="account" id="account" class="form-control" required>
+                <option value="">Selecione uma conta</option>
+                {% for acc in accounts %}
+                <option value="{{ acc.id }}" 
+                        {% if credit_card and credit_card.account.id == acc.id %}selected{% endif %}>
+                    {{ acc.name }} - {{ acc.bank_name }}
+                </option>
+                {% endfor %}
+            </select>
+            <small style="color: var(--text-secondary);">
+                O cartão será vinculado a esta conta
+            </small>
+        </div>
+
+        <div class="form-group">
+            <label for="name">Nome do Cartão: *</label>
+            <input type="text" 
+                   name="name" 
+                   id="name" 
+                   class="form-control" 
+                   value="{% if credit_card %}{{ credit_card.name }}{% endif %}"
+                   placeholder="Ex: Nubank Gold"
+                   required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+                <label for="card_number">Últimos 4 dígitos: *</label>
+                <input type="text" 
+                       name="card_number" 
+                       id="card_number" 
+                       class="form-control" 
+                       value="{% if credit_card %}{{ credit_card.card_number }}{% endif %}"
+                       placeholder="1234"
+                       maxlength="4"
+                       pattern="[0-9]{4}"
+                       required>
+                <small style="color: var(--text-secondary);">
+                    Apenas os 4 últimos dígitos
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label for="card_brand">Bandeira: *</label>
+                <select name="card_brand" id="card_brand" class="form-control" required>
+                    {% for value, label in card_brands %}
+                    <option value="{{ value }}" 
+                            {% if credit_card and credit_card.card_brand == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="credit_limit">Limite de Crédito: *</label>
+            <input type="number" 
+                   name="credit_limit" 
+                   id="credit_limit" 
+                   class="form-control" 
+                   step="0.01" 
+                   min="0.01"
+                   value="{% if credit_card %}{{ credit_card.credit_limit }}{% endif %}"
+                   placeholder="Ex: 5000.00"
+                   required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+                <label for="closing_day">Dia de Fechamento: *</label>
+                <input type="number" 
+                       name="closing_day" 
+                       id="closing_day" 
+                       class="form-control" 
+                       min="1" 
+                       max="28"
+                       value="{% if credit_card %}{{ credit_card.closing_day }}{% endif %}"
+                       placeholder="Ex: 5"
+                       required>
+                <small style="color: var(--text-secondary);">
+                    Dia do mês (1 a 28)
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label for="due_day">Dia de Vencimento: *</label>
+                <input type="number" 
+                       name="due_day" 
+                       id="due_day" 
+                       class="form-control" 
+                       min="1" 
+                       max="28"
+                       value="{% if credit_card %}{{ credit_card.due_day }}{% endif %}"
+                       placeholder="Ex: 15"
+                       required>
+                <small style="color: var(--text-secondary);">
+                    Dia do mês (1 a 28)
+                </small>
+            </div>
+        </div>
+
+        {% if credit_card %}
+        <div class="form-group">
+            <label>
+                <input type="checkbox" name="is_active" 
+                       {% if credit_card.is_active %}checked{% endif %}>
+                Cartão ativo
+            </label>
+        </div>
+        {% endif %}
+
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Salvar
+            </button>
+            <a href="{% url 'creditcard_list' %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+// Validar apenas números nos últimos 4 dígitos
+document.getElementById('card_number').addEventListener('input', function(e) {
+    this.value = this.value.replace(/[^0-9]/g, '');
+});
+</script>
+{% endblock %}

@@ -98,6 +98,16 @@ class Transaction(models.Model):
         auto_now=True,
         verbose_name='Atualizado em'
     )
+    
+    credit_card = models.ForeignKey(
+    'accounts.CreditCard',
+    on_delete=models.SET_NULL,
+    related_name='transactions',
+    verbose_name='Cartão de Crédito',
+    null=True,
+    blank=True,
+    help_text='Vincule se a transação foi feita com cartão de crédito'
+    )
 
     class Meta:
         verbose_name = 'Transação'

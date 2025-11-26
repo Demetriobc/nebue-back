@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Excluir Cartão - Nebue{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-trash"></i> Confirmar Exclusão
+    </div>
+
+    <div class="alert alert-danger">
+        <i class="fas fa-exclamation-triangle"></i>
+        <strong>Atenção!</strong> Esta ação não pode ser desfeita. 
+        Todas as transações vinculadas a este cartão também serão afetadas.
+    </div>
+
+    <p>Tem certeza que deseja excluir este cartão de crédito?</p>
+
+    <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 8px; margin: 1.5rem 0;">
+        <h3 style="color: var(--gold-primary); margin-bottom: 1rem;">
+            <i class="fas fa-credit-card"></i> {{ credit_card.name }}
+        </h3>
+        <p><strong>Conta:</strong> {{ credit_card.account.name }} - {{ credit_card.account.bank_name }}</p>
+        <p><strong>Número:</strong> **** **** **** {{ credit_card.card_number }}</p>
+        <p><strong>Bandeira:</strong> {{ credit_card.get_card_brand_display }}</p>
+        <p><strong>Limite:</strong> R$ {{ credit_card.credit_limit|floatformat:2 }}</p>
+        <p><strong>Fatura Atual:</strong> R$ {{ credit_card.current_invoice|floatformat:2 }}</p>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div style="display: flex; gap: 1rem;">
+            <button type="submit" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Sim, Excluir
+            </button>
+            <a href="{% url 'creditcard_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

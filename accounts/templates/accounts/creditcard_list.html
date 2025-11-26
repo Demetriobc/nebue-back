@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+
+{% block title %}Cartões de Crédito - Nebue{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Header com Breadcrumb -->
+    <nav class="flex mb-6" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <li class="inline-flex items-center">
+                <a href="{% url 'dashboard' %}" class="text-slate-400 hover:text-purple-400 transition-colors">
+                    Dashboard
+                </a>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <svg class="w-6 h-6 text-slate-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span class="ml-1 text-slate-100 font-medium">Cartões de Crédito</span>
+                </div>
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Título e Botão -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-100 mb-2">Cartões de Crédito</h1>
+            <p class="text-slate-400">Gerencie seus cartões e faturas</p>
+        </div>
+        <a href="{% url 'accounts:creditcard_create' %}" 
+           class="mt-4 md:mt-0 inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-700 text-white font-medium rounded-lg hover:from-purple-600 hover:to-purple-800 transition-all shadow-lg">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Novo Cartão
+        </a>
+    </div>
+
+    <!-- Cards de Resumo -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <!-- Limite Total -->
+        <div class="bg-gradient-to-br from-blue-500/10 to-blue-600/10 border border-blue-500/20 rounded-lg p-6">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-slate-400 text-sm font-medium">Limite Total</span>
+                <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                </svg>
+            </div>
+            <p class="text-3xl font-bold text-blue-400">R$ {{ total_limit|floatformat:2 }}</p>
+        </div>
+
+        <!-- Fatura Atual -->
+        <div class="bg-gradient-to-br from-yellow-500/10 to-yellow-600/10 border border-yellow-500/20 rounded-lg p-6">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-slate-400 text-sm font-medium">Fatura Atual</span>
+                <svg class="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+            </div>
+            <p class="text-3xl font-bold text-yellow-400">R$ {{ total_invoice|floatformat:2 }}</p>
+        </div>
+
+        <!-- Limite Disponível -->
+        <div class="bg-gradient-to-br from-emerald-500/10 to-emerald-600/10 border border-emerald-500/20 rounded-lg p-6">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-slate-400 text-sm font-medium">Limite Disponível</span>
+                <svg class="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <p class="text-3xl font-bold text-emerald-400">R$ {{ total_available|floatformat:2 }}</p>
+        </div>
+    </div>
+
+    <!-- Lista de Cartões -->
+    {% if credit_cards %}
+        {% for card in credit_cards %}
+        <div class="bg-slate-800 border {% if card.is_active %}border-purple-500/30{% else %}border-slate-700{% endif %} rounded-lg p-6 mb-6 hover:border-purple-500/50 transition-all">
+            <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+                <!-- Informações do Cartão -->
+                <div class="flex-1">
+                    <div class="flex items-center mb-4">
+                        <svg class="w-8 h-8 text-purple-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                        </svg>
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-100">{{ card.name }}</h3>
+                            {% if not card.is_active %}
+                            <span class="inline-block mt-1 px-2 py-0.5 text-xs bg-red-500/20 text-red-400 rounded-full">
+                                Inativo
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2 text-sm">
+                        <p class="text-slate-400">
+                            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                            </svg>
+                            {{ card.account.name }} - {{ card.account.bank_name }}
+                        </p>
+                        <p class="text-slate-400">
+                            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                            </svg>
+                            {{ card.get_card_brand_display }} • •••• {{ card.card_number }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Ações -->
+                <div class="flex lg:flex-col gap-2">
+                    <a href="{% url 'accounts:creditcard_detail' card.pk %}" 
+                       class="flex-1 lg:flex-none inline-flex items-center justify-center px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-100 rounded-lg transition-colors text-sm">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                        </svg>
+                        Ver Fatura
+                    </a>
+                    <a href="{% url 'accounts:creditcard_edit' card.pk %}" 
+                       class="inline-flex items-center justify-center px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-100 rounded-lg transition-colors text-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                    </a>
+                    <a href="{% url 'accounts:creditcard_delete' card.pk %}" 
+                       class="inline-flex items-center justify-center px-4 py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg transition-colors text-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Grid de Informações -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mt-6 pt-6 border-t border-slate-700">
+                <div>
+                    <p class="text-xs text-slate-400 mb-1">Limite Total</p>
+                    <p class="text-lg font-semibold text-slate-100">R$ {{ card.credit_limit|floatformat:2 }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-400 mb-1">Fatura Atual</p>
+                    <p class="text-lg font-semibold text-yellow-400">R$ {{ card.current_invoice|floatformat:2 }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-400 mb-1">Disponível</p>
+                    <p class="text-lg font-semibold text-emerald-400">R$ {{ card.available_limit|floatformat:2 }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-400 mb-1">Fechamento</p>
+                    <p class="text-lg font-semibold text-slate-100">Dia {{ card.closing_day }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-400 mb-1">Vencimento</p>
+                    <p class="text-lg font-semibold text-slate-100">Dia {{ card.due_day }}</p>
+                </div>
+            </div>
+
+            <!-- Barra de Uso -->
+            {% if card.credit_limit > 0 %}
+            {% widthratio card.current_invoice card.credit_limit 100 as usage_percent %}
+            <div class="mt-4">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm text-slate-400">Uso do Limite</span>
+                    <span class="text-sm font-semibold text-purple-400">{{ usage_percent }}%</span>
+                </div>
+                <div class="w-full bg-slate-700 rounded-full h-2">
+                    <div class="h-2 rounded-full transition-all duration-300 
+                        {% if usage_percent >= 80 %}bg-red-500
+                        {% elif usage_percent >= 50 %}bg-yellow-500
+                        {% else %}bg-emerald-500{% endif %}"
+                        style="width: {{ usage_percent }}%">
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% else %}
+    <!-- Estado Vazio -->
+    <div class="bg-slate-800 border border-slate-700 rounded-lg p-12 text-center">
+        <svg class="w-16 h-16 text-slate-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+        </svg>
+        <h3 class="text-lg font-medium text-slate-300 mb-2">Nenhum cartão cadastrado</h3>
+        <p class="text-slate-400 mb-6">Adicione seu primeiro cartão de crédito para acompanhar suas faturas</p>
+        <a href="{% url 'accounts:creditcard_create' %}" 
+           class="inline-flex items-center px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Cadastrar Primeiro Cartão
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
