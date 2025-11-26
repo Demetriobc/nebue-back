@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Fatura {{ fatura.mes }}/{{ fatura.ano }} - Nebue{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6">
+    
+    <!-- Header -->
+    <div class="mb-8">
+        <a href="{% url 'cards:cartao_detail' fatura.cartao.id %}" 
+           class="text-gray-400 hover:text-purple-400 transition-colors mb-4 inline-block">
+            <i class="fas fa-arrow-left mr-2"></i>Voltar para {{ fatura.cartao.nome }}
+        </a>
+        <div class="flex justify-between items-start">
+            <div>
+                <h1 class="text-4xl font-bold text-white mb-2">
+                    Fatura {{ fatura.mes }}/{{ fatura.ano }}
+                </h1>
+                <p class="text-gray-400">{{ fatura.cartao.nome }} • {{ fatura.cartao.get_banco_display }}</p>
+            </div>
+            {% if fatura.status != 'paga' %}
+            <a href="{% url 'cards:fatura_pagar' fatura.id %}" 
+               class="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg font-semibold hover:from-green-600 hover:to-green-700 transition-all shadow-lg">
+                <i class="fas fa-money-bill-wave mr-2"></i>Pagar Fatura
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Resumo da Fatura -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <!-- Valor Total -->
+        <div class="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-gray-400 text-sm">Valor Total</span>
+                <i class="fas fa-file-invoice-dollar text-purple-400"></i>
+            </div>
+            <p class="text-2xl font-bold text-purple-400">R$ {{ fatura.valor_total|floatformat:2 }}</p>
+        </div>
+
+        <!-- Valor Pago -->
+        <div class="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-gray-400 text-sm">Valor Pago</span>
+                <i class="fas fa-check-circle text-green-400"></i>
+            </div>
+            <p class="text-2xl font-bold text-green-400">R$ {{ fatura.valor_pago|floatformat:2 }}</p>
+        </div>
+
+</div>
+{% endblock %} 

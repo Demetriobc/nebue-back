@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if editing %}Editar{% else %}Novo{% endif %} Cartão - Nebue{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6">
+    
+    <!-- Header -->
+    <div class="mb-8">
+        <a href="{% if editing %}{% url 'cards:cartao_detail' cartao.id %}{% else %}{% url 'cards:cartoes_list' %}{% endif %}" 
+           class="text-gray-400 hover:text-yellow-400 transition-colors mb-4 inline-block">
+            <i class="fas fa-arrow-left mr-2"></i>Voltar
+        </a>
+        <h1 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600">
+            {% if editing %}
+                <i class="fas fa-edit"></i> Editar Cartão
+            {% else %}
+                <i class="fas fa-plus"></i> Novo Cartão
+            {% endif %}
+        </h1>
+        <p class="text-gray-400 mt-2">
+            {% if editing %}
+                Atualize as informações do seu cartão
+            {% else %}
+                Adicione um novo cartão de crédito
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- Formulário -->
+    <div class="max-w-3xl mx-auto">
+        <form method="POST" class="bg-gray-800/50 backdrop-blur-sm rounded-xl p-8 border border-gray-700 space-y-6">
+            {% csrf_token %}
+
+            <!-- Nome do Cartão -->
+            <div>
+                <label class="block text-gray-300 font-semibold mb-2">
+                    <i class="fas fa-tag text-yellow-400 mr-2"></i>Nome do Cartão *
+                </label>
+                <input type="text" 
+                       name="nome" 
+                       value="{% if editing %}{{ cartao.nome }}{% endif %}"
+                       placeholder="Ex: Cartão Principal, Nubank Roxinho, etc."
+                       class="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 transition-all"
+                       required>
+            </div>
+
+            <!-- Banco e Bandeira -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Banco -->
+                <div>
+                    <label class="block text-gray-300 font-semibold mb-2">
+                        <i class="fas fa-university text-yellow-400 mr-2"></i>Banco *
+                    </label>
+                    <select name="banco" 
+                            class="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 transition-all"
+                            required>
+                        <option value="">Selecione o banco</option>
+                        {% for value, label in bancos %}
+                        <option value="{{ value }}" {% if editing and cartao.banco == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Bandeira -->
+                <div>
+                    <label class="block text-gray-300 font-semibold mb-2">
+                        <i class="fas fa-credit-card text-yellow-400 mr-2"></i>Bandeira *
+                    </label>
+                    <select name="bandeira" 
+                            class="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 transition-all"
+                            required>
+                        <option value="">Selecione a bandeira</option>
+                        {% for value, label in bandeiras %}
+                        <option value="{{ value }}" {% if editing and cartao.bandeira == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Últimos Dígitos e Limite -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Últimos Dígitos -->
+                <div>
+                    <label class="block text-gray-300 font-semibold mb-2">
+                        <i class="fas fa-hashtag text-yellow-400 mr-2"></i>Últimos 4 Dígitos *
+                    </label>
+                    <input type="text" 
+                           name="ultimos_digitos" 
+                           value="{% if editing %}{{ cartao.ultimos_digitos }}{% endif %}"
+                           placeholder="1234"
+                           maxlength="4"
+                           pattern="[0-9]{4}"
+                           class="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 transition-all"
+                           required>
+                    <p class="text-xs text-gray-500 mt-1">Apenas números</p>
+                </div>
+
+                <!-- Limite Total -->
+                <div>
+                    <label class="block text-gray-300 font-semibold mb-2">
+                        <i class="fas fa-dollar-sign text-yellow-400 mr-2"></i>Limite Total *
+                    </label>
+                    <input type="number" 
+                           name="limite_total" 
+                           value="{% if editing %}{{ cartao.limite_total }}{% endif %}"
+                           placeholder="0.00"
+                           step="0.01"
+                           min="0"
+                           class="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 transition-all"
+                           required>
+                    <p class="text-xs text-gray-500 mt-1">Limite aprovado pelo banco</p>
+                </div>
+            </div>
+
+            <!-- Dias de Fechamento e Vencimento -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Dia Fechamento -->
+                <div>
+                    <label class="block text-gray-300 font-semibold mb-2">
+                        <i class="fas fa-calendar-check text-yellow-400 mr-2"></i>Dia de Fechamento *
+                    </label>
+                    <input type="number" 
+                           name="dia_fechamento" 
+                           value="{% if editing %}{{ cartao.dia_fechamento }}{% endif %}"
+                           placeholder="10"
+                           min="1"
+                           max="31"
+                           class="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 transition-all"
+                           required>
+                    <p class="text-xs text-gray-500 mt-1">Dia do mês (1-31)</p>
+                </div>
+
+                <!-- Dia Vencimento -->
+                <div>
+                    <label class="block text-gray-300 font-semibold mb-2">
+                        <i class="fas fa-calendar-times text-yellow-400 mr-2"></i>Dia de Vencimento *
+                    </label>
+                    <input type="number" 
+                           name="dia_vencimento" 
+                           value="{% if editing %}{{ cartao.dia_vencimento }}{% endif %}"
+                           placeholder="20"
+                           min="1"
+                           max="31"
+                           class="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 transition-all"
+                           required>
+                    <p class="text-xs text-gray-500 mt-1">Dia do mês (1-31)</p>
+                </div>
+            </div>
+
+            <!-- Conta Vinculada (opcional) -->
+            <div>
+                <label class="block text-gray-300 font-semibold mb-2">
+                    <i class="fas fa-link text-yellow-400 mr-2"></i>Conta Vinculada (opcional)
+                </label>
+                <select name="conta" 
+                        class="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 transition-all">
+                    <option value="">Nenhuma conta vinculada</option>
+                    {% for conta in contas %}
+                    <option value="{{ conta.id }}" {% if editing and cartao.conta_id == conta.id %}selected{% endif %}>
+                       {{ conta.name }} {% if conta.bank %}({{ conta.bank }}){% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+                <p class="text-xs text-gray-500 mt-1">Vincule a uma conta para debitar pagamentos automaticamente</p>
+            </div>
+
+            <!-- Botões -->
+            <div class="flex gap-4 pt-4">
+                <button type="submit"
+                        class="flex-1 px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-gray-900 rounded-lg font-semibold hover:from-yellow-600 hover:to-yellow-700 transition-all shadow-lg hover:shadow-yellow-500/50">
+                    <i class="fas fa-save mr-2"></i>
+                    {% if editing %}Atualizar Cartão{% else %}Cadastrar Cartão{% endif %}
+                </button>
+                <a href="{% if editing %}{% url 'cards:cartao_detail' cartao.id %}{% else %}{% url 'cards:cartoes_list' %}{% endif %}"
+                   class="px-6 py-3 bg-gray-700 text-gray-300 rounded-lg font-semibold hover:bg-gray-600 transition-all text-center">
+                    <i class="fas fa-times mr-2"></i>Cancelar
+                </a>
+            </div>
+
+        </form>
+
+        <!-- Dica -->
+        <div class="mt-6 bg-blue-500/10 border border-blue-500/30 rounded-xl p-4">
+            <div class="flex items-start gap-3">
+                <i class="fas fa-info-circle text-blue-400 text-xl mt-1"></i>
+                <div>
+                    <h4 class="text-blue-300 font-semibold mb-1">Dica</h4>
+                    <p class="text-blue-200 text-sm">
+                        O dia de fechamento é quando as compras param de entrar na fatura atual. 
+                        O dia de vencimento é quando você deve pagar a fatura. Geralmente há 10 dias entre eles.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

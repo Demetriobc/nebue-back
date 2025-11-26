@@ -64,14 +64,14 @@
                 </a>
 
                 <!-- NOVO: Cartões -->
-                <a href="{% url 'accounts:creditcard_list' %}"
-                   class="px-4 py-2 rounded-lg font-medium transition-all
-                          {% if 'cartoes' in request.path %}
-                              bg-slate-700 text-purple-400
-                          {% else %}
-                              text-slate-300 hover:bg-slate-700 hover:text-slate-100
-                          {% endif %}">
-                    Cartões
+                <a href="{% url 'cards:cartoes_list' %}"
+                    class="px-4 py-2 rounded-lg font-medium transition-all
+                            {% if 'cartoes' in request.path %}
+                                bg-slate-700 text-purple-400
+                            {% else %}
+                                text-slate-300 hover:bg-slate-700 hover:text-slate-100
+                            {% endif %}">
+                        Cartões
                 </a>
             </div>
 
@@ -230,14 +230,14 @@
             </a>
 
             <!-- NOVO: Cartões (Mobile) -->
-            <a href="{% url 'accounts:creditcard_list' %}"
-               class="block px-4 py-3 rounded-lg font-medium transition-all
-                      {% if 'cartoes' in request.path %}
-                          bg-slate-700 text-purple-400
-                      {% else %}
-                          text-slate-300 hover:bg-slate-700 hover:text-slate-100
-                      {% endif %}">
-                Cartões
+            <a href="{% url 'cards:cartoes_list' %}"
+                class="block px-4 py-3 rounded-lg font-medium transition-all
+                        {% if 'cartoes' in request.path %}
+                            bg-slate-700 text-purple-400
+                        {% else %}
+                            text-slate-300 hover:bg-slate-700 hover:text-slate-100
+                        {% endif %}">
+                    Cartões
             </a>
 
             <!-- Profile Links -->
