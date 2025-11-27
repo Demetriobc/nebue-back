@@ -6,35 +6,52 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from .models import Cartao, Fatura, TransacaoCartao
 from accounts.models import Account 
+from datetime import date, datetime
+
 
 @login_required
 def cartoes_list(request):
-    """Lista todos os cartões do usuário"""
-    cartoes = Cartao.objects.filter(usuario=request.user, ativo=True)
+    cartoes = Cartao.objects.filter(usuario=request.user).order_by('-criado_em')
     
-    # Estatísticas gerais
-    total_limite = sum(c.limite_total for c in cartoes)
-    total_disponivel = sum(c.limite_disponivel for c in cartoes)
-    total_usado = total_limite - total_disponivel
+    # Calcular totais
+    total_limite = sum(cartao.limite_total for cartao in cartoes)
+    total_usado = sum(cartao.limite_usado for cartao in cartoes)
+    total_disponivel = sum(cartao.limite_disponivel for cartao in cartoes)
     
-    # Faturas em aberto
-    mes_atual = datetime.now().month
-    ano_atual = datetime.now().year
-    faturas_mes = Fatura.objects.filter(
+    # Pegar mês e ano atual
+    mes_atual = date.today().month
+    ano_atual = date.today().year
+    
+    # Calcular total das faturas do mês (soma de todas as transações do mês)
+    total_faturas = TransacaoCartao.objects.filter(
         cartao__usuario=request.user,
-        mes=mes_atual,
-        ano=ano_atual,
-        status__in=['aberta', 'fechada']
-    )
-    total_faturas = sum(f.valor_total for f in faturas_mes)
+        cartao__in=cartoes,
+        data__month=mes_atual,
+        data__year=ano_atual
+    ).aggregate(total=Sum('valor'))['total'] or 0
+    
+    # Calcular percentual usado
+    percentual_usado = (total_usado / total_limite * 100) if total_limite > 0 else 0
+    
+    # Adicionar valor da fatura atual para cada cartão
+    for cartao in cartoes:
+        # Calcula o valor das transações do mês para este cartão
+        fatura_mes = TransacaoCartao.objects.filter(
+            cartao=cartao,
+            data__month=mes_atual,
+            data__year=ano_atual
+        ).aggregate(total=Sum('valor'))['total'] or 0
+        
+        # Adiciona como atributo temporário (não sobrescreve a property)
+        cartao.valor_fatura_mes = fatura_mes
     
     context = {
         'cartoes': cartoes,
         'total_limite': total_limite,
-        'total_disponivel': total_disponivel,
         'total_usado': total_usado,
+        'total_disponivel': total_disponivel,
         'total_faturas': total_faturas,
-        'percentual_usado': (total_usado / total_limite * 100) if total_limite > 0 else 0,
+        'percentual_usado': percentual_usado,
     }
     
     return render(request, 'cartoes/cartoes_list.html', context)
@@ -247,17 +264,20 @@ def transacao_create(request, cartao_id):
 
 @login_required
 def fatura_detail(request, fatura_id):
-    """Mostra detalhes de uma fatura"""
     fatura = get_object_or_404(Fatura, id=fatura_id, cartao__usuario=request.user)
     transacoes = fatura.transacoes.all()
     
-    # Agrupa transações por categoria
+    # Agrupa transações por categoria e calcula totais
     por_categoria = {}
     for transacao in transacoes:
         categoria = transacao.get_categoria_display()
         if categoria not in por_categoria:
-            por_categoria[categoria] = []
-        por_categoria[categoria].append(transacao)
+            por_categoria[categoria] = {
+                'transacoes': [],
+                'total': 0
+            }
+        por_categoria[categoria]['transacoes'].append(transacao)
+        por_categoria[categoria]['total'] += transacao.valor
     
     context = {
         'fatura': fatura,
@@ -367,6 +387,8 @@ def obter_ou_criar_fatura(cartao, data_transacao):
 
 def criar_transacoes_parceladas(cartao, descricao, categoria, valor, data_inicial, parcelas):
     """Cria transações parceladas distribuídas nos meses seguintes"""
+    valor_parcela = valor / parcelas  # ← ADICIONA ESSA LINHA!
+    
     for i in range(parcelas):
         # Calcula a data da parcela
         mes = data_inicial.month + i
@@ -387,7 +409,7 @@ def criar_transacoes_parceladas(cartao, descricao, categoria, valor, data_inicia
             fatura=fatura,
             descricao=descricao,
             categoria=categoria,
-            valor=valor,
+            valor=valor_parcela,  # ← CORRETO! Usa o valor dividido
             data=data_parcela,
             parcelas=parcelas,
             parcela_atual=i + 1
@@ -440,3 +462,77 @@ def calcular_data_vencimento(cartao, mes, ano):
         mes = 1
         ano += 1
     return datetime(ano, mes, cartao.dia_vencimento).date()
+
+
+@login_required
+def transacao_edit(request, transacao_id):
+    """Edita uma transação existente"""
+    transacao = get_object_or_404(TransacaoCartao, id=transacao_id, cartao__usuario=request.user)
+    cartao = transacao.cartao
+    fatura = transacao.fatura
+    
+    if request.method == 'POST':
+        # Pega os dados do form
+        descricao = request.POST.get('descricao')
+        categoria = request.POST.get('categoria')
+        novo_valor = Decimal(request.POST.get('valor'))
+        data = request.POST.get('data')
+        
+        # Calcula a diferença de valor
+        valor_antigo = transacao.valor
+        diferenca = novo_valor - valor_antigo
+        
+        # Atualiza a transação
+        transacao.descricao = descricao
+        transacao.categoria = categoria
+        transacao.valor = novo_valor
+        transacao.data = data
+        transacao.save()
+        
+        # Atualiza o total da fatura
+        fatura.atualizar_total()
+        
+        # Atualiza o limite disponível do cartão
+        cartao.limite_disponivel -= diferenca
+        cartao.save()
+        
+        messages.success(request, 'Transação atualizada com sucesso!')
+        return redirect('cards:fatura_detail', fatura_id=fatura.id)
+    
+    # GET - mostra o form
+    context = {
+        'transacao': transacao,
+        'cartao': cartao,
+        'categorias': TransacaoCartao.CATEGORIAS,
+    }
+    return render(request, 'cartoes/transacao_edit.html', context)
+
+
+@login_required
+def transacao_delete(request, transacao_id):
+    """Deleta uma transação"""
+    transacao = get_object_or_404(TransacaoCartao, id=transacao_id, cartao__usuario=request.user)
+    cartao = transacao.cartao
+    fatura = transacao.fatura
+    fatura_id = fatura.id
+    
+    if request.method == 'POST':
+        # Devolve o limite pro cartão
+        cartao.limite_disponivel += transacao.valor
+        cartao.save()
+        
+        # Deleta a transação
+        transacao.delete()
+        
+        # Recalcula o total da fatura
+        fatura.atualizar_total()
+        
+        messages.success(request, 'Transação excluída com sucesso!')
+        return redirect('cards:fatura_detail', fatura_id=fatura_id)
+    
+    # GET - mostra confirmação
+    context = {
+        'transacao': transacao,
+        'fatura': fatura,
+    }
+    return render(request, 'cartoes/transacao_confirm_delete.html', context)

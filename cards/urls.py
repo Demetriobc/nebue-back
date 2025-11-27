@@ -13,6 +13,9 @@ urlpatterns = [
     
     # Transações
     path('<int:cartao_id>/transacao/nova/', views.transacao_create, name='transacao_create'),
+    path('transacao/<int:transacao_id>/editar/', views.transacao_edit, name='transacao_edit'), 
+    path('transacao/<int:transacao_id>/deletar/', views.transacao_delete, name='transacao_delete'),  
+    
     
     # Faturas
     path('fatura/<int:fatura_id>/', views.fatura_detail, name='fatura_detail'),

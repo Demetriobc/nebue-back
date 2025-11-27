@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Transação - {{ transacao.descricao }} - Nebue{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6">
+    
+    <!-- Header -->
+    <div class="mb-8">
+        <a href="{% url 'cards:fatura_detail' transacao.fatura.id %}" 
+           class="text-gray-400 hover:text-purple-400 transition-colors mb-4 inline-block">
+            <i class="fas fa-arrow-left mr-2"></i>Voltar para Fatura
+        </a>
+        <h1 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-purple-600">
+            <i class="fas fa-edit"></i> Editar Transação
+        </h1>
+        <p class="text-gray-400 mt-2">Edite os dados da transação abaixo</p>
+    </div>
+
+    <!-- Info do Cartão -->
+    <div class="max-w-3xl mx-auto mb-6">
+        <div class="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700 flex justify-between items-center">
+            <div>
+                <p class="text-gray-400 text-sm">Cartão</p>
+                <p class="text-xl font-bold text-white">{{ cartao.nome }}</p>
+            </div>
+            <div class="text-right">
+                <p class="text-gray-400 text-sm">Fatura</p>
+                <p class="text-white font-semibold">{{ transacao.fatura.mes }}/{{ transacao.fatura.ano }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulário -->
+    <div class="max-w-3xl mx-auto">
+        <form method="POST" class="bg-gray-800/50 backdrop-blur-sm rounded-xl p-8 border border-gray-700 space-y-6">
+            {% csrf_token %}
+
+            <!-- Alerta se for parcelada -->
+            {% if transacao.parcelas > 1 %}
+            <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
+                <div class="flex items-start gap-3">
+                    <i class="fas fa-exclamation-triangle text-yellow-400 text-xl mt-1"></i>
+                    <div>
+                        <p class="text-yellow-400 font-semibold mb-1">Atenção: Transação Parcelada</p>
+                        <p class="text-gray-300 text-sm">
+                            Esta é a parcela <strong>{{ transacao.parcela_atual }}/{{ transacao.parcelas }}</strong> de uma compra parcelada.
+                            Ao editar, você estará alterando apenas esta parcela, não todas.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Descrição -->
+            <div>
+                <label class="block text-gray-300 font-semibold mb-2">
+                    <i class="fas fa-tag text-purple-400 mr-2"></i>Descrição da Compra *
+                </label>
+                <input type="text" 
+                       name="descricao" 
+                       value="{{ transacao.descricao }}"
+                       placeholder="Ex: Supermercado, Restaurante, Amazon, etc."
+                       class="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                       required>
+            </div>
+
+            <!-- Categoria e Valor -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Categoria -->
+                <div>
+                    <label class="block text-gray-300 font-semibold mb-2">
+                        <i class="fas fa-folder text-purple-400 mr-2"></i>Categoria *
+                    </label>
+                    <select name="categoria" 
+                            class="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                            required>
+                        {% for value, label in categorias %}
+                        <option value="{{ value }}" {% if transacao.categoria == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Valor -->
+                <div>
+                    <label class="block text-gray-300 font-semibold mb-2">
+                        <i class="fas fa-dollar-sign text-purple-400 mr-2"></i>Valor *
+                    </label>
+                    <input type="number" 
+                           name="valor" 
+                           value="{{ transacao.valor }}"
+                           placeholder="0.00"
+                           step="0.01"
+                           min="0.01"
+                           class="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                           required>
+                    <p class="text-xs text-gray-400 mt-2">
+                        Valor original: R$ {{ transacao.valor|floatformat:2 }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Data -->
+            <div>
+                <label class="block text-gray-300 font-semibold mb-2">
+                    <i class="fas fa-calendar text-purple-400 mr-2"></i>Data da Compra *
+                </label>
+                <input type="date" 
+                       name="data" 
+                       value="{{ transacao.data|date:'Y-m-d' }}"
+                       class="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                       required>
+            </div>
+
+            <!-- Info de Parcelas (somente leitura) -->
+            {% if transacao.parcelas > 1 %}
+            <div class="bg-gray-900/30 rounded-lg p-4 border border-gray-700">
+                <p class="text-gray-400 text-sm mb-2">
+                    <i class="fas fa-info-circle text-blue-400 mr-2"></i>Informações de Parcelamento
+                </p>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <span class="text-gray-400">Parcela Atual:</span>
+                        <span class="text-white font-semibold ml-2">{{ transacao.parcela_atual }}/{{ transacao.parcelas }}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-400">Valor Total:</span>
+                        <span class="text-white font-semibold ml-2">R$ {{ transacao.valor_total_parcelado|floatformat:2 }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Botões -->
+            <div class="flex gap-4 pt-4">
+                <button type="submit"
+                        class="flex-1 px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg font-semibold hover:from-purple-600 hover:to-purple-700 transition-all shadow-lg hover:shadow-purple-500/50">
+                    <i class="fas fa-save mr-2"></i>Salvar Alterações
+                </button>
+                <a href="{% url 'cards:fatura_detail' transacao.fatura.id %}"
+                   class="px-6 py-3 bg-gray-700 text-gray-300 rounded-lg font-semibold hover:bg-gray-600 transition-all text-center">
+                    <i class="fas fa-times mr-2"></i>Cancelar
+                </a>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+{% endblock %}

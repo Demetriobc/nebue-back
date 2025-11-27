@@ -2,178 +2,521 @@
 
 {% block title %}Cartões - Nebue{% endblock %}
 
+{% block extra_css %}
+<style>
+    .cartoes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+        gap: 2rem;
+    }
+
+    .cartao-item {
+        background: linear-gradient(135deg, var(--dark-surface) 0%, #3a3a3a 100%);
+        border-radius: 20px;
+        padding: 2rem;
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        transition: all 0.3s;
+        position: relative;
+    }
+
+    .cartao-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+        border-color: rgba(212, 175, 55, 0.4);
+    }
+
+    .cartao-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+    }
+
+    .cartao-info {
+        flex: 1;
+    }
+
+    .cartao-nome {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .cartao-banco {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .cartao-numero {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 2px;
+    }
+
+    .cartao-bandeira {
+        width: 70px;
+        height: 70px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.95rem;
+        font-weight: bold;
+        color: white;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .bandeira-visa {
+        background: linear-gradient(135deg, #1A1F71 0%, #0066B2 100%);
+        font-size: 1.2rem;
+    }
+
+    .bandeira-mastercard {
+        background: linear-gradient(135deg, #EB001B 0%, #F79E1B 100%);
+        position: relative;
+    }
+
+    .mastercard-circles {
+        position: relative;
+        width: 40px;
+        height: 40px;
+    }
+
+    .mastercard-circles::before,
+    .mastercard-circles::after {
+        content: '';
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .mastercard-circles::before {
+        background: #EB001B;
+        left: 0;
+    }
+
+    .mastercard-circles::after {
+        background: #F79E1B;
+        right: 0;
+    }
+
+    .bandeira-elo {
+        background: linear-gradient(135deg, #000000 0%, #FFCB05 100%);
+    }
+
+    .bandeira-amex {
+        background: linear-gradient(135deg, #006FCF 0%, #00C3FF 100%);
+    }
+
+    .bandeira-hipercard {
+        background: linear-gradient(135deg, #C1272D 0%, #ED1C24 100%);
+    }
+
+    .bandeira-discover {
+        background: linear-gradient(135deg, #FF6000 0%, #FF9900 100%);
+    }
+
+    .bandeira-diners {
+        background: linear-gradient(135deg, #0079BE 0%, #00529F 100%);
+    }
+
+    .bandeira-default {
+        background: linear-gradient(135deg, #AB47BC 0%, #7B1FA2 100%);
+    }
+
+    .cartao-detalhes {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .detalhe-item {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 1rem;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .detalhe-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+    }
+
+    .detalhe-label i {
+        font-size: 1rem;
+    }
+
+    .detalhe-valor {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .detalhe-item.limite-total .detalhe-valor {
+        color: #64B5F6;
+    }
+
+    .detalhe-item.disponivel .detalhe-valor {
+        color: #66BB6A;
+    }
+
+    .uso-cartao {
+        margin-bottom: 1rem;
+    }
+
+    .uso-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .uso-label {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+
+    .uso-valor {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--gold-primary);
+    }
+
+    .progress-mini {
+        width: 100%;
+        height: 8px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .progress-mini-fill {
+        height: 100%;
+        border-radius: 10px;
+        transition: width 0.5s ease;
+    }
+
+    .progress-mini-fill.baixo {
+        background: linear-gradient(90deg, #66BB6A 0%, #81C784 100%);
+    }
+
+    .progress-mini-fill.medio {
+        background: linear-gradient(90deg, #FFA726 0%, #FFB74D 100%);
+    }
+
+    .progress-mini-fill.alto {
+        background: linear-gradient(90deg, #EF5350 0%, #E57373 100%);
+    }
+
+    .cartao-acoes {
+        display: flex;
+        gap: 0.75rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .btn-acao {
+        flex: 1;
+        padding: 0.75rem;
+        border-radius: 8px;
+        text-decoration: none;
+        text-align: center;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-visualizar {
+        background: rgba(212, 175, 55, 0.1);
+        color: var(--gold-primary);
+        border: 1px solid rgba(212, 175, 55, 0.3);
+    }
+
+    .btn-visualizar:hover {
+        background: rgba(212, 175, 55, 0.2);
+        border-color: var(--gold-primary);
+    }
+
+    .btn-editar {
+        background: rgba(100, 181, 246, 0.1);
+        color: #64B5F6;
+        border: 1px solid rgba(100, 181, 246, 0.3);
+    }
+
+    .btn-editar:hover {
+        background: rgba(100, 181, 246, 0.2);
+        border-color: #64B5F6;
+    }
+
+    .btn-excluir {
+        background: rgba(239, 83, 80, 0.1);
+        color: #EF5350;
+        border: 1px solid rgba(239, 83, 80, 0.3);
+    }
+
+    .btn-excluir:hover {
+        background: rgba(239, 83, 80, 0.2);
+        border-color: #EF5350;
+    }
+
+    @media (max-width: 1200px) {
+        .cartoes-grid {
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        }
+    }
+
+    @media (max-width: 768px) {
+        .cartoes-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .cartao-detalhes {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6">
-    <!-- Header -->
-    <div class="mb-8">
-        <div class="flex justify-between items-center">
-            <div>
-                <h1 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-purple-600">
-                    💳 Cartões
-                </h1>
-                <p class="text-gray-400 mt-2">Gerencie seus cartões de crédito</p>
-            </div>
-            <a href="{% url 'cards:cartao_create' %}" 
-               class="px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg font-semibold hover:from-purple-600 hover:to-purple-700 transition-all shadow-lg hover:shadow-purple-500/50">
-                <i class="fas fa-plus mr-2"></i>Novo Cartão
-            </a>
+<div class="container mx-auto px-4 py-8">
+    <!-- Header com Breadcrumb -->
+    <nav class="flex mb-6" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <li class="inline-flex items-center">
+                <a href="{% url 'dashboard' %}" class="text-slate-400 hover:text-purple-400 transition-colors">
+                    Dashboard
+                </a>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <svg class="w-6 h-6 text-slate-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span class="ml-1 text-slate-100 font-medium">Cartões</span>
+                </div>
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Título e Botão -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-100 mb-2">Cartões</h1>
+            <p class="text-slate-400">Gerencie seus cartões de crédito</p>
         </div>
+        <a href="{% url 'cards:cartao_create' %}" 
+           class="mt-4 md:mt-0 inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-700 text-white font-medium rounded-lg hover:from-purple-600 hover:to-purple-800 transition-all shadow-lg">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Novo Cartão
+        </a>
     </div>
 
-    <!-- Cards de Estatísticas -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <!-- Cards de Resumo -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <!-- Limite Total -->
-        <div class="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700 hover:border-purple-500/50 transition-all">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-400 text-sm mb-1">Limite Total</p>
-                    <h3 class="text-2xl font-bold text-white">R$ {{ total_limite|floatformat:2 }}</h3>
-                </div>
-                <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-wallet text-blue-400 text-xl"></i>
-                </div>
+        <div class="bg-gradient-to-br from-purple-500/10 to-purple-600/10 border border-purple-500/20 rounded-lg p-6">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-slate-400 text-sm font-medium">Limite Total</span>
+                <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
             </div>
+            <p class="text-3xl font-bold text-purple-400">R$ {{ total_limite|floatformat:2 }}</p>
         </div>
 
         <!-- Limite Usado -->
-        <div class="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700 hover:border-red-500/50 transition-all">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-400 text-sm mb-1">Limite Usado</p>
-                    <h3 class="text-2xl font-bold text-red-400">R$ {{ total_usado|floatformat:2 }}</h3>
-                </div>
-                <div class="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-shopping-bag text-red-400 text-xl"></i>
-                </div>
+        <div class="bg-gradient-to-br from-red-500/10 to-red-600/10 border border-red-500/20 rounded-lg p-6">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-slate-400 text-sm font-medium">Limite Usado</span>
+                <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                </svg>
             </div>
+            <p class="text-3xl font-bold text-red-400">R$ {{ total_usado|floatformat:2 }}</p>
         </div>
 
-        <!-- Limite Disponível -->
-        <div class="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700 hover:border-green-500/50 transition-all">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-400 text-sm mb-1">Disponível</p>
-                    <h3 class="text-2xl font-bold text-green-400">R$ {{ total_disponivel|floatformat:2 }}</h3>
-                </div>
-                <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-check-circle text-green-400 text-xl"></i>
-                </div>
+        <!-- Disponível -->
+        <div class="bg-gradient-to-br from-emerald-500/10 to-emerald-600/10 border border-emerald-500/20 rounded-lg p-6">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-slate-400 text-sm font-medium">Disponível</span>
+                <svg class="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
             </div>
+            <p class="text-3xl font-bold text-emerald-400">R$ {{ total_disponivel|floatformat:2 }}</p>
         </div>
 
         <!-- Fatura do Mês -->
-        <div class="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700 hover:border-purple-500/50 transition-all">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-400 text-sm mb-1">Fatura do Mês</p>
-                    <h3 class="text-2xl font-bold text-purple-400">R$ {{ total_faturas|floatformat:2 }}</h3>
-                </div>
-                <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-file-invoice-dollar text-purple-400 text-xl"></i>
-                </div>
+        <div class="bg-gradient-to-br from-blue-500/10 to-blue-600/10 border border-blue-500/20 rounded-lg p-6">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-slate-400 text-sm font-medium">Fatura do Mês</span>
+                <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                </svg>
             </div>
+            <p class="text-3xl font-bold text-blue-400">R$ {{ total_faturas|floatformat:2 }}</p>
         </div>
     </div>
 
     <!-- Barra de Uso Total -->
-    <div class="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700 mb-8">
+    <div class="bg-slate-800 border border-slate-700 rounded-lg p-6 mb-6">
         <div class="flex justify-between items-center mb-3">
-            <span class="text-gray-300 font-medium">Uso Total dos Cartões</span>
+            <span class="text-slate-300 font-medium">Uso Total dos Cartões</span>
             <span class="text-purple-400 font-bold">{{ percentual_usado|floatformat:1 }}%</span>
         </div>
-        <div class="w-full bg-gray-700 rounded-full h-4 overflow-hidden">
+        <div class="w-full bg-slate-700 rounded-full h-4 overflow-hidden">
             <div class="h-full bg-gradient-to-r from-purple-500 to-purple-600 transition-all duration-500 rounded-full"
-                 style="width: {{ percentual_usado }}%">
-            </div>
+                 style="width: {{ percentual_usado }}%"></div>
         </div>
     </div>
 
-    <!-- Lista de Cartões -->
+    <!-- Lista de Cartões (versão antiga mais profissional) -->
     {% if cartoes %}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="cartoes-grid">
         {% for cartao in cartoes %}
-        <a href="{% url 'cards:cartao_detail' cartao.id %}" 
-           class="block bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border border-gray-700 hover:border-purple-500/50 transition-all hover:scale-105 shadow-lg">
-            
-            <!-- Cabeçalho do Card -->
-            <div class="flex justify-between items-start mb-4">
-                <div class="flex-1">
-                    <div class="flex items-center gap-3 mb-2">
-                        <div class="w-12 h-12 rounded-lg flex items-center justify-center text-2xl"
-                             style="background: {{ cartao.get_cor_banco }}20; color: {{ cartao.get_cor_banco }}">
-                            <i class="fas fa-credit-card"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-bold text-white">{{ cartao.nome }}</h3>
-                            <p class="text-gray-400 text-sm">{{ cartao.get_banco_display }}</p>
-                        </div>
+        <div class="cartao-item">
+            <!-- Cabeçalho do Cartão -->
+            <div class="cartao-header">
+                <div class="cartao-info">
+                    <h3 class="cartao-nome">{{ cartao.nome }}</h3>
+                    <div class="cartao-banco">
+                        <i class="fas fa-university"></i>
+                        {{ cartao.get_banco_display }}
+                    </div>
+                    <div class="cartao-numero">
+                        •••• •••• •••• {{ cartao.ultimos_digitos }}
                     </div>
                 </div>
-                <span class="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-xs font-semibold">
-                    {{ cartao.get_bandeira_display }}
-                </span>
+
+                <!-- Bandeira do Cartão com Logo -->
+                <div class="cartao-bandeira bandeira-{{ cartao.bandeira|lower }}">
+                    {% if cartao.bandeira == 'visa' %}
+                        VISA
+                    {% elif cartao.bandeira == 'mastercard' %}
+                        <div class="mastercard-circles"></div>
+                    {% elif cartao.bandeira == 'elo' %}
+                        ELO
+                    {% elif cartao.bandeira == 'amex' or cartao.bandeira == 'american_express' %}
+                        AMEX
+                    {% elif cartao.bandeira == 'hipercard' %}
+                        HIPER
+                    {% elif cartao.bandeira == 'discover' %}
+                        DISC
+                    {% elif cartao.bandeira == 'diners' %}
+                        DINERS
+                    {% else %}
+                        <i class="fas fa-credit-card" style="font-size: 1.8rem;"></i>
+                    {% endif %}
+                </div>
             </div>
 
-            <!-- Número do Cartão -->
-            <div class="mb-4">
-                <p class="text-gray-500 text-sm font-mono">
-                    •••• •••• •••• {{ cartao.ultimos_digitos }}
-                </p>
-            </div>
-
-            <!-- Informações de Limite -->
-            <div class="space-y-3 mb-4">
-                <div class="flex justify-between items-center">
-                    <span class="text-gray-400 text-sm">Limite Total</span>
-                    <span class="text-white font-semibold">R$ {{ cartao.limite_total|floatformat:2 }}</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-gray-400 text-sm">Disponível</span>
-                    <span class="text-green-400 font-semibold">R$ {{ cartao.limite_disponivel|floatformat:2 }}</span>
-                </div>
-            </div>
-
-            <!-- Barra de Progresso -->
-            <div class="mb-4">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-xs text-gray-400">Uso do Limite</span>
-                    <span class="text-xs font-bold text-purple-400">
-                        {{ cartao.percentual_usado|floatformat:1 }}%
-                    </span>
-                </div>
-                <div class="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
-                    <div class="h-full bg-gradient-to-r from-purple-500 to-purple-600 transition-all duration-500 rounded-full"
-                         style="width: {{ cartao.percentual_usado }}%">
+            <!-- Detalhes do Cartão -->
+            <div class="cartao-detalhes">
+                <div class="detalhe-item limite-total">
+                    <div class="detalhe-label">
+                        <i class="fas fa-wallet"></i>
+                        Limite Total
                     </div>
+                    <div class="detalhe-valor">R$ {{ cartao.limite_total|floatformat:2 }}</div>
+                </div>
+
+                <div class="detalhe-item disponivel">
+                    <div class="detalhe-label">
+                        <i class="fas fa-check-circle"></i>
+                        Disponível
+                    </div>
+                    <div class="detalhe-valor">R$ {{ cartao.limite_disponivel|floatformat:2 }}</div>
                 </div>
             </div>
 
-            <!-- Datas -->
-            <div class="flex justify-between items-center pt-4 border-t border-gray-700">
-                <div class="text-center">
-                    <p class="text-xs text-gray-400">Fechamento</p>
-                    <p class="text-sm font-semibold text-gray-300">Dia {{ cartao.dia_fechamento }}</p>
+            <!-- Barra de Uso Individual -->
+            <div class="uso-cartao">
+                <div class="uso-info">
+                    <span class="uso-label">Uso do Limite</span>
+                    <span class="uso-valor">{{ cartao.percentual_usado|floatformat:1 }}%</span>
                 </div>
-                <div class="text-center">
-                    <p class="text-xs text-gray-400">Vencimento</p>
-                    <p class="text-sm font-semibold text-gray-300">Dia {{ cartao.dia_vencimento }}</p>
+                <div class="progress-mini">
+                    {% if cartao.percentual_usado < 50 %}
+                        <div class="progress-mini-fill baixo" style="width: {{ cartao.percentual_usado }}%"></div>
+                    {% elif cartao.percentual_usado < 80 %}
+                        <div class="progress-mini-fill medio" style="width: {{ cartao.percentual_usado }}%"></div>
+                    {% else %}
+                        <div class="progress-mini-fill alto" style="width: {{ cartao.percentual_usado }}%"></div>
+                    {% endif %}
                 </div>
             </div>
 
-        </a>
+            <!-- Informações Adicionais -->
+            <div class="flex justify-between mb-4">
+                <div>
+                    <div class="text-xs text-slate-400">Fechamento</div>
+                    <div class="font-semibold text-slate-100">Dia {{ cartao.dia_fechamento }}</div>
+                </div>
+                <div>
+                    <div class="text-xs text-slate-400">Vencimento</div>
+                    <div class="font-semibold text-slate-100">Dia {{ cartao.dia_vencimento }}</div>
+                </div>
+                <div>
+                    <div class="text-xs text-slate-400">Fatura Atual</div>
+                    <div class="font-semibold text-purple-400">R$ {{ cartao.valor_fatura_mes|floatformat:2 }}</div>
+                </div>
+            </div>
+
+            <!-- Ações do Cartão -->
+            <div class="cartao-acoes">
+                <a href="{% url 'cards:cartao_detail' cartao.id %}" class="btn-acao btn-visualizar">
+                    <i class="fas fa-eye"></i>
+                    Ver
+                </a>
+                <a href="{% url 'cards:cartao_edit' cartao.id %}" class="btn-acao btn-editar">
+                    <i class="fas fa-edit"></i>
+                    Editar
+                </a>
+                <a href="{% url 'cards:cartao_delete' cartao.id %}" class="btn-acao btn-excluir"
+                   onclick="return confirm('Tem certeza que deseja excluir este cartão?');">
+                    <i class="fas fa-trash"></i>
+                    Excluir
+                </a>
+            </div>
+        </div>
         {% endfor %}
     </div>
     {% else %}
-    <!-- Mensagem quando não há cartões -->
-    <div class="bg-gray-800/50 backdrop-blur-sm rounded-xl p-12 border border-gray-700 text-center">
-        <div class="w-24 h-24 bg-gray-700/50 rounded-full flex items-center justify-center mx-auto mb-6">
-            <i class="fas fa-credit-card text-gray-500 text-4xl"></i>
-        </div>
-        <h3 class="text-2xl font-bold text-gray-300 mb-2">Nenhum cartão cadastrado</h3>
-        <p class="text-gray-400 mb-6">Cadastre seu primeiro cartão para começar!</p>
+    <!-- Estado Vazio (do layout novo) -->
+    <div class="bg-slate-800 border border-slate-700 rounded-lg p-12 text-center">
+        <svg class="w-16 h-16 text-slate-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+        </svg>
+        <h3 class="text-lg font-medium text-slate-300 mb-2">Nenhum cartão cadastrado</h3>
+        <p class="text-slate-400 mb-6">Cadastre seu primeiro cartão para começar!</p>
         <a href="{% url 'cards:cartao_create' %}" 
-           class="inline-block px-8 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg font-semibold hover:from-purple-600 hover:to-purple-700 transition-all shadow-lg">
-            <i class="fas fa-plus mr-2"></i>Cadastrar Primeiro Cartão
+           class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-700 text-white font-medium rounded-lg hover:from-purple-600 hover:to-purple-800 transition-all shadow-lg">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Cadastrar Primeiro Cartão
         </a>
     </div>
     {% endif %}

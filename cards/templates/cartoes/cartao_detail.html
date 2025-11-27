@@ -218,22 +218,22 @@
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             {% for fatura in faturas %}
-            <a href="{% url 'cards:fatura_detail' fatura.id %}" 
-               class="block p-4 bg-gray-900/50 rounded-lg border border-gray-700 hover:border-yellow-500/50 transition-all">
-                <div class="flex justify-between items-start mb-3">
-                    <span class="text-white font-bold">{{ fatura.mes }}/{{ fatura.ano }}</span>
-                    <span class="px-2 py-1 rounded-full text-xs font-semibold
-                                {% if fatura.status == 'paga' %}bg-green-500/20 text-green-400
-                                {% elif fatura.status == 'atrasada' %}bg-red-500/20 text-red-400
-                                {% elif fatura.status == 'fechada' %}bg-yellow-500/20 text-yellow-400
-                                {% else %}bg-blue-500/20 text-blue-400{% endif %}">
-                        {{ fatura.get_status_display }}
-                    </span>
-                </div>
-                <p class="text-2xl font-bold text-yellow-400 mb-2">R$ {{ fatura.valor_total|floatformat:2 }}</p>
-                <p class="text-gray-400 text-sm">Vence: {{ fatura.data_vencimento|date:"d/m/Y" }}</p>
-            </a>
-            {% endfor %}
+                <a href="{% url 'cards:fatura_detail' fatura.id %}" 
+                class="block p-4 bg-gray-900/50 rounded-lg border border-gray-700 hover:border-purple-500/50 transition-all hover:scale-105 cursor-pointer">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-white font-bold">{{ fatura.mes }}/{{ fatura.ano }}</span>
+                        <span class="px-2 py-1 rounded-full text-xs font-semibold
+                                    {% if fatura.status == 'paga' %}bg-green-500/20 text-green-400
+                                    {% elif fatura.status == 'atrasada' %}bg-red-500/20 text-red-400
+                                    {% elif fatura.status == 'fechada' %}bg-purple-500/20 text-purple-400
+                                    {% else %}bg-blue-500/20 text-blue-400{% endif %}">
+                            {{ fatura.get_status_display }}
+                        </span>
+                    </div>
+                    <p class="text-2xl font-bold text-purple-400 mb-2">R$ {{ fatura.valor_total|floatformat:2 }}</p>
+                    <p class="text-gray-400 text-sm">Vence: {{ fatura.data_vencimento|date:"d/m/Y" }}</p>
+                </a>
+                {% endfor %}
         </div>
     </div>
     {% endif %}
