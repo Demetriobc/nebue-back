@@ -31,6 +31,7 @@ urlpatterns = [
     path('categories/', include('categories.urls', namespace='categories')),
     path('transactions/', include('transactions.urls', namespace='transactions')),
     path('cartoes/', include('cards.urls', namespace='cards')),  # ← ADICIONA ESSA LINHA!
+    path('notifications/', include('notifications.urls')),
 ]
 
 handler404 = core_views.page_not_found_view

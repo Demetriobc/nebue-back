@@ -10,7 +10,7 @@
 
     <title>{% block title %}Nebue{% endblock %} | Nebue</title>
 
-    <!-- Google Fonts - Inter gdwqeqwewfsfsag-->
+    <!-- Google Fonts - Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -21,10 +21,22 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
+    <!-- Alpine.js for Interactive Components -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
     <!-- Custom Styles -->
     <style>
-            body {
+        body {
             font-family: 'Inter', sans-serif;
+        }
+        
+        [x-cloak] {
+        display: none !important;
+        }
+
+        /* 🟡 GRADIENTE DOURADO NEBUE */
+        .gradient-primary {
+            background: linear-gradient(135deg, #D4AF37 0%, #F4E4BC 100%);
         }
 
         /* 🟡 GRADIENTE DOURADO NEBUE */
