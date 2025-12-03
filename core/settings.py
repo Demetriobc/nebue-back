@@ -52,6 +52,8 @@ INSTALLED_APPS = [
     'users',
     'cards',
     'notifications',
+    'analytics',
+    'chatbot',
 ]
 
 MIDDLEWARE = [
@@ -140,7 +142,7 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 
 # Tailwind CSS configuration
 TAILWIND_APP_NAME = 'theme'
-NPM_BIN_PATH = '/opt/homebrew/bin/npm'
+NPM_BIN_PATH = r"C:\Program Files\nodejs\npm.cmd"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -187,4 +189,10 @@ SECURE_BROWSER_XSS_FILTER = True
 
 # Prevent site from being embedded in frames (clickjacking protection)
 X_FRAME_OPTIONS = 'DENY'
-NPM_BIN_PATH = r"C:\Program Files\nodejs\npm.cmd"
+
+# ============================================================================
+# AI/Chatbot Configuration
+# ============================================================================
+# Groq API Key for AI-powered financial assistant
+# Get your free API key at: https://console.groq.com/keys
+GROQ_API_KEY = config('GROQ_API_KEY', default='')

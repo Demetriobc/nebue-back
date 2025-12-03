@@ -79,6 +79,28 @@
         .message-toast.fade-out {
             animation: slideOutRight 0.3s ease-in-out forwards;
         }
+
+        /* Chat Button Pulse Animation */
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        .chat-button-pulse::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgb(168, 85, 247) 0%, rgb(147, 51, 234) 100%);
+            animation: pulse-ring 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
     </style>
 
     {% block extra_css %}{% endblock %}
@@ -164,6 +186,33 @@
         </div>
     </footer>
     {% endblock %}
+
+    <!-- 🤖 CHATBOT FLUTUANTE (ESTILO WHATSAPP) -->
+    {% if user.is_authenticated %}
+    <a href="{% url 'chatbot:chat' %}"
+       class="fixed bottom-6 right-6 w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 z-50 group chat-button-pulse">
+        
+        <!-- Ícone do Chat -->
+        <svg class="w-8 h-8 text-white relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+        </svg>
+        
+        <!-- Badge de "Online" -->
+        <span class="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-slate-900 animate-pulse z-10"></span>
+        
+        <!-- Tooltip -->
+        <div class="absolute right-full mr-4 px-4 py-2 bg-slate-800 text-slate-100 text-sm font-medium rounded-lg shadow-xl whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none border border-slate-700">
+            <div class="flex items-center space-x-2">
+                <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                </svg>
+                <span>Assistente IA Nebue</span>
+            </div>
+            <!-- Seta do Tooltip -->
+            <div class="absolute top-1/2 -right-1 transform -translate-y-1/2 w-2 h-2 bg-slate-800 rotate-45 border-r border-b border-slate-700"></div>
+        </div>
+    </a>
+    {% endif %}
 
     <!-- Custom Scripts -->
     <script>
