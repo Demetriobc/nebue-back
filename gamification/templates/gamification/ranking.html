@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Ranking - Nebue{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <i class="fas fa-trophy"></i> Ranking
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <a href="?periodo=semanal" class="btn {% if periodo == 'semanal' %}btn-primary{% else %}btn-secondary{% endif %}" style="padding: 0.5rem 1rem;">Semanal</a>
+            <a href="?periodo=mensal" class="btn {% if periodo == 'mensal' %}btn-primary{% else %}btn-secondary{% endif %}" style="padding: 0.5rem 1rem;">Mensal</a>
+            <a href="?periodo=geral" class="btn {% if periodo == 'geral' %}btn-primary{% else %}btn-secondary{% endif %}" style="padding: 0.5rem 1rem;">Geral</a>
+        </div>
+    </div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 80px;">Posição</th>
+                <th>Usuário</th>
+                <th>Nível</th>
+                <th style="text-align: right;">Pontos</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for perfil in ranking %}
+            <tr style="{% if perfil.user == user %}background: rgba(212, 175, 55, 0.1); font-weight: bold;{% endif %}">
+                <td>
+                    {% if forloop.counter == 1 %}
+                        🥇 1º
+                    {% elif forloop.counter == 2 %}
+                        🥈 2º
+                    {% elif forloop.counter == 3 %}
+                        🥉 3º
+                    {% else %}
+                        {{ forloop.counter }}º
+                    {% endif %}
+                </td>
+                <td>
+                    {{ perfil.user.username }}
+                    {% if perfil.user == user %}
+                        <span style="color: var(--gold-primary);">(você)</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <span style="color: var(--gold-light);">
+                        {{ perfil.nivel_atual.nome|default:"Iniciante" }}
+                    </span>
+                </td>
+                <td style="text-align: right; color: var(--gold-primary); font-weight: bold;">
+                    {{ perfil.pontos_totais }} pts
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+                    Nenhum usuário no ranking ainda
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if posicao_user and posicao_user > 10 %}
+<div class="card" style="margin-top: 2rem;">
+    <div class="card-header">
+        <i class="fas fa-user"></i> Sua Posição
+    </div>
+    <div style="padding: 1.5rem; text-align: center;">
+        <div style="font-size: 3rem; color: var(--gold-primary); margin-bottom: 0.5rem;">
+            {{ posicao_user }}º
+        </div>
+        <p style="color: var(--text-secondary);">
+            Continue assim! Você está entre os top {{ posicao_user }} usuários.
+        </p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

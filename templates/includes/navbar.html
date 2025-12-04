@@ -73,12 +73,21 @@
                 </a>
                 <a href="{% url 'analytics:insights' %}"
                     class="px-4 py-2 rounded-lg font-medium transition-all
-                            {% if 'cartoes' in request.path %}
+                            {% if 'insights' in request.path %}
                                 bg-slate-700 text-purple-400
                             {% else %}
                                 text-slate-300 hover:bg-slate-700 hover:text-slate-100
                             {% endif %}">
                         Insights
+                </a>
+                <a href="{% url 'gamification:dashboard' %}"
+                    class="px-4 py-2 rounded-lg font-medium transition-all
+                            {% if 'dashboard' in request.path %}
+                                bg-slate-700 text-purple-400
+                            {% else %}
+                                text-slate-300 hover:bg-slate-700 hover:text-slate-100
+                            {% endif %}">
+                        Pontuações
                 </a>
             </div>
 

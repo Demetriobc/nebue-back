@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+
+{% block title %}Conquistas - Nebue{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 md:p-8">
+    <div class="max-w-7xl mx-auto">
+        
+        <!-- Header -->
+        <div class="mb-8">
+            <a href="{% url 'gamification:dashboard' %}" 
+               class="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 mb-4 transition-all">
+                <i class="fas fa-arrow-left"></i>
+                <span class="font-semibold">Voltar ao Dashboard</span>
+            </a>
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-4xl md:text-5xl font-black text-white mb-2 flex items-center gap-3">
+                        <span class="text-5xl">🏆</span>
+                        Conquistas
+                    </h1>
+                    <p class="text-slate-400 text-lg">Desbloqueie conquistas e mostre suas habilidades financeiras</p>
+                </div>
+                
+                <!-- Stats Summary -->
+                <div class="flex gap-4">
+                    <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl px-6 py-3">
+                        <div class="text-3xl font-black text-white">{{ conquistas_desbloqueadas.count }}</div>
+                        <div class="text-slate-400 text-sm">Desbloqueadas</div>
+                    </div>
+                    <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl px-6 py-3">
+                        <div class="text-3xl font-black text-white">{{ todas_conquistas.count }}</div>
+                        <div class="text-slate-400 text-sm">Total</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs/Filters -->
+        <div class="flex gap-3 mb-8 overflow-x-auto pb-2">
+            <button class="filter-btn active px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap" 
+                    onclick="filterConquistas('todas')">
+                Todas
+            </button>
+            <button class="filter-btn px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap" 
+                    onclick="filterConquistas('desbloqueadas')">
+                Desbloqueadas
+            </button>
+            <button class="filter-btn px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap" 
+                    onclick="filterConquistas('bloqueadas')">
+                Bloqueadas
+            </button>
+            <button class="filter-btn px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap" 
+                    onclick="filterConquistas('lendaria')">
+                Lendárias
+            </button>
+        </div>
+
+        <!-- Conquistas Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for conquista in todas_conquistas %}
+            {% with desbloqueada=conquista.id in conquistas_desbloqueadas_ids %}
+            <div class="conquista-card {% if desbloqueada %}desbloqueada{% else %}bloqueada{% endif %} {{ conquista.raridade }}"
+                 data-categoria="{{ conquista.tipo.categoria }}"
+                 data-raridade="{{ conquista.raridade }}">
+                
+                <div class="relative overflow-hidden bg-slate-800/50 backdrop-blur-sm border-2 rounded-2xl p-6 transition-all duration-300 hover:scale-105 hover:shadow-2xl
+                            {% if desbloqueada %}
+                                {% if conquista.raridade == 'comum' %}border-gray-500 hover:border-gray-400{% endif %}
+                                {% if conquista.raridade == 'rara' %}border-blue-500 hover:border-blue-400{% endif %}
+                                {% if conquista.raridade == 'epica' %}border-purple-500 hover:border-purple-400{% endif %}
+                                {% if conquista.raridade == 'lendaria' %}border-yellow-500 hover:border-yellow-400 shadow-yellow-500/20{% endif %}
+                            {% else %}
+                                border-slate-700 grayscale opacity-60
+                            {% endif %}">
+                    
+                    <!-- Rarity Badge -->
+                    <div class="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-black uppercase
+                                {% if conquista.raridade == 'comum' %}bg-gray-600 text-gray-100{% endif %}
+                                {% if conquista.raridade == 'rara' %}bg-blue-600 text-blue-100{% endif %}
+                                {% if conquista.raridade == 'epica' %}bg-purple-600 text-purple-100{% endif %}
+                                {% if conquista.raridade == 'lendaria' %}bg-gradient-to-r from-yellow-500 to-orange-500 text-white{% endif %}">
+                        {{ conquista.get_raridade_display }}
+                    </div>
+                    
+                    <!-- Icon -->
+                    <div class="flex justify-center mb-6 mt-4">
+                        <div class="relative">
+                            <div class="w-24 h-24 rounded-2xl flex items-center justify-center text-5xl shadow-xl
+                                        {% if desbloqueada %}
+                                            {% if conquista.raridade == 'comum' %}bg-gradient-to-br from-gray-600 to-gray-700{% endif %}
+                                            {% if conquista.raridade == 'rara' %}bg-gradient-to-br from-blue-600 to-blue-700{% endif %}
+                                            {% if conquista.raridade == 'epica' %}bg-gradient-to-br from-purple-600 to-purple-700{% endif %}
+                                            {% if conquista.raridade == 'lendaria' %}bg-gradient-to-br from-yellow-500 to-orange-500 animate-pulse{% endif %}
+                                        {% else %}
+                                            bg-slate-700
+                                        {% endif %}">
+                                {% if desbloqueada %}
+                                    <i class="fas {{ conquista.icone }} text-white"></i>
+                                {% else %}
+                                    <i class="fas fa-lock text-slate-500"></i>
+                                {% endif %}
+                            </div>
+                            
+                            {% if conquista.raridade == 'lendaria' and desbloqueada %}
+                            <div class="absolute -top-2 -right-2 text-3xl animate-bounce">✨</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Title -->
+                    <h3 class="text-xl font-bold text-center mb-2
+                                {% if desbloqueada %}text-white{% else %}text-slate-500{% endif %}">
+                        {{ conquista.titulo }}
+                    </h3>
+                    
+                    <!-- Description -->
+                    <p class="text-sm text-center mb-4 leading-relaxed
+                              {% if desbloqueada %}text-slate-400{% else %}text-slate-600{% endif %}">
+                        {{ conquista.descricao }}
+                    </p>
+                    
+                    <!-- Points -->
+                    <div class="flex items-center justify-center gap-2 mb-4">
+                        <span class="text-2xl">⭐</span>
+                        <span class="text-2xl font-black
+                                    {% if desbloqueada %}text-purple-400{% else %}text-slate-600{% endif %}">
+                            {{ conquista.pontos }}
+                        </span>
+                        <span class="text-sm text-slate-500">pontos</span>
+                    </div>
+                    
+                    <!-- Status Footer -->
+                    {% if desbloqueada %}
+                    <div class="pt-4 border-t border-slate-700">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-green-400 flex items-center gap-1">
+                                <i class="fas fa-check-circle"></i>
+                                Desbloqueada
+                            </span>
+                            {% with conquista_user=conquista.conquistausuario_set.first %}
+                            {% if conquista_user %}
+                            <span class="text-slate-500">
+                                {{ conquista_user.desbloqueada_em|date:"d/m/Y" }}
+                            </span>
+                            {% endif %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="pt-4 border-t border-slate-700">
+                        <div class="flex items-center justify-center text-xs text-slate-500">
+                            <i class="fas fa-lock mr-2"></i>
+                            Continue jogando para desbloquear
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endwith %}
+            {% endfor %}
+        </div>
+
+        <!-- Empty State -->
+        {% if not todas_conquistas %}
+        <div class="text-center py-20">
+            <div class="text-8xl mb-6 opacity-20">🏆</div>
+            <p class="text-slate-400 text-xl font-semibold mb-3">Nenhuma conquista disponível</p>
+            <p class="text-slate-500">Continue usando o Nebue para desbloquear conquistas!</p>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<style>
+    .filter-btn {
+        background: rgba(30, 41, 59, 0.6);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        color: rgba(148, 163, 184, 0.8);
+    }
+    
+    .filter-btn:hover {
+        background: rgba(30, 41, 59, 0.8);
+        border-color: rgba(168, 85, 247, 0.5);
+        color: rgb(168, 85, 247);
+    }
+    
+    .filter-btn.active {
+        background: linear-gradient(135deg, rgb(168, 85, 247), rgb(124, 58, 237));
+        border-color: rgb(168, 85, 247);
+        color: white;
+    }
+    
+    .conquista-card {
+        transition: all 0.3s;
+    }
+    
+    .conquista-card.hidden {
+        display: none;
+    }
+</style>
+
+<script>
+function filterConquistas(filtro) {
+    // Remove active de todos os botões
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Adiciona active no botão clicado
+    event.target.classList.add('active');
+    
+    // Filtra conquistas
+    const cards = document.querySelectorAll('.conquista-card');
+    
+    cards.forEach(card => {
+        const isDesbloqueada = card.classList.contains('desbloqueada');
+        const raridade = card.dataset.raridade;
+        
+        let mostrar = false;
+        
+        if (filtro === 'todas') {
+            mostrar = true;
+        } else if (filtro === 'desbloqueadas') {
+            mostrar = isDesbloqueada;
+        } else if (filtro === 'bloqueadas') {
+            mostrar = !isDesbloqueada;
+        } else if (filtro === 'lendaria') {
+            mostrar = raridade === 'lendaria';
+        }
+        
+        if (mostrar) {
+            card.classList.remove('hidden');
+        } else {
+            card.classList.add('hidden');
+        }
+    });
+}
+</script>
+{% endblock %}

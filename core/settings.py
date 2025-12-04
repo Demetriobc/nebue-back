@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'notifications',
     'analytics',
     'chatbot',
+    'gamification',
 ]
 
 MIDDLEWARE = [

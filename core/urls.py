@@ -34,6 +34,7 @@ urlpatterns = [
     path('notifications/', include('notifications.urls')),
     path('insights/', include('analytics.urls')),
     path('chat/', include('chatbot.urls')),
+    path('gamificacao/', include('gamification.urls')),
 ]
 
 handler404 = core_views.page_not_found_view
