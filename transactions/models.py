@@ -124,3 +124,93 @@ class Transaction(models.Model):
         """
         type_display = self.get_transaction_type_display()
         return f'{type_display} - {self.account.name} ({self.amount})'
+
+# ========================================
+# GAMIFICAÇÃO - SIGNALS
+# ========================================
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+@receiver(post_save, sender=Transaction)
+def processar_gamificacao_transacao(sender, instance, created, **kwargs):
+    """
+    Adiciona pontos quando uma transação é criada
+    """
+    if not created:  # Só executa quando criar nova transação
+        return
+    
+    try:
+        # Importa aqui para evitar circular import
+        from gamification.services import GamificationService
+        from gamification.models import PerfilGamificacao
+        
+        # Pega o usuário da transação
+        user = instance.account.user
+        
+        # Pontos base por transação
+        pontos = 10
+        
+        # Bônus: 1 ponto a cada R$ 100
+        bonus = int(instance.amount / 100)
+        pontos += bonus
+        
+        # Adiciona os pontos
+        GamificationService.adicionar_pontos(
+            user=user,
+            pontos=pontos,
+            tipo='transacao',
+            descricao=f'💰 Transação registrada: {instance.description[:50] if instance.description else "sem descrição"}'
+        )
+        
+        # Atualiza streak (sequência de dias)
+        GamificationService.atualizar_streak(user)
+        
+        # Verifica conquistas de transações
+        verificar_conquistas_transacoes(user)
+        
+    except Exception as e:
+        # Se der erro, só loga mas não quebra a criação da transação
+        print(f"Erro ao processar gamificação: {e}")
+
+
+def verificar_conquistas_transacoes(user):
+    """
+    Verifica e desbloqueia conquistas relacionadas a transações
+    """
+    try:
+        from gamification.services import GamificationService
+        
+        # Conta quantas transações o usuário tem
+        total = Transaction.objects.filter(account__user=user).count()
+        
+        # Primeira transação
+        if total == 1:
+            GamificationService.verificar_e_desbloquear_conquista(
+                user, 
+                'primeira_transacao'
+            )
+        
+        # 10 transações
+        elif total == 10:
+            GamificationService.verificar_e_desbloquear_conquista(
+                user, 
+                '10_transacoes'
+            )
+        
+        # 50 transações
+        elif total == 50:
+            GamificationService.verificar_e_desbloquear_conquista(
+                user, 
+                '50_transacoes'
+            )
+        
+        # 100 transações
+        elif total == 100:
+            GamificationService.verificar_e_desbloquear_conquista(
+                user, 
+                '100_transacoes'
+            )
+        
+    except Exception as e:
+        print(f"Erro ao verificar conquistas: {e}")

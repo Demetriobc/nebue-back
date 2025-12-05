@@ -3,6 +3,7 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from datetime import timedelta
+import uuid 
 
 class NivelFinanceiro(models.Model):
     """Níveis de evolução do usuário"""
@@ -57,7 +58,13 @@ class Conquista(models.Model):
         ('epica', 'Épica'),
         ('lendaria', 'Lendária'),
     ]
-    
+
+    codigo = models.CharField(
+        max_length=50,
+        unique=True,
+        default=uuid.uuid4,   # gera um código único automático
+        editable=False        # opcional: evita mexer no admin sem querer
+    )
     tipo = models.ForeignKey(TipoConquista, on_delete=models.CASCADE, related_name='conquistas')
     titulo = models.CharField(max_length=100)
     descricao = models.TextField()

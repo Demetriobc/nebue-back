@@ -1,297 +1,303 @@
-# gamification/services.py
-from django.db.models import Sum, Count, Q
+"""
+Services para Sistema de Gamificação do Nebue
+Centraliza toda a lógica de negócio da gamificação
+"""
+from django.db import transaction
 from django.utils import timezone
 from datetime import timedelta
-from decimal import Decimal
-from .models import (
-    PerfilGamificacao, Conquista, ConquistaUsuario, 
-    Desafio, DesafioUsuario, HistoricoGamificacao,
-    NivelFinanceiro
-)
+import logging
+
+logger = logging.getLogger(__name__)
 
 
-class GamificacaoService:
-    """Serviço centralizado para lógica de gamificação"""
+class GamificationService:
+    """Serviço centralizado para gamificação"""
     
     @staticmethod
-    def inicializar_perfil(user):
-        """Cria o perfil de gamificação para um novo usuário"""
-        perfil, criado = PerfilGamificacao.objects.get_or_create(user=user)
+    def adicionar_pontos(user, pontos, tipo='geral', descricao='Pontos adicionados'):
+        """
+        Adiciona pontos ao usuário e registra no histórico
+        """
+        from gamification.models import PerfilGamificacao, HistoricoGamificacao, NivelFinanceiro
         
-        if criado:
-            # Configura nível inicial
-            nivel_inicial = NivelFinanceiro.objects.filter(numero=1).first()
-            perfil.nivel_atual = nivel_inicial
-            perfil.save()
-            
-            # Bônus de boas-vindas
-            perfil.adicionar_pontos(50, "Boas-vindas ao Nebue! 🎉")
-        
-        return perfil
-    
-    @staticmethod
-    def registrar_transacao(user, transacao):
-        """Registra uma transação e verifica conquistas relacionadas"""
-        perfil = GamificacaoService.inicializar_perfil(user)
-        
-        # Atualiza streak
-        streak_mantido = perfil.atualizar_streak()
-        
-        # Pontos base por registrar transação
-        perfil.adicionar_pontos(5, "Registrou uma transação")
-        
-        # Verifica conquistas de disciplina
-        GamificacaoService.verificar_conquistas_disciplina(perfil)
-        
-        # Verifica conquistas específicas de economia/gasto
-        if transacao.tipo == 'receita':
-            GamificacaoService.verificar_conquistas_receita(perfil, transacao)
-        else:
-            GamificacaoService.verificar_conquistas_despesa(perfil, transacao)
-        
-        return perfil
-    
-    @staticmethod
-    def verificar_conquistas_disciplina(perfil):
-        """Verifica conquistas relacionadas à disciplina de registro"""
-        conquistas = {
-            7: 'Primeira Semana Completa',
-            30: 'Um Mês de Controle',
-            90: 'Trimestre Disciplinado',
-            365: 'Ano de Ouro',
-        }
-        
-        if perfil.streak_atual in conquistas:
-            titulo = conquistas[perfil.streak_atual]
-            conquista = Conquista.objects.filter(titulo=titulo).first()
-            
-            if conquista:
-                obj, criado = ConquistaUsuario.objects.get_or_create(
+        try:
+            with transaction.atomic():
+                perfil, created = PerfilGamificacao.objects.get_or_create(user=user)
+                perfil.pontos_totais += pontos
+                
+                HistoricoGamificacao.objects.create(
                     perfil=perfil,
-                    conquista=conquista
+                    pontos=pontos,
+                    tipo=tipo,
+                    descricao=descricao
                 )
                 
-                if criado:
-                    perfil.adicionar_pontos(conquista.pontos, f"Conquista: {titulo}!")
-                    perfil.conquistas_desbloqueadas += 1
-                    perfil.save()
+                nivel_anterior = perfil.nivel_atual
+                novo_nivel = GamificationService._calcular_nivel(perfil.pontos_totais)
+                
+                if novo_nivel and novo_nivel != nivel_anterior:
+                    perfil.nivel_atual = novo_nivel
                     
                     HistoricoGamificacao.objects.create(
                         perfil=perfil,
-                        tipo='conquista',
-                        descricao=f"Desbloqueou: {titulo}",
-                        pontos=conquista.pontos
+                        pontos=50,
+                        tipo='nivel_up',
+                        descricao=f'🎊 Level UP! Você alcançou o nível {novo_nivel.numero}: {novo_nivel.nome}'
                     )
+                    perfil.pontos_totais += 50
+                
+                perfil.save()
+                logger.info(f"{user.username} ganhou {pontos} pontos - Total: {perfil.pontos_totais}")
+                return perfil
+                
+        except Exception as e:
+            logger.error(f"Erro ao adicionar pontos: {e}")
+            raise
     
     @staticmethod
-    def verificar_conquistas_receita(perfil, transacao):
-        """Verifica conquistas relacionadas a receitas"""
-        from transactions.models import Transaction  # Ajuste o import conforme seu projeto
+    def _calcular_nivel(pontos_totais):
+        """Calcula qual nível o usuário deve estar"""
+        from gamification.models import NivelFinanceiro
         
-        total_receitas = Transaction.objects.filter(
-            user=perfil.user,
-            tipo='receita'
-        ).aggregate(total=Sum('valor'))['total'] or Decimal('0')
-        
-        marcos = [
-            (Decimal('1000'), 'Primeiros Mil'),
-            (Decimal('5000'), 'Cinco Mil Acumulados'),
-            (Decimal('10000'), 'Dez Mil em Receitas'),
-            (Decimal('50000'), 'Cinquenta Mil!'),
-        ]
-        
-        for valor, titulo in marcos:
-            if total_receitas >= valor:
-                conquista = Conquista.objects.filter(titulo=titulo).first()
-                if conquista:
-                    obj, criado = ConquistaUsuario.objects.get_or_create(
-                        perfil=perfil,
-                        conquista=conquista
-                    )
-                    if criado:
-                        perfil.adicionar_pontos(conquista.pontos, f"Conquista: {titulo}!")
+        try:
+            nivel = NivelFinanceiro.objects.filter(
+                pontos_necessarios__lte=pontos_totais
+            ).order_by('-pontos_necessarios').first()
+            return nivel
+        except Exception as e:
+            logger.error(f"Erro ao calcular nível: {e}")
+            return None
     
     @staticmethod
-    def verificar_conquistas_despesa(perfil, transacao):
-        """Verifica conquistas relacionadas a controle de despesas"""
-        # Implementar lógica específica para despesas
-        pass
-    
-    @staticmethod
-    def verificar_conquista_meta(perfil, meta):
-        """Verifica conquistas ao completar uma meta"""
-        conquista = Conquista.objects.filter(titulo='Primeira Meta Alcançada').first()
+    def atualizar_streak(user):
+        """Atualiza a sequência (streak) do usuário"""
+        from gamification.models import PerfilGamificacao, HistoricoGamificacao
         
-        if conquista:
-            obj, criado = ConquistaUsuario.objects.get_or_create(
-                perfil=perfil,
-                conquista=conquista
-            )
-            if criado:
-                perfil.adicionar_pontos(conquista.pontos, "Completou sua primeira meta! 🎯")
-    
-    @staticmethod
-    def verificar_conquista_reserva(perfil, valor_reserva):
-        """Verifica conquistas relacionadas à reserva de emergência"""
-        marcos_reserva = [
-            (Decimal('500'), 'Primeira Reserva'),
-            (Decimal('1000'), 'Mil Guardados'),
-            (Decimal('5000'), 'Reserva Sólida'),
-            (Decimal('10000'), 'Reserva de Elite'),
-        ]
-        
-        for valor, titulo in marcos_reserva:
-            if valor_reserva >= valor:
-                conquista = Conquista.objects.filter(titulo=titulo).first()
-                if conquista:
-                    obj, criado = ConquistaUsuario.objects.get_or_create(
-                        perfil=perfil,
-                        conquista=conquista
-                    )
-                    if criado:
-                        perfil.adicionar_pontos(conquista.pontos, f"Conquista: {titulo}! 💰")
-    
-    @staticmethod
-    def atualizar_desafios(perfil):
-        """Atualiza o progresso de todos os desafios ativos do usuário"""
-        desafios_ativos = DesafioUsuario.objects.filter(
-            perfil=perfil,
-            status='em_andamento',
-            desafio__status='ativo'
-        )
-        
-        for desafio_usuario in desafios_ativos:
-            # Verifica se o desafio ainda está no prazo
-            if not desafio_usuario.desafio.esta_ativo():
-                desafio_usuario.status = 'falhado'
-                desafio_usuario.save()
-                continue
+        try:
+            perfil, created = PerfilGamificacao.objects.get_or_create(user=user)
+            hoje = timezone.now().date()
             
-            # Atualiza progresso baseado no tipo de desafio
-            GamificacaoService.calcular_progresso_desafio(desafio_usuario)
-    
-    @staticmethod
-    def calcular_progresso_desafio(desafio_usuario):
-        """Calcula o progresso atual de um desafio"""
-        desafio = desafio_usuario.desafio
-        perfil = desafio_usuario.perfil
-        
-        if desafio.meta_tipo == 'economia':
-            # Calcula quanto o usuário economizou no período
-            from transactions.models import Transaction
+            # Verifica se já atualizou hoje
+            if perfil.ultima_atividade == hoje:
+                return perfil
             
-            economia = Transaction.objects.filter(
-                user=perfil.user,
-                tipo='receita',
-                data__gte=desafio.data_inicio,
-                data__lte=desafio.data_fim
-            ).aggregate(total=Sum('valor'))['total'] or Decimal('0')
+            ontem = hoje - timedelta(days=1)
             
-            gastos = Transaction.objects.filter(
-                user=perfil.user,
-                tipo='despesa',
-                data__gte=desafio.data_inicio,
-                data__lte=desafio.data_fim
-            ).aggregate(total=Sum('valor'))['total'] or Decimal('0')
-            
-            economia_real = economia - gastos
-            desafio_usuario.atualizar_progresso(max(0, economia_real))
-        
-        elif desafio.meta_tipo == 'reduzir_gastos':
-            # Compara gastos com período anterior
-            pass  # Implementar lógica de comparação
-        
-        elif desafio.meta_tipo == 'investimento':
-            # Verifica investimentos realizados
-            pass  # Implementar quando tiver módulo de investimentos
-    
-    @staticmethod
-    def get_ranking(periodo='mensal', limite=10):
-        """Retorna o ranking de usuários"""
-        hoje = timezone.now().date()
-        
-        if periodo == 'semanal':
-            data_inicio = hoje - timedelta(days=7)
-        elif periodo == 'mensal':
-            data_inicio = hoje - timedelta(days=30)
-        else:
-            data_inicio = None
-        
-        query = PerfilGamificacao.objects.select_related('user', 'nivel_atual')
-        
-        if data_inicio:
-            # Calcula pontos no período
-            query = query.annotate(
-                pontos_periodo=Sum(
-                    'historico__pontos',
-                    filter=Q(historico__criado_em__gte=data_inicio)
+            if perfil.ultima_atividade == ontem:
+                # Mantém e aumenta streak
+                perfil.streak_atual += 1
+                
+                if perfil.streak_atual > perfil.maior_streak:
+                    perfil.maior_streak = perfil.streak_atual
+                
+                # Bônus por streak
+                bonus_streak = perfil.streak_atual * 5
+                
+                HistoricoGamificacao.objects.create(
+                    perfil=perfil,
+                    pontos=bonus_streak,
+                    tipo='streak',
+                    descricao=f'🔥 Sequência de {perfil.streak_atual} dias! Bônus streak'
                 )
-            ).order_by('-pontos_periodo')
-        else:
-            query = query.order_by('-pontos_totais')
-        
-        return query[:limite]
+                perfil.pontos_totais += bonus_streak
+                
+            elif perfil.ultima_atividade is None or perfil.ultima_atividade < ontem:
+                # Perdeu o streak, reinicia
+                if perfil.streak_atual > 0:
+                    logger.info(f"{user.username} perdeu o streak de {perfil.streak_atual} dias")
+                perfil.streak_atual = 1
+            
+            perfil.ultima_atividade = hoje
+            perfil.save()
+            
+            # Verifica conquistas de streak
+            GamificationService._verificar_conquistas_streak(user, perfil.streak_atual)
+            
+            return perfil
+            
+        except Exception as e:
+            logger.error(f"Erro ao atualizar streak: {e}")
+            return None
     
     @staticmethod
-    def get_conquistas_nao_visualizadas(perfil):
-        """Retorna conquistas não visualizadas"""
-        return ConquistaUsuario.objects.filter(
-            perfil=perfil,
-            visualizada=False
-        ).select_related('conquista', 'conquista__tipo')
-    
-    @staticmethod
-    def marcar_conquistas_visualizadas(perfil):
-        """Marca todas as conquistas como visualizadas"""
-        ConquistaUsuario.objects.filter(
-            perfil=perfil,
-            visualizada=False
-        ).update(visualizada=True)
-    
-    @staticmethod
-    def criar_desafio_personalizado(perfil, tipo_meta, valor_meta, dias=30):
-        """Cria um desafio personalizado para o usuário"""
-        hoje = timezone.now().date()
-        
-        desafio = Desafio.objects.create(
-            titulo=f"Desafio Personalizado - {tipo_meta}",
-            descricao=f"Alcance {tipo_meta} de R$ {valor_meta} em {dias} dias",
-            periodo='personalizado',
-            meta_tipo=tipo_meta,
-            meta_valor=valor_meta,
-            pontos_recompensa=100,
-            data_inicio=hoje,
-            data_fim=hoje + timedelta(days=dias),
-            publico=False
-        )
-        
-        desafio_usuario = DesafioUsuario.objects.create(
-            perfil=perfil,
-            desafio=desafio
-        )
-        
-        return desafio_usuario
-    
-    @staticmethod
-    def get_estatisticas(perfil):
-        """Retorna estatísticas completas do perfil"""
-        return {
-            'pontos_totais': perfil.pontos_totais,
-            'nivel': {
-                'numero': perfil.nivel_atual.numero if perfil.nivel_atual else 0,
-                'nome': perfil.nivel_atual.nome if perfil.nivel_atual else 'Iniciante',
-                'progresso': perfil.progresso_nivel()
-            },
-            'streak': {
-                'atual': perfil.streak_atual,
-                'maior': perfil.maior_streak
-            },
-            'conquistas': {
-                'total': perfil.conquistas_desbloqueadas,
-                'nao_visualizadas': perfil.conquistas.filter(visualizada=False).count()
-            },
-            'desafios': {
-                'completados': perfil.desafios_completados,
-                'em_andamento': perfil.desafios.filter(status='em_andamento').count()
-            }
+    def _verificar_conquistas_streak(user, streak_atual):
+        """Verifica conquistas relacionadas a streak"""
+        conquistas_streak = {
+            7: 'streak_7',
+            30: 'streak_30',
+            100: 'streak_100'
         }
+        
+        if streak_atual in conquistas_streak:
+            GamificationService.verificar_e_desbloquear_conquista(
+                user, conquistas_streak[streak_atual]
+            )
+    
+    @staticmethod
+    def verificar_e_desbloquear_conquista(user, codigo_conquista):
+        """Verifica e desbloqueia uma conquista específica"""
+        from gamification.models import PerfilGamificacao, Conquista, ConquistaUsuario, HistoricoGamificacao
+        
+        try:
+            perfil, created = PerfilGamificacao.objects.get_or_create(user=user)
+            
+            try:
+                conquista = Conquista.objects.get(codigo=codigo_conquista)
+            except Conquista.DoesNotExist:
+                logger.warning(f"Conquista {codigo_conquista} não existe")
+                return False
+            
+            # Verifica se já possui
+            if ConquistaUsuario.objects.filter(perfil=perfil, conquista=conquista).exists():
+                return False
+            
+            # Desbloqueia
+            ConquistaUsuario.objects.create(perfil=perfil, conquista=conquista)
+            
+            # Adiciona pontos da conquista
+            HistoricoGamificacao.objects.create(
+                perfil=perfil,
+                pontos=conquista.pontos,
+                tipo='conquista',
+                descricao=f'🏆 Conquista desbloqueada: {conquista.titulo}'
+            )
+            
+            perfil.pontos_totais += conquista.pontos
+            perfil.conquistas_desbloqueadas += 1
+            perfil.save()
+            
+            logger.info(f"{user.username} desbloqueou conquista: {conquista.titulo}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Erro ao desbloquear conquista: {e}")
+            return False
+    
+    @staticmethod
+    def get_ranking(periodo='geral', limit=None):
+        """Retorna o ranking de usuários"""
+        from gamification.models import PerfilGamificacao, HistoricoGamificacao
+        from django.db.models import Sum, Subquery, OuterRef
+        
+        try:
+            if periodo == 'semanal':
+                data_inicio = timezone.now() - timedelta(days=7)
+                
+                perfis_com_pontos = HistoricoGamificacao.objects.filter(
+                    criado_em__gte=data_inicio
+                ).values_list('perfil_id', flat=True).distinct()
+                
+                perfis = PerfilGamificacao.objects.filter(
+                    id__in=perfis_com_pontos
+                ).select_related('user', 'nivel_atual')
+                
+                pontos_semana = HistoricoGamificacao.objects.filter(
+                    perfil=OuterRef('pk'),
+                    criado_em__gte=data_inicio
+                ).values('perfil').annotate(total=Sum('pontos')).values('total')
+                
+                perfis = perfis.annotate(pontos_periodo=Subquery(pontos_semana)).order_by('-pontos_periodo')
+                
+            elif periodo == 'mensal':
+                data_inicio = timezone.now() - timedelta(days=30)
+                
+                perfis_com_pontos = HistoricoGamificacao.objects.filter(
+                    criado_em__gte=data_inicio
+                ).values_list('perfil_id', flat=True).distinct()
+                
+                perfis = PerfilGamificacao.objects.filter(
+                    id__in=perfis_com_pontos
+                ).select_related('user', 'nivel_atual')
+                
+                pontos_mes = HistoricoGamificacao.objects.filter(
+                    perfil=OuterRef('pk'),
+                    criado_em__gte=data_inicio
+                ).values('perfil').annotate(total=Sum('pontos')).values('total')
+                
+                perfis = perfis.annotate(pontos_periodo=Subquery(pontos_mes)).order_by('-pontos_periodo')
+                
+            else:  # geral
+                perfis = PerfilGamificacao.objects.all().select_related(
+                    'user', 'nivel_atual'
+                ).order_by('-pontos_totais')
+            
+            if limit:
+                perfis = perfis[:limit]
+            
+            return perfis
+            
+        except Exception as e:
+            logger.error(f"Erro ao buscar ranking: {e}")
+            return PerfilGamificacao.objects.none()
+    
+    @staticmethod
+    def get_posicao_usuario(user, periodo='geral'):
+        """Retorna a posição do usuário no ranking"""
+        try:
+            ranking = GamificationService.get_ranking(periodo=periodo)
+            
+            for index, perfil in enumerate(ranking, start=1):
+                if perfil.user == user:
+                    return index
+            
+            return None
+            
+        except Exception as e:
+            logger.error(f"Erro ao buscar posição do usuário: {e}")
+            return None
+    
+    @staticmethod
+    def get_estatisticas_usuario(user):
+        """Retorna estatísticas completas do usuário"""
+        from gamification.models import PerfilGamificacao, ConquistaUsuario, NivelFinanceiro
+        
+        try:
+            perfil, created = PerfilGamificacao.objects.get_or_create(user=user)
+            
+            total_conquistas = ConquistaUsuario.objects.filter(perfil=perfil).count()
+            conquistas_nao_vistas = ConquistaUsuario.objects.filter(
+                perfil=perfil, visualizada=False
+            ).count()
+            
+            proximo_nivel = NivelFinanceiro.objects.filter(
+                pontos_necessarios__gt=perfil.pontos_totais
+            ).order_by('pontos_necessarios').first()
+            
+            if proximo_nivel and perfil.nivel_atual:
+                nivel_atual_pontos = perfil.nivel_atual.pontos_necessarios
+                pontos_para_proximo = proximo_nivel.pontos_necessarios - nivel_atual_pontos
+                pontos_progresso = perfil.pontos_totais - nivel_atual_pontos
+                progresso_percentual = int((pontos_progresso / pontos_para_proximo) * 100) if pontos_para_proximo > 0 else 0
+            else:
+                progresso_percentual = 100 if not proximo_nivel else 0
+            
+            return {
+                'pontos_totais': perfil.pontos_totais,
+                'nivel': {
+                    'atual': perfil.nivel_atual,
+                    'proximo': proximo_nivel,
+                    'progresso': progresso_percentual
+                },
+                'streak': {
+                    'atual': perfil.streak_atual,
+                    'maior': perfil.maior_streak
+                },
+                'conquistas': {
+                    'total': total_conquistas,
+                    'nao_visualizadas': conquistas_nao_vistas
+                },
+                'desafios': {
+                    'completados': perfil.desafios_completados,
+                    'em_andamento': 0
+                }
+            }
+            
+        except Exception as e:
+            logger.error(f"Erro ao buscar estatísticas: {e}")
+            return {
+                'pontos_totais': 0,
+                'nivel': {'atual': None, 'proximo': None, 'progresso': 0},
+                'streak': {'atual': 0, 'maior': 0},
+                'conquistas': {'total': 0, 'nao_visualizadas': 0},
+                'desafios': {'completados': 0, 'em_andamento': 0}
+            }

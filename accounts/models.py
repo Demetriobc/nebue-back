@@ -391,3 +391,67 @@ class CreditCard(models.Model):
         ).aggregate(total=Sum('amount'))['total'] or 0
         
         return invoice_total
+    
+# ========================================
+# GAMIFICAÇÃO - SIGNALS
+# ========================================
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+@receiver(post_save, sender=Budget)
+def processar_gamificacao_budget(sender, instance, created, **kwargs):
+    """
+    Adiciona pontos quando cria um orçamento
+    """
+    if not created:
+        return
+    
+    try:
+        from gamification.services import GamificationService
+        
+        # 50 pontos por criar orçamento
+        GamificationService.adicionar_pontos(
+            user=instance.user,
+            pontos=50,
+            tipo='orcamento',
+            descricao=f'📊 Orçamento criado: {instance.category.name if instance.category else "Geral"}'
+        )
+        
+        # Verifica conquistas
+        total_budgets = Budget.objects.filter(user=instance.user).count()
+        
+        if total_budgets == 1:
+            GamificationService.verificar_e_desbloquear_conquista(instance.user, 'primeiro_orcamento')
+        
+    except Exception as e:
+        print(f"Erro gamificação budget: {e}")
+
+
+@receiver(post_save, sender=CreditCard)
+def processar_gamificacao_cartao(sender, instance, created, **kwargs):
+    """
+    Adiciona pontos quando cadastra cartão de crédito
+    """
+    if not created:
+        return
+    
+    try:
+        from gamification.services import GamificationService
+        
+        # 30 pontos por cadastrar cartão
+        GamificationService.adicionar_pontos(
+            user=instance.account.user,
+            pontos=30,
+            tipo='cartao',
+            descricao=f'💳 Cartão cadastrado: {instance.name}'
+        )
+        
+        # Conquista de primeiro cartão
+        total_cards = CreditCard.objects.filter(account__user=instance.account.user).count()
+        
+        if total_cards == 1:
+            GamificationService.verificar_e_desbloquear_conquista(instance.account.user, 'primeiro_cartao')
+        
+    except Exception as e:
+        print(f"Erro gamificação cartão: {e}")

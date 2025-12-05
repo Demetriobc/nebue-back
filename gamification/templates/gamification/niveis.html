@@ -2,177 +2,642 @@
 
 {% block title %}Sistema de Níveis - Nebue{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* ========================================
+       ANIMAÇÕES AVANÇADAS
+    ======================================== */
+    @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.05); opacity: 0.8; }
+    }
+    
+    @keyframes glow {
+        0%, 100% { 
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.4),
+                        0 0 40px rgba(168, 85, 247, 0.2);
+        }
+        50% { 
+            box-shadow: 0 0 40px rgba(168, 85, 247, 0.8),
+                        0 0 80px rgba(168, 85, 247, 0.4);
+        }
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-15px); }
+    }
+    
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes progressFill {
+        from { width: 0%; }
+    }
+    
+    @keyframes sparkle {
+        0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+        50% { opacity: 1; transform: scale(1) rotate(180deg); }
+    }
+
+    /* ========================================
+       GLASS CARDS
+    ======================================== */
+    .glass-card {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .glass-card:hover {
+        background: rgba(30, 41, 59, 0.85);
+        border-color: rgba(168, 85, 247, 0.5);
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    /* ========================================
+       LEVEL CARDS
+    ======================================== */
+    .level-card {
+        opacity: 0;
+        animation: slideInUp 0.6s ease-out forwards;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .level-card:nth-child(1) { animation-delay: 0.1s; }
+    .level-card:nth-child(2) { animation-delay: 0.15s; }
+    .level-card:nth-child(3) { animation-delay: 0.2s; }
+    .level-card:nth-child(4) { animation-delay: 0.25s; }
+    .level-card:nth-child(5) { animation-delay: 0.3s; }
+    .level-card:nth-child(6) { animation-delay: 0.35s; }
+    .level-card:nth-child(n+7) { animation-delay: 0.4s; }
+    
+    .level-card.completed {
+        border-color: rgba(34, 197, 94, 0.5) !important;
+    }
+    
+    .level-card.completed::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #10b981, #059669);
+    }
+    
+    .level-card.current {
+        border-color: rgba(251, 191, 36, 0.6) !important;
+        animation: glow 2s ease-in-out infinite;
+    }
+    
+    .level-card.current::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #fbbf24, #f59e0b, #ef4444);
+        animation: shimmer 2s infinite;
+    }
+    
+    .level-card.next {
+        border-color: rgba(59, 130, 246, 0.5) !important;
+    }
+    
+    .level-card.locked {
+        opacity: 0.5;
+        filter: grayscale(50%);
+    }
+    
+    .level-card.locked:hover {
+        opacity: 0.7;
+        filter: grayscale(30%);
+    }
+
+    /* ========================================
+       LEVEL ICON
+    ======================================== */
+    .level-icon-container {
+        position: relative;
+        transition: all 0.3s;
+    }
+    
+    .level-card:hover .level-icon-container {
+        transform: scale(1.1) rotate(5deg);
+    }
+    
+    .level-icon-bg {
+        width: 100px;
+        height: 100px;
+        border-radius: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .level-icon-bg::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    
+    .level-card:hover .level-icon-bg::before {
+        opacity: 1;
+    }
+
+    /* ========================================
+       STATUS BADGES
+    ======================================== */
+    .status-badge {
+        position: absolute;
+        bottom: -8px;
+        right: -8px;
+        border-radius: 50px;
+        font-weight: 900;
+        font-size: 11px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        z-index: 10;
+    }
+    
+    .badge-completed {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        padding: 6px 12px;
+    }
+    
+    .badge-current {
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        color: #1e293b;
+        padding: 8px 16px;
+        animation: pulse 2s ease-in-out infinite;
+    }
+    
+    .badge-next {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        color: white;
+        padding: 6px 12px;
+        animation: pulse 2s ease-in-out infinite;
+    }
+    
+    .badge-locked {
+        background: rgba(51, 65, 85, 0.8);
+        padding: 8px;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* ========================================
+       PROGRESS BAR
+    ======================================== */
+    .progress-container {
+        position: relative;
+        width: 100%;
+        height: 16px;
+        background: rgba(15, 23, 42, 0.9);
+        border-radius: 100px;
+        overflow: hidden;
+        border: 2px solid rgba(148, 163, 184, 0.3);
+        box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+    
+    .progress-bar-fill {
+        height: 100%;
+        border-radius: 100px;
+        background: linear-gradient(90deg, #a855f7, #ec4899, #f59e0b);
+        position: relative;
+        transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        animation: progressFill 2s ease-out;
+        box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
+    }
+    
+    .progress-bar-fill::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.4),
+            transparent
+        );
+        animation: shimmer 2s infinite;
+    }
+
+    /* ========================================
+       POINTS DISPLAY
+    ======================================== */
+    .points-badge {
+        background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(236, 72, 153, 0.2));
+        border: 2px solid rgba(168, 85, 247, 0.3);
+        border-radius: 50px;
+        padding: 12px 24px;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s;
+    }
+    
+    .points-badge:hover {
+        border-color: rgba(168, 85, 247, 0.6);
+        transform: scale(1.05);
+        box-shadow: 0 8px 24px rgba(168, 85, 247, 0.3);
+    }
+
+    /* ========================================
+       CURRENT LEVEL HERO
+    ======================================== */
+    .hero-level-icon {
+        animation: float 4s ease-in-out infinite;
+        filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
+    }
+    
+    .sparkle-effect {
+        position: absolute;
+        animation: sparkle 2s ease-in-out infinite;
+        font-size: 2rem;
+        pointer-events: none;
+    }
+    
+    .sparkle-1 { top: -10px; right: -10px; animation-delay: 0s; }
+    .sparkle-2 { top: -10px; left: -10px; animation-delay: 0.5s; }
+    .sparkle-3 { bottom: -10px; right: -10px; animation-delay: 1s; }
+    .sparkle-4 { bottom: -10px; left: -10px; animation-delay: 1.5s; }
+
+    /* ========================================
+       ROADMAP CONNECTOR
+    ======================================== */
+    .level-connector {
+        position: relative;
+        margin: -16px 0;
+        height: 32px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .connector-line {
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(180deg, 
+            rgba(168, 85, 247, 0.5) 0%,
+            rgba(148, 163, 184, 0.2) 100%
+        );
+        border-radius: 4px;
+    }
+    
+    .connector-dot {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        background: rgba(168, 85, 247, 0.6);
+        border: 3px solid rgba(15, 23, 42, 0.9);
+        border-radius: 50%;
+        box-shadow: 0 0 12px rgba(168, 85, 247, 0.6);
+    }
+
+    /* ========================================
+       STATS SUMMARY
+    ======================================== */
+    .stat-box {
+        background: rgba(30, 41, 59, 0.6);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(148, 163, 184, 0.2);
+        border-radius: 20px;
+        padding: 20px 28px;
+        transition: all 0.3s;
+    }
+    
+    .stat-box:hover {
+        border-color: rgba(168, 85, 247, 0.5);
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    /* ========================================
+       TIP CARD
+    ======================================== */
+    .tip-card {
+        background: linear-gradient(135deg, 
+            rgba(59, 130, 246, 0.15),
+            rgba(168, 85, 247, 0.15)
+        );
+        border: 2px solid rgba(59, 130, 246, 0.3);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s;
+    }
+    
+    .tip-card:hover {
+        border-color: rgba(59, 130, 246, 0.6);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+    }
+
+    /* ========================================
+       RESPONSIVE
+    ======================================== */
+    @media (max-width: 768px) {
+        .level-icon-bg {
+            width: 80px;
+            height: 80px;
+        }
+        
+        .hero-level-icon {
+            width: 100px !important;
+            height: 100px !important;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 md:p-8">
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-6xl mx-auto">
         
-        <!-- Header -->
+        <!-- ========================================
+             HEADER
+        ======================================== -->
         <div class="mb-8">
             <a href="{% url 'gamification:dashboard' %}" 
-               class="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 mb-4 transition-all">
+               class="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 mb-6 transition-all hover:translate-x-[-4px] font-semibold">
                 <i class="fas fa-arrow-left"></i>
-                <span class="font-semibold">Voltar ao Dashboard</span>
+                <span>Voltar ao Dashboard</span>
             </a>
-            <h1 class="text-4xl md:text-5xl font-black text-white mb-2 flex items-center gap-3">
-                <span class="text-5xl">📊</span>
-                Sistema de Níveis
-            </h1>
-            <p class="text-slate-400 text-lg">Evolua e desbloqueie novos marcos na sua jornada financeira</p>
+            
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div>
+                    <h1 class="text-5xl md:text-6xl font-black text-white mb-3 flex items-center gap-4">
+                        <span class="text-6xl">📊</span>
+                        <span class="bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
+                            Sistema de Níveis
+                        </span>
+                    </h1>
+                    <p class="text-slate-400 text-xl">Evolua e desbloqueie novos marcos na sua jornada financeira</p>
+                </div>
+                
+                <!-- Stats Summary -->
+                <div class="flex gap-4">
+                    <div class="stat-box">
+                        <div class="text-4xl font-black text-white tabular-nums">{{ perfil.nivel_atual.numero|default:1 }}</div>
+                        <div class="text-slate-400 text-sm font-semibold">Nível Atual</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="text-4xl font-black text-purple-400 tabular-nums">{{ todos_niveis.count }}</div>
+                        <div class="text-slate-400 text-sm font-semibold">Total</div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Current Level Card -->
-        <div class="relative overflow-hidden bg-gradient-to-br from-purple-600 via-purple-700 to-purple-900 rounded-3xl p-8 md:p-10 mb-8 shadow-2xl">
-            <div class="absolute top-0 right-0 w-64 h-64 bg-purple-500 rounded-full opacity-10 blur-3xl"></div>
-            <div class="absolute bottom-0 left-0 w-64 h-64 bg-pink-500 rounded-full opacity-10 blur-3xl"></div>
+        <!-- ========================================
+             CURRENT LEVEL HERO CARD
+        ======================================== -->
+        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-600 via-purple-700 to-purple-900 p-8 md:p-12 mb-12 shadow-2xl">
+            
+            <!-- Decorative Background -->
+            <div class="absolute top-0 right-0 w-96 h-96 bg-purple-500 rounded-full opacity-10 blur-3xl"></div>
+            <div class="absolute bottom-0 left-0 w-96 h-96 bg-pink-500 rounded-full opacity-10 blur-3xl"></div>
+            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full">
+                <div class="absolute top-10 right-20 text-6xl opacity-5 rotate-12">⭐</div>
+                <div class="absolute bottom-20 left-10 text-6xl opacity-5 -rotate-12">🏆</div>
+            </div>
             
             <div class="relative z-10">
-                <div class="flex flex-col md:flex-row items-center gap-6 mb-6">
+                <div class="flex flex-col md:flex-row items-center gap-8 mb-8">
+                    
+                    <!-- Icon Section -->
                     <div class="relative">
-                        <div class="w-32 h-32 bg-white/20 rounded-3xl flex items-center justify-center backdrop-blur-sm border-4 border-white/30 shadow-2xl">
-                            <i class="fas {{ perfil.nivel_atual.icone|default:'fa-star' }} text-6xl text-white"></i>
+                        <div class="hero-level-icon w-40 h-40 bg-white/20 rounded-3xl flex items-center justify-center backdrop-blur-sm border-4 border-white/30 shadow-2xl">
+                            <i class="fas {{ perfil.nivel_atual.icone|default:'fa-star' }} text-8xl text-white"></i>
                         </div>
-                        <div class="absolute -bottom-3 -right-3 bg-yellow-400 text-slate-900 font-black px-4 py-2 rounded-full text-sm shadow-lg">
+                        
+                        <!-- Sparkles -->
+                        <div class="sparkle-effect sparkle-1">✨</div>
+                        <div class="sparkle-effect sparkle-2">✨</div>
+                        <div class="sparkle-effect sparkle-3">✨</div>
+                        <div class="sparkle-effect sparkle-4">✨</div>
+                        
+                        <!-- Level Badge -->
+                        <div class="absolute -bottom-4 -right-4 bg-gradient-to-r from-yellow-400 to-orange-400 text-slate-900 font-black px-6 py-3 rounded-full text-lg shadow-2xl">
                             LVL {{ perfil.nivel_atual.numero|default:1 }}
                         </div>
                     </div>
                     
-                    <div class="text-center md:text-left">
-                        <div class="bg-purple-400/20 text-purple-200 px-4 py-1 rounded-full text-sm font-bold inline-block mb-2">
-                            SEU NÍVEL ATUAL
+                    <!-- Info Section -->
+                    <div class="text-center md:text-left flex-1">
+                        <div class="inline-flex items-center gap-2 bg-purple-400/20 text-purple-200 px-5 py-2 rounded-full text-sm font-bold mb-3">
+                            <i class="fas fa-crown"></i>
+                            <span>SEU NÍVEL ATUAL</span>
                         </div>
-                        <h2 class="text-4xl md:text-5xl font-black text-white mb-2">
+                        <h2 class="text-5xl md:text-6xl font-black text-white mb-3">
                             {{ perfil.nivel_atual.nome|default:"Iniciante" }}
                         </h2>
-                        <p class="text-purple-100 text-lg">{{ perfil.nivel_atual.descricao|default:"Começando a jornada" }}</p>
+                        <p class="text-purple-100 text-xl leading-relaxed max-w-2xl">
+                            {{ perfil.nivel_atual.descricao|default:"Começando sua jornada rumo à estabilidade financeira" }}
+                        </p>
                     </div>
                 </div>
                 
-                <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                    <div class="text-center">
-                        <div class="text-5xl font-black text-white mb-2">{{ perfil.pontos_totais }}</div>
-                        <div class="text-purple-200 font-semibold">pontos acumulados</div>
+                <!-- Points Display -->
+                <div class="flex justify-center">
+                    <div class="bg-white/10 backdrop-blur-sm rounded-3xl px-12 py-6 border-2 border-white/20">
+                        <div class="flex items-baseline gap-3">
+                            <span class="text-7xl font-black text-white tabular-nums">{{ perfil.pontos_totais|default:0 }}</span>
+                            <span class="text-3xl text-purple-200 font-bold">pontos</span>
+                        </div>
+                        <div class="text-center text-purple-200 font-semibold mt-2">acumulados na jornada</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Levels List -->
-        <div class="space-y-6">
+        <!-- ========================================
+             LEVELS ROADMAP
+        ======================================== -->
+        <div class="space-y-0">
             {% for nivel in todos_niveis %}
-            <div class="relative overflow-hidden rounded-2xl transition-all duration-300 hover:transform hover:scale-[1.02]
-                        {% if perfil.nivel_atual and nivel.numero <= perfil.nivel_atual.numero %}
-                            bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-purple-500/50 shadow-lg shadow-purple-500/20
+            
+            <!-- Level Card -->
+            <div class="level-card glass-card rounded-3xl border-2 p-6 md:p-8
+                        {% if perfil.nivel_atual and nivel.numero < perfil.nivel_atual.numero %}completed{% endif %}
+                        {% if perfil.nivel_atual and nivel.numero == perfil.nivel_atual.numero %}current{% endif %}
+                        {% if perfil.nivel_atual and nivel.numero == perfil.nivel_atual.numero|add:1 %}next{% endif %}
+                        {% if perfil.nivel_atual and nivel.numero > perfil.nivel_atual.numero|add:1 %}locked{% endif %}">
+                
+                <div class="flex flex-col md:flex-row items-center gap-8">
+                    
+                    <!-- Level Icon -->
+                    <div class="level-icon-container flex-shrink-0">
+                        <div class="level-icon-bg" style="background: linear-gradient(135deg, {{ nivel.cor }}60, {{ nivel.cor }}30);">
+                            <i class="fas {{ nivel.icone }} text-6xl" style="color: {{ nivel.cor }};"></i>
+                        </div>
+                        
+                        <!-- Status Badge -->
+                        {% if perfil.nivel_atual and nivel.numero < perfil.nivel_atual.numero %}
+                        <div class="status-badge badge-completed">
+                            <i class="fas fa-check"></i>
+                            COMPLETO
+                        </div>
+                        {% elif perfil.nivel_atual and nivel.numero == perfil.nivel_atual.numero %}
+                        <div class="status-badge badge-current">
+                            <i class="fas fa-star mr-1"></i>
+                            ATUAL
+                        </div>
+                        {% elif perfil.nivel_atual and nivel.numero == perfil.nivel_atual.numero|add:1 %}
+                        <div class="status-badge badge-next">
+                            <i class="fas fa-arrow-up"></i>
+                            PRÓXIMO
+                        </div>
                         {% else %}
-                            bg-slate-800/50 border-2 border-slate-700/50 opacity-70 hover:opacity-100
-                        {% endif %}">
-                
-                <!-- Current Level Highlight -->
-                {% if perfil.nivel_atual and nivel.numero == perfil.nivel_atual.numero %}
-                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400"></div>
-                {% endif %}
-                
-                <div class="p-6 md:p-8">
-                    <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
-                        
-                        <!-- Level Icon -->
-                        <div class="relative flex-shrink-0">
-                            <div class="w-20 h-20 md:w-24 md:h-24 rounded-2xl flex items-center justify-center shadow-xl transition-transform hover:scale-110"
-                                 style="background: linear-gradient(135deg, {{ nivel.cor }}40, {{ nivel.cor }}20);">
-                                <i class="fas {{ nivel.icone }} text-4xl md:text-5xl" style="color: {{ nivel.cor }};"></i>
-                            </div>
+                        <div class="status-badge badge-locked">
+                            <i class="fas fa-lock text-slate-500"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Level Info -->
+                    <div class="flex-1 min-w-0 w-full">
+                        <!-- Header -->
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                            <h3 class="text-3xl md:text-4xl font-black text-white flex items-center gap-3 flex-wrap">
+                                <span class="text-slate-400">Nível {{ nivel.numero }}</span>
+                                <span class="text-purple-400">•</span>
+                                <span style="color: {{ nivel.cor }};">{{ nivel.nome }}</span>
+                            </h3>
                             
-                            <!-- Status Badge -->
-                            <div class="absolute -bottom-2 -right-2">
-                                {% if perfil.nivel_atual and nivel.numero == perfil.nivel_atual.numero %}
-                                    <div class="bg-gradient-to-r from-yellow-400 to-orange-400 text-slate-900 px-3 py-1 rounded-full text-xs font-black shadow-lg">
-                                        ATUAL
+                            <div class="points-badge">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-3xl">⭐</span>
+                                    <div>
+                                        <div class="text-3xl font-black text-white tabular-nums">{{ nivel.pontos_necessarios }}</div>
+                                        <div class="text-slate-400 text-xs font-semibold">pontos necessários</div>
                                     </div>
-                                {% elif perfil.nivel_atual and nivel.numero < perfil.nivel_atual.numero %}
-                                    <div class="bg-green-500 w-8 h-8 rounded-full flex items-center justify-center shadow-lg">
-                                        <i class="fas fa-check text-white text-sm"></i>
-                                    </div>
-                                {% elif perfil.nivel_atual and nivel.numero == perfil.nivel_atual.numero|add:1 %}
-                                    <div class="bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-black shadow-lg animate-pulse">
-                                        PRÓXIMO
-                                    </div>
-                                {% else %}
-                                    <div class="bg-slate-700 w-8 h-8 rounded-full flex items-center justify-center shadow-lg">
-                                        <i class="fas fa-lock text-slate-500 text-sm"></i>
-                                    </div>
-                                {% endif %}
+                                </div>
                             </div>
                         </div>
                         
-                        <!-- Level Info -->
-                        <div class="flex-1 min-w-0">
-                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-3">
-                                <h3 class="text-2xl md:text-3xl font-black text-white flex items-center gap-3">
-                                    <span>Nível {{ nivel.numero }}</span>
-                                    <span class="text-purple-400">•</span>
-                                    <span style="color: {{ nivel.cor }};">{{ nivel.nome }}</span>
-                                </h3>
-                                <div class="flex items-center gap-2 bg-slate-700/50 px-4 py-2 rounded-full">
-                                    <span class="text-2xl">⭐</span>
-                                    <span class="text-xl font-black text-white">{{ nivel.pontos_necessarios }}</span>
-                                    <span class="text-slate-400 text-sm">pts</span>
+                        <!-- Description -->
+                        <p class="text-slate-300 text-lg leading-relaxed mb-6">
+                            {{ nivel.descricao }}
+                        </p>
+                        
+                        <!-- Progress Bar (only for next level) -->
+                        {% if perfil.nivel_atual and nivel.numero == perfil.nivel_atual.numero|add:1 %}
+                        <div class="space-y-4 mt-8 p-6 bg-slate-800/50 rounded-2xl border border-slate-700/50">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-slate-300 font-bold text-lg flex items-center gap-2">
+                                    <i class="fas fa-chart-line text-purple-400"></i>
+                                    Progresso até o próximo nível
+                                </span>
+                                <span class="text-3xl font-black text-purple-400 tabular-nums">
+                                    {% widthratio perfil.pontos_totais nivel.pontos_necessarios 100 %}%
+                                </span>
+                            </div>
+                            
+                            <div class="progress-container">
+                                <div class="progress-bar-fill" 
+                                     style="width: {% widthratio perfil.pontos_totais nivel.pontos_necessarios 100 %}%">
                                 </div>
                             </div>
                             
-                            <p class="text-slate-400 text-base leading-relaxed mb-4">{{ nivel.descricao }}</p>
-                            
-                            <!-- Progress Bar for Next Level -->
-                            {% if perfil.nivel_atual and nivel.numero == perfil.nivel_atual.numero|add:1 %}
-                            <div class="space-y-3 mt-6">
-                                <div class="flex justify-between items-center text-sm">
-                                    <span class="text-slate-400 font-semibold">Progresso até o próximo nível</span>
-                                    <span class="text-purple-400 font-bold">
-                                        {% widthratio perfil.pontos_totais nivel.pontos_necessarios 100 %}%
-                                    </span>
-                                </div>
-                                <div class="relative w-full h-4 bg-slate-900 rounded-full overflow-hidden border-2 border-slate-700">
-                                    <div class="h-full bg-gradient-to-r from-purple-500 via-purple-400 to-pink-500 rounded-full transition-all duration-1000 relative overflow-hidden"
-                                         style="width: {% widthratio perfil.pontos_totais nivel.pontos_necessarios 100 %}%">
-                                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
-                                    </div>
-                                </div>
-                                <div class="flex justify-between text-xs">
-                                    <span class="text-slate-500">{{ perfil.pontos_totais }} pontos</span>
-                                    <span class="text-slate-500">Meta: {{ nivel.pontos_necessarios }} pontos</span>
-                                </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400 font-semibold text-sm">
+                                    <i class="fas fa-coins mr-1"></i>
+                                    {{ perfil.pontos_totais }} pontos
+                                </span>
+                                <span class="text-slate-400 font-semibold text-sm">
+                                    <i class="fas fa-flag-checkered mr-1"></i>
+                                    Meta: {{ nivel.pontos_necessarios }} pontos
+                                </span>
                             </div>
-                            {% endif %}
+                            
+                            {% with faltam=nivel.pontos_necessarios|add:"-"|add:perfil.pontos_totais %}
+                            <div class="text-center pt-4 border-t border-slate-700/50">
+                                <span class="text-yellow-400 font-bold text-lg">
+                                    <i class="fas fa-bolt mr-2"></i>
+                                    Faltam apenas {{ faltam }} pontos para o próximo nível!
+                                </span>
+                            </div>
+                            {% endwith %}
                         </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
+            
+            <!-- Connector (não mostra depois do último) -->
+            {% if not forloop.last %}
+            <div class="level-connector">
+                <div class="connector-line"></div>
+                <div class="connector-dot"></div>
+            </div>
+            {% endif %}
+            
             {% endfor %}
         </div>
 
-        <!-- Info Card -->
-        <div class="mt-8 bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-2xl p-6">
-            <div class="flex items-start gap-4">
-                <div class="flex-shrink-0 text-4xl">💡</div>
-                <div>
-                    <h3 class="text-white font-bold text-xl mb-2">Dica para Evoluir Mais Rápido</h3>
-                    <p class="text-slate-300 leading-relaxed">
-                        Mantenha sua sequência ativa, complete desafios e desbloqueie conquistas para ganhar pontos extras! 
-                        Cada transação registrada também contribui para sua evolução.
-                    </p>
+        <!-- ========================================
+             TIP CARD
+        ======================================== -->
+        <div class="mt-12 tip-card rounded-3xl p-8">
+            <div class="flex items-start gap-6">
+                <div class="flex-shrink-0 text-6xl">💡</div>
+                <div class="flex-1">
+                    <h3 class="text-white font-black text-2xl mb-3 flex items-center gap-2">
+                        <i class="fas fa-lightbulb text-yellow-400"></i>
+                        Dicas para Evoluir Mais Rápido
+                    </h3>
+                    <div class="space-y-3 text-slate-300 text-lg leading-relaxed">
+                        <p class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-green-400 mt-1"></i>
+                            <span>Mantenha sua <strong class="text-orange-400">sequência ativa</strong> todos os dias para ganhar pontos de bônus</span>
+                        </p>
+                        <p class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-green-400 mt-1"></i>
+                            <span>Complete <strong class="text-blue-400">desafios</strong> e desbloqueie <strong class="text-yellow-400">conquistas</strong> para multiplicar seus pontos</span>
+                        </p>
+                        <p class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-green-400 mt-1"></i>
+                            <span>Registre suas <strong class="text-purple-400">transações</strong> regularmente para acumular experiência</span>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
 
     </div>
 </div>
-
-<style>
-    @keyframes shimmer {
-        0% { transform: translateX(-100%); }
-        100% { transform: translateX(100%); }
-    }
-    
-    .animate-shimmer {
-        animation: shimmer 2s infinite;
-    }
-</style>
 {% endblock %}

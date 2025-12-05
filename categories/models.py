@@ -76,3 +76,39 @@ class Category(models.Model):
             str: The category name
         '''
         return self.name
+
+
+# ========================================
+# GAMIFICAÇÃO - SIGNALS
+# ========================================
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+@receiver(post_save, sender=Category)
+def processar_gamificacao_categoria(sender, instance, created, **kwargs):
+    """
+    Adiciona pontos quando cria uma categoria personalizada
+    """
+    if not created:
+        return
+    
+    try:
+        from gamification.services import GamificationService
+        
+        # 20 pontos por criar categoria
+        GamificationService.adicionar_pontos(
+            user=instance.user,
+            pontos=20,
+            tipo='categoria',
+            descricao=f'🏷️ Categoria criada: {instance.name}'
+        )
+        
+        # Verifica conquistas
+        total_categorias = Category.objects.filter(user=instance.user).count()
+        
+        if total_categorias >= 10:  # 10 categorias personalizadas
+            GamificationService.verificar_e_desbloquear_conquista(instance.user, 'organizador_expert')
+        
+    except Exception as e:
+        print(f"Erro gamificação categoria: {e}")
