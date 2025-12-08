@@ -3,237 +3,290 @@
 {% block title %}Orçamentos - Nebue{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <!-- Header com Breadcrumb -->
-    <nav class="flex mb-6" aria-label="Breadcrumb">
-        <ol class="inline-flex items-center space-x-1 md:space-x-3">
-            <li class="inline-flex items-center">
-                <a href="{% url 'dashboard' %}" class="text-slate-400 hover:text-purple-400 transition-colors">
-                    Dashboard
-                </a>
-            </li>
-            <li>
-                <div class="flex items-center">
-                    <svg class="w-6 h-6 text-slate-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+<div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-8 px-6">
+    <div class="max-w-7xl mx-auto">
+        
+        <!-- Breadcrumbs -->
+        <nav class="mb-6" aria-label="Breadcrumb">
+            <ol class="flex items-center space-x-2 text-sm">
+                <li class="flex items-center">
+                    <a href="{% url 'dashboard' %}" class="text-slate-400 hover:text-violet-400 transition-colors flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
+                        Dashboard
+                    </a>
+                    <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
-                    <span class="ml-1 text-slate-100 font-medium">Orçamentos</span>
+                </li>
+                <li>
+                    <span class="text-slate-100 font-medium">Orçamentos</span>
+                </li>
+            </ol>
+        </nav>
+
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500/20 to-indigo-500/20 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
                 </div>
-            </li>
-        </ol>
-    </nav>
-
-    <!-- Título e Botão -->
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-        <div>
-            <h1 class="text-3xl font-bold text-slate-100 mb-2">Orçamentos</h1>
-            <p class="text-slate-400">Acompanhe seus limites de gastos mensais</p>
-        </div>
-        <a href="{% url 'accounts:budget_create' %}" 
-           class="mt-4 md:mt-0 inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-700 text-white font-medium rounded-lg hover:from-purple-600 hover:to-purple-800 transition-all shadow-lg">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-            </svg>
-            Novo Orçamento
-        </a>
-    </div>
-
-    <!-- Filtros -->
-    <div class="bg-slate-800 border border-slate-700 rounded-lg p-6 mb-6">
-        <h3 class="text-lg font-semibold text-slate-100 mb-4">Filtros rápidos:</h3>
-        <form method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-                <label class="block text-sm font-medium text-slate-300 mb-2">Mês</label>
-                <select name="month" class="w-full bg-slate-700 border border-slate-600 text-slate-100 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                    {% for month_num, month_name in months %}
-                    <option value="{{ month_num }}" {% if month_num == selected_month %}selected{% endif %}>
-                        {{ month_name }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-slate-300 mb-2">Ano</label>
-                <select name="year" class="w-full bg-slate-700 border border-slate-600 text-slate-100 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                    {% for year in years %}
-                    <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>
-                        {{ year }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="flex items-end">
-                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg px-6 py-2.5 transition-colors">
-                    <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                <div class="flex-1">
+                    <h1 class="text-3xl md:text-4xl font-bold text-slate-100">Orçamentos</h1>
+                    <p class="text-slate-400 text-sm mt-1">Acompanhe seus limites de gastos mensais</p>
+                </div>
+                <a href="{% url 'accounts:budget_create' %}" 
+                   class="hidden md:flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-500 to-indigo-600 text-white font-semibold rounded-xl hover:from-violet-600 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
-                    Filtrar
-                </button>
+                    Novo Orçamento
+                </a>
             </div>
-        </form>
-    </div>
-
-    <!-- Cards de Resumo -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <!-- Orçamento Total -->
-        <div class="bg-gradient-to-br from-blue-500/10 to-blue-600/10 border border-blue-500/20 rounded-lg p-6">
-            <div class="flex items-center justify-between mb-2">
-                <span class="text-slate-400 text-sm font-medium">Orçamento Total</span>
-                <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-            </div>
-            <p class="text-3xl font-bold text-blue-400">R$ {{ total_limit|floatformat:2 }}</p>
         </div>
 
-        <!-- Total Gasto -->
-        <div class="bg-gradient-to-br from-red-500/10 to-red-600/10 border border-red-500/20 rounded-lg p-6">
-            <div class="flex items-center justify-between mb-2">
-                <span class="text-slate-400 text-sm font-medium">Total Gasto</span>
-                <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+        <!-- Mobile Button -->
+        <div class="md:hidden mb-6">
+            <a href="{% url 'accounts:budget_create' %}"
+               class="flex items-center justify-center gap-2 w-full px-6 py-3 bg-gradient-to-r from-violet-500 to-indigo-600 text-white font-semibold rounded-xl hover:from-violet-600 hover:to-indigo-700 transition-all shadow-lg">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                 </svg>
-            </div>
-            <p class="text-3xl font-bold text-red-400">R$ {{ total_spent|floatformat:2 }}</p>
+                Novo Orçamento
+            </a>
         </div>
 
-        <!-- Restante -->
-        <div class="bg-gradient-to-br from-emerald-500/10 to-emerald-600/10 border border-emerald-500/20 rounded-lg p-6">
-            <div class="flex items-center justify-between mb-2">
-                <span class="text-slate-400 text-sm font-medium">Restante</span>
-                <svg class="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 8h6m-5 0a3 3 0 110 6H9l3 3m-3-6h6m6 1a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        <!-- Filters -->
+        <div class="bg-slate-800/50 backdrop-blur rounded-2xl border border-slate-700/50 shadow-lg p-6 mb-8">
+            <h3 class="text-lg font-semibold text-slate-100 mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
                 </svg>
-            </div>
-            <p class="text-3xl font-bold {% if total_remaining >= 0 %}text-emerald-400{% else %}text-red-400{% endif %}">
-                R$ {{ total_remaining|floatformat:2 }}
-            </p>
+                Filtros Rápidos
+            </h3>
+            <form method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Mês</label>
+                    <select name="month" class="w-full bg-slate-700 border border-slate-600 text-slate-100 rounded-xl px-4 py-3 focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all">
+                        {% for month_num, month_name in months %}
+                        <option value="{{ month_num }}" {% if month_num == selected_month %}selected{% endif %}>
+                            {{ month_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Ano</label>
+                    <select name="year" class="w-full bg-slate-700 border border-slate-600 text-slate-100 rounded-xl px-4 py-3 focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all">
+                        {% for year in years %}
+                        <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>
+                            {{ year }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button type="submit" class="w-full bg-gradient-to-r from-violet-500 to-indigo-600 hover:from-violet-600 hover:to-indigo-700 text-white font-semibold rounded-xl px-6 py-3 transition-all shadow-lg flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                        </svg>
+                        Filtrar
+                    </button>
+                </div>
+            </form>
         </div>
-    </div>
-    </div>
 
-    <!-- Lista de Orçamentos -->
-    {% if budgets %}
-    <div class="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full">
-                <thead class="bg-slate-700/50">
-                    <tr>
-                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Categoria</th>
-                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Limite</th>
-                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Gasto</th>
-                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Restante</th>
-                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Progresso</th>
-                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-4 text-right text-xs font-medium text-slate-300 uppercase tracking-wider">Ações</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-700">
-                    {% for budget in budgets %}
-                    <tr class="hover:bg-slate-700/30 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            {% if budget.is_general %}
-                            <div class="flex items-center">
-                                <svg class="w-5 h-5 text-purple-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                <span class="text-slate-100 font-medium">Orçamento Geral</span>
-                            </div>
-                            {% else %}
-                            <div class="flex items-center">
-                                <svg class="w-5 h-5 text-slate-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-                                </svg>
-                                <span class="text-slate-100">{{ budget.category.name }}</span>
-                            </div>
-                            {% endif %}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-slate-300">
-                            R$ {{ budget.amount_limit|floatformat:2 }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-slate-300">
-                            R$ {{ budget.spent_amount|floatformat:2 }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-slate-300">
-                            R$ {{ budget.remaining_amount|floatformat:2 }}
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="w-full bg-slate-700 rounded-full h-2.5">
-                                {% with percentage=budget.percentage_used|floatformat:0 %}
-                                <div class="h-2.5 rounded-full transition-all duration-300
-                                    {% if budget.alert_level == 'danger' %}bg-red-500
-                                    {% elif budget.alert_level == 'warning' %}bg-yellow-500
-                                    {% else %}bg-emerald-500{% endif %}"
-                                    style="width: {{ percentage }}%">
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- Total Budget -->
+            <div class="group relative overflow-hidden bg-gradient-to-br from-blue-500/10 to-blue-600/10 border border-blue-500/20 rounded-2xl p-6 hover:border-blue-500/40 transition-all">
+                <div class="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent"></div>
+                <div class="relative">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-slate-400 text-sm font-medium uppercase tracking-wider">Orçamento Total</span>
+                        <div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center">
+                            <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="text-4xl font-bold text-blue-400">R$ {{ total_limit|floatformat:2 }}</p>
+                </div>
+            </div>
+
+            <!-- Total Spent -->
+            <div class="group relative overflow-hidden bg-gradient-to-br from-red-500/10 to-red-600/10 border border-red-500/20 rounded-2xl p-6 hover:border-red-500/40 transition-all">
+                <div class="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent"></div>
+                <div class="relative">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-slate-400 text-sm font-medium uppercase tracking-wider">Total Gasto</span>
+                        <div class="w-12 h-12 bg-red-500/10 rounded-xl flex items-center justify-center">
+                            <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="text-4xl font-bold text-red-400">R$ {{ total_spent|floatformat:2 }}</p>
+                </div>
+            </div>
+
+            <!-- Remaining -->
+            <div class="group relative overflow-hidden bg-gradient-to-br from-emerald-500/10 to-emerald-600/10 border border-emerald-500/20 rounded-2xl p-6 hover:border-emerald-500/40 transition-all">
+                <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent"></div>
+                <div class="relative">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-slate-400 text-sm font-medium uppercase tracking-wider">Restante</span>
+                        <div class="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center">
+                            <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 8h6m-5 0a3 3 0 110 6H9l3 3m-3-6h6m6 1a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="text-4xl font-bold {% if total_remaining >= 0 %}text-emerald-400{% else %}text-red-400{% endif %}">
+                        R$ {{ total_remaining|floatformat:2 }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Budgets List -->
+        {% if budgets %}
+        <div class="bg-slate-800/50 backdrop-blur rounded-2xl border border-slate-700/50 shadow-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-slate-700/50">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Categoria</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Limite</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Gasto</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Restante</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Progresso</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-4 text-right text-xs font-semibold text-slate-300 uppercase tracking-wider">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-700">
+                        {% for budget in budgets %}
+                        <tr class="hover:bg-slate-700/30 transition-all">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                {% if budget.is_general %}
+                                <div class="flex items-center gap-2">
+                                    <div class="w-10 h-10 bg-violet-500/10 rounded-xl flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                    </div>
+                                    <span class="text-slate-100 font-medium">Orçamento Geral</span>
                                 </div>
-                                {% endwith %}
-                            </div>
-                            <span class="text-xs text-slate-400 mt-1 block">{{ budget.percentage_used|floatformat:1 }}%</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            {% if budget.is_exceeded %}
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-500/20 text-red-400">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                                </svg>
-                                Excedido
-                            </span>
-                            {% elif budget.alert_level == 'warning' %}
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-500/20 text-yellow-400">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                                </svg>
-                                Atenção
-                            </span>
-                            {% else %}
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/20 text-emerald-400">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                OK
-                            </span>
-                            {% endif %}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right">
-                            <div class="flex items-center justify-end space-x-2">
-                                <a href="{% url 'accounts:budget_edit' budget.pk %}" 
-                                   class="text-slate-400 hover:text-purple-400 transition-colors"
-                                   title="Editar">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                {% else %}
+                                <div class="flex items-center gap-2">
+                                    <div class="w-10 h-10 bg-slate-700 rounded-xl flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                                        </svg>
+                                    </div>
+                                    <span class="text-slate-100">{{ budget.category.name }}</span>
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="text-slate-200 font-semibold">R$ {{ budget.amount_limit|floatformat:2 }}</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="text-slate-300">R$ {{ budget.spent_amount|floatformat:2 }}</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="text-slate-300">R$ {{ budget.remaining_amount|floatformat:2 }}</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="space-y-2">
+                                    <div class="w-full bg-slate-700 rounded-full h-3 overflow-hidden">
+                                        {% with percentage=budget.percentage_used|floatformat:0 %}
+                                        <div class="h-3 rounded-full transition-all duration-500
+                                            {% if budget.alert_level == 'danger' %}bg-gradient-to-r from-red-500 to-red-600
+                                            {% elif budget.alert_level == 'warning' %}bg-gradient-to-r from-yellow-500 to-amber-500
+                                            {% else %}bg-gradient-to-r from-emerald-500 to-emerald-600{% endif %}"
+                                            style="width: {{ percentage }}%">
+                                        </div>
+                                        {% endwith %}
+                                    </div>
+                                    <span class="text-xs text-slate-400 font-medium">{{ budget.percentage_used|floatformat:1 }}%</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                {% if budget.is_exceeded %}
+                                <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-500/20 text-red-400 border border-red-500/30">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                                     </svg>
-                                </a>
-                                <a href="{% url 'accounts:budget_delete' budget.pk %}" 
-                                   class="text-slate-400 hover:text-red-400 transition-colors"
-                                   title="Excluir">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    Excedido
+                                </span>
+                                {% elif budget.alert_level == 'warning' %}
+                                <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                                     </svg>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                                    Atenção
+                                </span>
+                                {% else %}
+                                <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    OK
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <a href="{% url 'accounts:budget_edit' budget.pk %}" 
+                                       class="p-2 text-slate-400 hover:text-violet-400 hover:bg-violet-500/10 rounded-lg transition-all"
+                                       title="Editar">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
+                                    </a>
+                                    <a href="{% url 'accounts:budget_delete' budget.pk %}" 
+                                       class="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
+                                       title="Excluir">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
+        {% else %}
+        
+        <!-- Empty State -->
+        <div class="bg-slate-800/50 backdrop-blur rounded-2xl border border-slate-700/50 shadow-lg p-12 text-center">
+            <div class="max-w-md mx-auto">
+                <div class="w-20 h-20 bg-slate-700/50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    <svg class="w-10 h-10 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-300 mb-2">Nenhum orçamento cadastrado</h3>
+                <p class="text-slate-400 mb-8">Comece criando seu primeiro orçamento para controlar seus gastos mensais</p>
+                <a href="{% url 'accounts:budget_create' %}" 
+                   class="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-violet-500 to-indigo-600 text-white font-semibold rounded-xl hover:from-violet-600 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Criar Primeiro Orçamento
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
     </div>
-    {% else %}
-    <!-- Estado Vazio -->
-    <div class="bg-slate-800 border border-slate-700 rounded-lg p-12 text-center">
-        <svg class="w-16 h-16 text-slate-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-        </svg>
-        <h3 class="text-lg font-medium text-slate-300 mb-2">Nenhum orçamento cadastrado</h3>
-        <p class="text-slate-400 mb-6">Comece criando seu primeiro orçamento para controlar seus gastos</p>
-        <a href="{% url 'accounts:budget_create' %}" 
-           class="inline-flex items-center px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-            </svg>
-            Criar Primeiro Orçamento
-        </a>
-    </div>
-    {% endif %}
 </div>
 {% endblock %}

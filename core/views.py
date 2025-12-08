@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, Q
 from django.utils import timezone
 from decimal import Decimal
+from datetime import timedelta
 import json
 import logging
 
@@ -44,22 +45,88 @@ class HomeView(TemplateView):
         return super().get(request, *args, **kwargs)
 
 
+def capitalize_month(month_string):
+    """
+    Capitaliza o primeiro caractere da string do mês.
+    Ex: "dezembro de 2025" -> "Dezembro de 2025"
+    """
+    if not month_string:
+        return month_string
+    return month_string[0].upper() + month_string[1:]
+
+
 @login_required
 def dashboard_view(request):
     """
-    Dashboard principal com tratamento completo de erros.
+    Dashboard principal com filtro de mês e tratamento completo de erros.
     Garante que sempre retorna um contexto válido.
     """
     try:
         # ========================================
-        # CONTEXTO PADRÃO (valores seguros)
+        # 1. PROCESSAMENTO DO FILTRO DE MÊS
+        # ========================================
+        selected_month = request.GET.get('month', '')
+        now = timezone.now()
+        
+        # Gerar lista de meses disponíveis (últimos 12 meses)
+        available_months = []
+        for i in range(12):
+            month_date = now - timedelta(days=30 * i)
+            # Normalizar para primeiro dia do mês
+            month_date = month_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            
+            available_months.append({
+                'value': month_date.strftime('%Y-%m'),
+                'label': capitalize_month(month_date.strftime('%B de %Y'))
+            })
+        
+        # Determinar range de datas para filtro
+        if selected_month:
+            try:
+                year, month = map(int, selected_month.split('-'))
+                start_date = timezone.datetime(year, month, 1)
+                start_date = timezone.make_aware(start_date) if timezone.is_naive(start_date) else start_date
+                
+                # Último dia do mês
+                if month == 12:
+                    end_date = timezone.datetime(year + 1, 1, 1) - timedelta(days=1)
+                else:
+                    end_date = timezone.datetime(year, month + 1, 1) - timedelta(days=1)
+                
+                end_date = timezone.make_aware(end_date.replace(hour=23, minute=59, second=59)) if timezone.is_naive(end_date) else end_date.replace(hour=23, minute=59, second=59)
+                
+                current_month_label = capitalize_month(start_date.strftime('%B de %Y'))
+                
+            except (ValueError, AttributeError) as e:
+                logger.warning(f"Formato de mês inválido: {selected_month} - {e}")
+                # Se formato inválido, usar mês atual
+                start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+                end_date = now
+                current_month_label = capitalize_month(now.strftime('%B de %Y'))
+                selected_month = ''
+        else:
+            # Mês atual por padrão
+            start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            end_date = now
+            current_month_label = capitalize_month(now.strftime('%B de %Y'))
+
+        # ========================================
+        # 2. CONTEXTO PADRÃO (valores seguros)
         # ========================================
         context = {
+            # Filtro de mês
+            'available_months': available_months,
+            'selected_month': selected_month,
+            'current_month': current_month_label,
+            
+            # Estatísticas
             'total_balance': Decimal('0.00'),
             'month_income': Decimal('0.00'),
             'month_expenses': Decimal('0.00'),
             'month_balance': Decimal('0.00'),
             'active_accounts_count': 0,
+            
+            # Dados
             'recent_transactions': [],
             'top_categories': [],
             'category_chart_data': '[]',
@@ -68,7 +135,6 @@ def dashboard_view(request):
                 'income': [], 
                 'expense': []
             }),
-            'current_month': timezone.now().strftime('%B de %Y'),
         }
 
         # Imports dentro para evitar circular imports
@@ -77,16 +143,13 @@ def dashboard_view(request):
             from transactions.models import Transaction
         except ImportError as e:
             logger.error(f"Erro ao importar models: {e}")
-            return render(request, 'dashboard_error.html', {
-                'error_message': 'Erro de configuração do sistema.'
-            }, status=500)
+            messages.error(request, 'Erro de configuração do sistema.')
+            return render(request, 'dashboard.html', context)
 
         user = request.user
-        now = timezone.now()
-        first_day = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 
         # ========================================
-        # SALDO TOTAL
+        # 3. SALDO TOTAL (todas as contas ativas)
         # ========================================
         try:
             accounts = Account.objects.filter(user=user, is_active=True)
@@ -95,55 +158,51 @@ def dashboard_view(request):
             total = accounts.aggregate(total=Sum('balance'))['total']
             context['total_balance'] = total if total else Decimal('0.00')
             
-            logger.info(f"Saldo carregado: {context['total_balance']}")
+            logger.debug(f"Saldo total: R$ {context['total_balance']}")
         except Exception as e:
             logger.error(f"Erro ao calcular saldo: {e}", exc_info=True)
 
         # ========================================
-        # TRANSAÇÕES DO MÊS
+        # 4. TRANSAÇÕES DO PERÍODO SELECIONADO
         # ========================================
         try:
             transactions = Transaction.objects.filter(
                 account__user=user,
-                transaction_date__gte=first_day,
-                transaction_date__lte=now
+                transaction_date__gte=start_date,
+                transaction_date__lte=end_date
             )
 
-            month_data = transactions.aggregate(
+            period_data = transactions.aggregate(
                 income=Sum('amount', filter=Q(transaction_type='INCOME')),
                 expense=Sum('amount', filter=Q(transaction_type='EXPENSE'))
             )
 
-            context['month_income'] = month_data['income'] or Decimal('0.00')
-            context['month_expenses'] = month_data['expense'] or Decimal('0.00')
+            context['month_income'] = period_data['income'] or Decimal('0.00')
+            context['month_expenses'] = period_data['expense'] or Decimal('0.00')
             context['month_balance'] = context['month_income'] - context['month_expenses']
             
-            logger.info(f"Transações do mês: +{context['month_income']} -{context['month_expenses']}")
+            logger.debug(f"Período {current_month_label}: +{context['month_income']} -{context['month_expenses']}")
         except Exception as e:
-            logger.error(f"Erro ao calcular transações: {e}", exc_info=True)
+            logger.error(f"Erro ao calcular transações do período: {e}", exc_info=True)
 
         # ========================================
-        # TRANSAÇÕES RECENTES
+        # 5. TRANSAÇÕES RECENTES (do período)
         # ========================================
         try:
-            context['recent_transactions'] = Transaction.objects.filter(
-                account__user=user
-            ).select_related(
+            context['recent_transactions'] = transactions.select_related(
                 'account', 'category'
-            ).order_by('-transaction_date')[:5]
+            ).order_by('-transaction_date', '-created_at')[:10]
             
-            logger.info(f"Transações recentes: {len(context['recent_transactions'])}")
+            logger.debug(f"Transações recentes: {context['recent_transactions'].count()}")
         except Exception as e:
             logger.error(f"Erro ao buscar transações recentes: {e}", exc_info=True)
 
         # ========================================
-        # TOP 5 CATEGORIAS (DESPESAS)
+        # 6. TOP 5 CATEGORIAS (DESPESAS do período)
         # ========================================
         try:
-            top_cats = Transaction.objects.filter(
-                account__user=user,
-                transaction_type='EXPENSE',
-                transaction_date__gte=first_day
+            top_cats = transactions.filter(
+                transaction_type='EXPENSE'
             ).values(
                 'category__name', 
                 'category__color'
@@ -160,44 +219,45 @@ def dashboard_view(request):
                     chart_data.append({
                         'name': cat['category__name'] or 'Sem categoria',
                         'total': float(cat['total']),
-                        'color': cat['category__color'] or '#6366f1'
+                        'color': cat['category__color'] or '#8b5cf6'  # Violet como padrão
                     })
                 context['category_chart_data'] = json.dumps(chart_data)
             
-            logger.info(f"Top categorias: {len(context['top_categories'])}")
+            logger.debug(f"Top {len(context['top_categories'])} categorias processadas")
         except Exception as e:
             logger.error(f"Erro ao processar categorias: {e}", exc_info=True)
 
         # ========================================
-        # GRÁFICO MENSAL (últimos 6 meses)
+        # 7. GRÁFICO DE EVOLUÇÃO (últimos 6 meses)
         # ========================================
         try:
-            from datetime import timedelta
-            
             months_data = {
                 'labels': [], 
                 'income': [], 
                 'expense': []
             }
             
-            for i in range(5, -1, -1):
+            for i in range(5, -1, -1):  # 6 meses (5 até 0)
                 month_date = now - timedelta(days=30 * i)
                 month_start = month_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
                 
                 # Último dia do mês
                 if month_date.month == 12:
-                    month_end = month_date.replace(
-                        year=month_date.year + 1, 
-                        month=1, 
-                        day=1
+                    month_end = timezone.datetime(
+                        month_date.year + 1, 1, 1
                     ) - timedelta(days=1)
                 else:
-                    month_end = month_date.replace(
-                        month=month_date.month + 1, 
-                        day=1
+                    month_end = timezone.datetime(
+                        month_date.year, month_date.month + 1, 1
                     ) - timedelta(days=1)
                 
                 month_end = month_end.replace(hour=23, minute=59, second=59)
+                
+                # Garantir timezone aware
+                if timezone.is_naive(month_start):
+                    month_start = timezone.make_aware(month_start)
+                if timezone.is_naive(month_end):
+                    month_end = timezone.make_aware(month_end)
 
                 # Transações do mês
                 month_trans = Transaction.objects.filter(
@@ -210,31 +270,48 @@ def dashboard_view(request):
                 )
 
                 # Adiciona aos dados
-                month_label = month_start.strftime('%b/%y')
+                month_label = month_start.strftime('%b/%y').capitalize()
                 months_data['labels'].append(month_label)
                 months_data['income'].append(float(month_trans['income'] or 0))
                 months_data['expense'].append(float(month_trans['expense'] or 0))
 
             context['monthly_chart_data'] = json.dumps(months_data)
-            logger.info(f"Gráfico mensal gerado: {len(months_data['labels'])} meses")
+            logger.debug(f"Gráfico mensal: {len(months_data['labels'])} meses processados")
             
         except Exception as e:
             logger.error(f"Erro ao gerar gráfico mensal: {e}", exc_info=True)
             # Mantém valor padrão já definido
 
         # ========================================
-        # RENDERIZA TEMPLATE
+        # 8. RENDERIZA TEMPLATE
         # ========================================
-        logger.info(f"Renderizando dashboard para {user.email}")
+        logger.info(f"Dashboard carregado para {user.email} - Período: {current_month_label}")
         return render(request, 'dashboard.html', context)
 
     except Exception as e:
         # Captura QUALQUER erro não tratado
         logger.exception(f"ERRO CRÍTICO no dashboard para {request.user}: {e}")
         
-        return render(request, 'dashboard_error.html', {
-            'error_message': 'Não foi possível carregar o dashboard. Tente novamente em alguns instantes.'
-        }, status=500)
+        messages.error(
+            request, 
+            'Não foi possível carregar o dashboard completamente. Alguns dados podem estar indisponíveis.'
+        )
+        
+        # Retorna com contexto mínimo ao invés de página de erro
+        return render(request, 'dashboard.html', {
+            'available_months': [],
+            'selected_month': '',
+            'current_month': timezone.now().strftime('%B de %Y'),
+            'total_balance': Decimal('0.00'),
+            'month_income': Decimal('0.00'),
+            'month_expenses': Decimal('0.00'),
+            'month_balance': Decimal('0.00'),
+            'active_accounts_count': 0,
+            'recent_transactions': [],
+            'top_categories': [],
+            'category_chart_data': '[]',
+            'monthly_chart_data': json.dumps({'labels': [], 'income': [], 'expense': []}),
+        })
 
 
 def page_not_found_view(request, exception):

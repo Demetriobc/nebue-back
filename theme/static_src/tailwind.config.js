@@ -1,9 +1,12 @@
 /**
  * Nebue - Tailwind Configuration
- * Paleta de cores douradas para gestão financeira premium
+ * Paleta de cores violet/indigo moderna + Dark Mode
  */
 
 module.exports = {
+    // ⭐ DARK MODE HABILITADO
+    darkMode: 'class', // Usa a classe 'dark' no <html> para ativar
+    
     content: [
         /**
          * HTML. Paths to Django template files that will contain Tailwind CSS classes.
@@ -39,53 +42,26 @@ module.exports = {
          */
         // '../../**/*.py'
     ],
+    
     theme: {
         extend: {
-            // 🟡 CORES DOURADAS NEBUE
+            // 🎨 CORES PRINCIPAIS (Violet/Indigo)
             colors: {
-                // Cores Primárias (Dourado)
-                'primary': {
-                    50: '#FFFBF0',
-                    100: '#FFF5DC',
-                    200: '#FFEAB8',
-                    300: '#FFE094',
-                    400: '#F4E4BC',
-                    500: '#D4AF37',  // Dourado Principal
-                    600: '#B8941E',  // Dourado Escuro
-                    700: '#A67C00',  // Dourado Profundo
-                    800: '#8A6600',
-                    900: '#6E5200',
-                },
-                
-                // Cores de Accent (Dourado Claro)
-                'accent': {
-                    50: '#FFFEF9',
-                    100: '#FFFCF0',
-                    200: '#FFF9E0',
-                    300: '#FFF5D1',
-                    400: '#FFF0C2',
-                    500: '#F4E4BC',  // Dourado Claro
-                    600: '#E6C75A',  // Dourado Médio
-                    700: '#C5A028',
-                    800: '#A38320',
-                    900: '#826818',
-                },
+                // Fundos Escuros (Dark Mode)
+                'bg-primary': '#0f172a',      // slate-950
+                'bg-secondary': '#1e293b',    // slate-900
+                'bg-tertiary': '#334155',     // slate-800
 
-                // Fundos Escuros (manter)
-                'bg-primary': '#0f172a',
-                'bg-secondary': '#1e293b',
-                'bg-tertiary': '#334155',
+                // Textos
+                'text-primary': '#f1f5f9',    // slate-100
+                'text-secondary': '#cbd5e1',  // slate-300
+                'text-muted': '#64748b',      // slate-500
 
-                // Textos (manter)
-                'text-primary': '#f1f5f9',
-                'text-secondary': '#cbd5e1',
-                'text-muted': '#64748b',
-
-                // Estados (manter)
-                'success': '#10b981',
-                'error': '#ef4444',
-                'warning': '#f59e0b',
-                'info': '#3b82f6',
+                // Estados
+                'success': '#10b981',         // emerald-500
+                'error': '#ef4444',           // red-500
+                'warning': '#f59e0b',         // amber-500
+                'info': '#3b82f6',            // blue-500
             },
 
             // Animações
@@ -100,12 +76,24 @@ module.exports = {
                         opacity: '1',
                     },
                 },
+                'pulse-ring': {
+                    '0%': {
+                        transform: 'scale(1)',
+                        opacity: '0.8',
+                    },
+                    '100%': {
+                        transform: 'scale(1.5)',
+                        opacity: '0',
+                    },
+                },
             },
             animation: {
                 'slide-in-right': 'slide-in-right 0.3s ease-out',
+                'pulse-ring': 'pulse-ring 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
             },
         },
     },
+    
     plugins: [
         /**
          * '@tailwindcss/forms' is the forms plugin that provides a minimal styling
