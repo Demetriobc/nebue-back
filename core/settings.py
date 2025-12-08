@@ -187,29 +187,23 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # These settings protect the application from common web vulnerabilities
 
 if not DEBUG:
-    # HTTPS/SSL Configuration
-    # Force all connections to use HTTPS instead of HTTP
-    SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=True, cast=bool)
-
-    # Cookie Security
-    # Ensure session cookies are only sent over HTTPS
-    SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', default=True, cast=bool)
-
-    # Ensure CSRF cookies are only sent over HTTPS
-    CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=True, cast=bool)
-
-    # HTTP Strict Transport Security (HSTS)
-    # Tells browsers to only access this site via HTTPS for the specified time
-    # 31536000 seconds = 1 year
-    SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', default=31536000, cast=int)
-
-    # Apply HSTS to all subdomains
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = config(
-        'SECURE_HSTS_INCLUDE_SUBDOMAINS', default=True, cast=bool
-    )
-
-    # Allow browser to preload HSTS (submit to browser preload lists)
-    SECURE_HSTS_PRELOAD = config('SECURE_HSTS_PRELOAD', default=True, cast=bool)
+    # Configuração para proxy reverso (Railway, Heroku, etc)
+    # Railway usa proxy, então precisamos confiar no header X-Forwarded-Proto
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    
+    # HTTPS/SSL Configuration - DESABILITADO para evitar loop de redirect
+    # O Railway já fornece HTTPS automaticamente via proxy
+    SECURE_SSL_REDIRECT = False
+    
+    # Cookie Security - DESABILITADO para evitar problemas com proxy
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    
+    # HTTP Strict Transport Security (HSTS) - COMENTADO por enquanto
+    # Pode habilitar depois que tudo estiver funcionando perfeitamente
+    # SECURE_HSTS_SECONDS = 31536000  # 1 ano
+    # SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    # SECURE_HSTS_PRELOAD = True
 
 # Additional Security Headers (enabled in all environments)
 # Prevent browsers from guessing content types
