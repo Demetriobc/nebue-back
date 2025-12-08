@@ -19,7 +19,7 @@ urlpatterns = [
     path('categories/', include('categories.urls', namespace='categories')),
     path('transactions/', include('transactions.urls', namespace='transactions')),
     path('cartoes/', include('cards.urls', namespace='cards')),
-    path('notifications/', include('notifications.urls')),
+    path('notifications/', include(('notifications.urls', 'notifications'), namespace='notifications')),  # ← CORRIGIDO!
     path('insights/', include('analytics.urls')),
     path('chat/', include('chatbot.urls')),
     path('gamificacao/', include('gamification.urls')),
