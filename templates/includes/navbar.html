@@ -422,11 +422,33 @@
             async loadNotifications() {
                 try {
                     const response = await fetch('/notifications/api/list/');
+                    
+                    if (!response.ok) {
+                        console.warn('⚠️ Notifications API returned:', response.status);
+                        this.notifications = [];
+                        this.unreadCount = 0;
+                        return;
+                    }
+                    
                     const data = await response.json();
-                    this.notifications = data.notifications;
-                    this.unreadCount = data.unread_count;
+                    
+                    // Valida estrutura da resposta
+                    if (!data || typeof data !== 'object') {
+                        console.error('❌ Invalid response format:', data);
+                        this.notifications = [];
+                        this.unreadCount = 0;
+                        return;
+                    }
+                    
+                    this.notifications = Array.isArray(data.notifications) ? data.notifications : [];
+                    this.unreadCount = Number(data.unread_count) || 0;
+                    
+                    console.log(`✅ Loaded ${this.notifications.length} notifications, ${this.unreadCount} unread`);
+                    
                 } catch (error) {
-                    console.error('Error loading notifications:', error);
+                    console.error('❌ Error loading notifications:', error);
+                    this.notifications = [];
+                    this.unreadCount = 0;
                 }
             },
 
