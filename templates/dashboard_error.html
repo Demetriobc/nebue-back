@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Erro - Dashboard{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-900 flex items-center justify-center px-4">
+    <div class="max-w-md w-full">
+        <div class="bg-slate-800 rounded-lg shadow-xl p-8 border border-slate-700 text-center">
+            <div class="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+            </div>
+
+            <h1 class="text-2xl font-bold text-slate-100 mb-4">
+                Ops! Algo deu errado
+            </h1>
+            
+            <p class="text-slate-400 mb-8">
+                {{ error_message|default:"Não foi possível carregar o dashboard." }}
+            </p>
+
+            <div class="space-y-3">
+                <a href="{% url 'dashboard' %}" 
+                   class="block w-full px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-700 text-white font-semibold rounded-lg hover:from-purple-600 hover:to-purple-800 transition-all">
+                    Tentar Novamente
+                </a>
+                
+                <a href="{% url 'users:logout' %}" 
+                   class="block w-full px-6 py-3 bg-slate-700 text-slate-100 font-semibold rounded-lg hover:bg-slate-600 transition-all">
+                    Fazer Logout
+                </a>
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-slate-700">
+                <p class="text-sm text-slate-500">
+                    Se o problema persistir, entre em contato com o suporte.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
