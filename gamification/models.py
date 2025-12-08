@@ -119,6 +119,27 @@ class PerfilGamificacao(models.Model):
     notificacoes_gamificacao = models.BooleanField(default=True)
     exibir_ranking = models.BooleanField(default=True)
     
+    # ========================================
+    # NOVOS CAMPOS DE PRIVACIDADE (ADICIONE AQUI)
+    # ========================================
+    apelido = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text='Apelido público do usuário (ex: Rápido Leão)'
+    )
+    
+    exibir_nome_real = models.BooleanField(
+        default=False,
+        help_text='Se marcado, exibe o email no ranking. Caso contrário, usa apelido anônimo.'
+    )
+    
+    perfil_publico = models.BooleanField(
+        default=True,
+        help_text='Se desmarcado, o perfil não aparece em rankings públicos'
+    )
+    # ========================================
+    
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
     
@@ -127,7 +148,46 @@ class PerfilGamificacao(models.Model):
         verbose_name_plural = 'Perfis de Gamificação'
     
     def __str__(self):
-        return f"Gamificação - {self.user.username}"
+        return f"Gamificação - {self.get_nome_exibicao()}"
+    
+    # ========================================
+    # NOVOS MÉTODOS (ADICIONE AQUI)
+    # ========================================
+    def save(self, *args, **kwargs):
+        """Gera apelido automático se não tiver"""
+        if not self.apelido:
+            self.apelido = self.gerar_apelido_aleatorio()
+        super().save(*args, **kwargs)
+    
+    def get_nome_exibicao(self):
+        """Retorna o nome para exibição pública baseado nas preferências"""
+        if self.exibir_nome_real:
+            # Usa o email (já que username não existe)
+            return self.user.email.split('@')[0]  # Pega só a parte antes do @
+        else:
+            # Usa o apelido anônimo
+            return self.apelido or self.gerar_apelido_aleatorio()
+    
+    @staticmethod
+    def gerar_apelido_aleatorio():
+        """Gera um apelido aleatório combinando adjetivo + animal"""
+        import random
+        
+        adjetivos = [
+            'Rápido', 'Sábio', 'Forte', 'Ágil', 'Valente', 'Calmo', 'Esperto',
+            'Focado', 'Dedicado', 'Persistente', 'Corajoso', 'Astuto', 'Firme',
+            'Estratégico', 'Veloz', 'Inteligente', 'Poupador', 'Disciplinado',
+            'Organizado', 'Eficiente', 'Próspero', 'Vencedor', 'Ambicioso'
+        ]
+        
+        animais = [
+            'Leão', 'Águia', 'Lobo', 'Raposa', 'Tigre', 'Falcão', 'Urso',
+            'Pantera', 'Dragão', 'Fênix', 'Coruja', 'Tubarão', 'Gato',
+            'Lince', 'Condor', 'Jaguar', 'Puma', 'Leopardo', 'Gavião'
+        ]
+        
+        return f"{random.choice(adjetivos)} {random.choice(animais)}"
+    # ========================================
     
     def adicionar_pontos(self, pontos, descricao=""):
         """Adiciona pontos e verifica se subiu de nível"""

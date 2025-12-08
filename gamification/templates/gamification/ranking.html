@@ -118,6 +118,76 @@
     }
 
     /* ========================================
+       PRIVACY BANNER
+    ======================================== */
+    .privacy-banner {
+        background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(236, 72, 153, 0.15));
+        border: 2px solid rgba(168, 85, 247, 0.3);
+        border-radius: 20px;
+        padding: 24px;
+        margin-bottom: 32px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s;
+    }
+    
+    .privacy-banner:hover {
+        border-color: rgba(168, 85, 247, 0.5);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(168, 85, 247, 0.2);
+    }
+    
+    .privacy-icon {
+        font-size: 48px;
+        flex-shrink: 0;
+    }
+    
+    .privacy-content {
+        flex: 1;
+    }
+    
+    .privacy-title {
+        font-size: 20px;
+        font-weight: 900;
+        color: white;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .privacy-text {
+        color: rgba(148, 163, 184, 0.8);
+        font-size: 15px;
+        line-height: 1.6;
+    }
+    
+    .privacy-btn {
+        background: linear-gradient(135deg, rgb(168, 85, 247), rgb(124, 58, 237));
+        color: white;
+        padding: 12px 28px;
+        border-radius: 12px;
+        font-weight: 900;
+        font-size: 14px;
+        text-transform: uppercase;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+    
+    .privacy-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(168, 85, 247, 0.4);
+    }
+
+    /* ========================================
        PODIUM (Top 3)
     ======================================== */
     .podium-container {
@@ -209,6 +279,22 @@
         font-weight: 900;
         color: white;
         margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    
+    .anonymous-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: rgba(100, 116, 139, 0.3);
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        padding: 2px 8px;
+        border-radius: 20px;
+        font-size: 11px;
+        color: rgba(148, 163, 184, 0.8);
     }
     
     .podium-level {
@@ -329,6 +415,9 @@
         font-size: 18px;
         font-weight: 700;
         color: white;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
     
     .user-badge {
@@ -343,7 +432,6 @@
         font-weight: 900;
         text-transform: uppercase;
         color: rgb(168, 85, 247);
-        margin-left: 8px;
     }
     
     .level-badge {
@@ -406,6 +494,38 @@
     }
 
     /* ========================================
+       PRIVATE MODE NOTICE
+    ======================================== */
+    .private-notice {
+        background: linear-gradient(135deg, rgba(100, 116, 139, 0.15), rgba(71, 85, 105, 0.15));
+        border: 2px solid rgba(148, 163, 184, 0.3);
+        border-radius: 20px;
+        padding: 40px;
+        text-align: center;
+        margin-top: 32px;
+    }
+    
+    .private-icon {
+        font-size: 80px;
+        margin-bottom: 20px;
+        opacity: 0.6;
+    }
+    
+    .private-title {
+        font-size: 28px;
+        font-weight: 900;
+        color: white;
+        margin-bottom: 12px;
+    }
+    
+    .private-text {
+        font-size: 18px;
+        color: rgba(148, 163, 184, 0.8);
+        margin-bottom: 24px;
+        line-height: 1.6;
+    }
+
+    /* ========================================
        EMPTY STATE
     ======================================== */
     .empty-state {
@@ -462,6 +582,17 @@
         .position-number-large {
             font-size: 64px;
         }
+        
+        .privacy-banner {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .username {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+        }
     }
 </style>
 {% endblock %}
@@ -510,6 +641,27 @@
         </div>
 
         <!-- ========================================
+             PRIVACY BANNER (informativo)
+        ======================================== -->
+        <div class="privacy-banner">
+            <div class="privacy-icon">🔒</div>
+            <div class="privacy-content">
+                <div class="privacy-title">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Privacidade Protegida</span>
+                </div>
+                <p class="privacy-text">
+                    Você controla como aparece no ranking! Por padrão, usamos apelidos anônimos para proteger sua identidade. 
+                    Configure suas preferências de privacidade a qualquer momento.
+                </p>
+            </div>
+            <a href="{% url 'gamification:configuracoes_privacidade' %}" class="privacy-btn">
+                <i class="fas fa-cog"></i>
+                <span>Configurar</span>
+            </a>
+        </div>
+
+        <!-- ========================================
              PODIUM (Top 3)
         ======================================== -->
         {% if ranking|length >= 3 %}
@@ -519,7 +671,21 @@
                 <div class="podium-avatar">
                     <span class="podium-medal">🥈</span>
                 </div>
-                <div class="podium-name">{{ ranking.1.user.username }}</div>
+                <div class="podium-name">
+                    {{ ranking.1.get_nome_exibicao }}
+                    {% if not ranking.1.exibir_nome_real %}
+                        <span class="anonymous-badge">
+                            <i class="fas fa-user-secret"></i>
+                            <span>Anônimo</span>
+                        </span>
+                    {% endif %}
+                    {% if ranking.1.user == user %}
+                        <span class="user-badge">
+                            <i class="fas fa-user"></i>
+                            você
+                        </span>
+                    {% endif %}
+                </div>
                 <div class="podium-level">
                     <i class="fas fa-star mr-1"></i>
                     {{ ranking.1.nivel_atual.nome|default:"Iniciante" }}
@@ -536,7 +702,21 @@
                 <div class="podium-avatar">
                     <span class="podium-medal">🥇</span>
                 </div>
-                <div class="podium-name">{{ ranking.0.user.username }}</div>
+                <div class="podium-name">
+                    {{ ranking.0.get_nome_exibicao }}
+                    {% if not ranking.0.exibir_nome_real %}
+                        <span class="anonymous-badge">
+                            <i class="fas fa-user-secret"></i>
+                            <span>Anônimo</span>
+                        </span>
+                    {% endif %}
+                    {% if ranking.0.user == user %}
+                        <span class="user-badge">
+                            <i class="fas fa-user"></i>
+                            você
+                        </span>
+                    {% endif %}
+                </div>
                 <div class="podium-level">
                     <i class="fas fa-crown mr-1"></i>
                     {{ ranking.0.nivel_atual.nome|default:"Iniciante" }}
@@ -552,7 +732,21 @@
                 <div class="podium-avatar">
                     <span class="podium-medal">🥉</span>
                 </div>
-                <div class="podium-name">{{ ranking.2.user.username }}</div>
+                <div class="podium-name">
+                    {{ ranking.2.get_nome_exibicao }}
+                    {% if not ranking.2.exibir_nome_real %}
+                        <span class="anonymous-badge">
+                            <i class="fas fa-user-secret"></i>
+                            <span>Anônimo</span>
+                        </span>
+                    {% endif %}
+                    {% if ranking.2.user == user %}
+                        <span class="user-badge">
+                            <i class="fas fa-user"></i>
+                            você
+                        </span>
+                    {% endif %}
+                </div>
                 <div class="podium-level">
                     <i class="fas fa-star mr-1"></i>
                     {{ ranking.2.nivel_atual.nome|default:"Iniciante" }}
@@ -596,11 +790,20 @@
                             <td>
                                 <div class="flex items-center gap-3">
                                     <div class="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 font-black text-white text-lg">
-                                        {{ perfil.user.username|slice:":1"|upper }}
+                                        {% if perfil.exibir_nome_real %}
+                                            {{ perfil.user.email|slice:":1"|upper }}
+                                        {% else %}
+                                            <i class="fas fa-user-secret"></i>
+                                        {% endif %}
                                     </div>
                                     <div>
                                         <div class="username">
-                                            {{ perfil.user.username }}
+                                            <span>{{ perfil.get_nome_exibicao }}</span>
+                                            {% if not perfil.exibir_nome_real %}
+                                                <span class="anonymous-badge">
+                                                    <i class="fas fa-lock"></i>
+                                                </span>
+                                            {% endif %}
                                             {% if perfil.user == user %}
                                                 <span class="user-badge">
                                                     <i class="fas fa-user"></i>
@@ -638,7 +841,7 @@
         </div>
 
         <!-- ========================================
-             USER POSITION (se fora do top 10)
+             USER POSITION (se público e fora do top 10)
         ======================================== -->
         {% if posicao_user and posicao_user > 10 %}
         <div class="user-position-card">
@@ -656,6 +859,22 @@
                     <span class="text-white font-bold">Continue acumulando pontos para subir no ranking!</span>
                 </div>
             </div>
+        </div>
+        {% elif posicao_user is None and perfil_user and not perfil_user.perfil_publico %}
+        <!-- ========================================
+             PRIVATE MODE NOTICE (perfil privado)
+        ======================================== -->
+        <div class="private-notice">
+            <div class="private-icon">🔒</div>
+            <div class="private-title">Você está no Modo Privado</div>
+            <p class="private-text">
+                Seu perfil não aparece nos rankings públicos. 
+                Se quiser competir com outros usuários, ative a exibição pública nas configurações de privacidade.
+            </p>
+            <a href="{% url 'gamification:configuracoes_privacidade' %}" class="privacy-btn">
+                <i class="fas fa-cog"></i>
+                <span>Alterar Configurações</span>
+            </a>
         </div>
         {% endif %}
 

@@ -25,55 +25,95 @@ class Command(BaseCommand):
         niveis = [
             {
                 'numero': 1,
-                'nome': 'Aprendiz Financeiro',
+                'nome': 'Iniciante',
                 'descricao': 'Começando sua jornada rumo à estabilidade financeira',
                 'pontos_necessarios': 0,
-                'icone': 'fa-star',
-                'cor': '#94a3b8'
+                'icone': 'fa-seedling',  # 🌱
+                'cor': '#10b981'
             },
             {
                 'numero': 2,
-                'nome': 'Organizador Consciente',
-                'descricao': 'Aprendendo a controlar suas finanças',
-                'pontos_necessarios': 500,
-                'icone': 'fa-seedling',
-                'cor': '#84cc16'
-            },
-            {
-                'numero': 3,
-                'nome': 'Poupador Estratégico',
-                'descricao': 'Começando a economizar com inteligência',
-                'pontos_necessarios': 1500,
-                'icone': 'fa-piggy-bank',
-                'cor': '#22c55e'
-            },
-            {
-                'numero': 4,
-                'nome': 'Investidor Iniciante',
-                'descricao': 'Fazendo seu dinheiro trabalhar para você',
-                'pontos_necessarios': 3000,
-                'icone': 'fa-chart-line',
+                'nome': 'Aprendiz',
+                'descricao': 'Aprendendo o básico sobre finanças',
+                'pontos_necessarios': 100,
+                'icone': 'fa-book-open',  # 📖
                 'cor': '#3b82f6'
             },
             {
+                'numero': 3,
+                'nome': 'Organizador',
+                'descricao': 'Organizando as finanças',
+                'pontos_necessarios': 300,
+                'icone': 'fa-clipboard-list',  # 📋
+                'cor': '#8b5cf6'
+            },
+            {
+                'numero': 4,
+                'nome': 'Disciplinado',
+                'descricao': 'Mantendo a disciplina',
+                'pontos_necessarios': 600,
+                'icone': 'fa-chart-line',  # 📈
+                'cor': '#06b6d4'
+            },
+            {
                 'numero': 5,
-                'nome': 'Mestre das Finanças',
-                'descricao': 'Dominando o controle financeiro pessoal',
-                'pontos_necessarios': 5000,
-                'icone': 'fa-crown',
+                'nome': 'Poupador',
+                'descricao': 'Economizando com inteligência',
+                'pontos_necessarios': 1000,
+                'icone': 'fa-piggy-bank',  # 🐷
+                'cor': '#ec4899'
+            },
+            {
+                'numero': 6,
+                'nome': 'Equilibrado',
+                'descricao': 'Mantendo o equilíbrio financeiro',
+                'pontos_necessarios': 1500,
+                'icone': 'fa-balance-scale',  # ⚖️
+                'cor': '#14b8a6'
+            },
+            {
+                'numero': 7,
+                'nome': 'Campeão',
+                'descricao': 'Conquistando suas metas financeiras',
+                'pontos_necessarios': 2500,
+                'icone': 'fa-trophy',  # 🏆
+                'cor': '#f59e0b'
+            },
+            {
+                'numero': 8,
+                'nome': 'Expert',
+                'descricao': 'Expert em gestão financeira',
+                'pontos_necessarios': 4000,
+                'icone': 'fa-graduation-cap',  # 🎓
+                'cor': '#a855f7'
+            },
+            {
+                'numero': 9,
+                'nome': 'Guardião',
+                'descricao': 'Guardião das suas finanças',
+                'pontos_necessarios': 6000,
+                'icone': 'fa-shield-alt',  # 🛡️
+                'cor': '#ef4444'
+            },
+            {
+                'numero': 10,
+                'nome': 'Mestre',
+                'descricao': 'Mestre das finanças pessoais',
+                'pontos_necessarios': 10000,
+                'icone': 'fa-crown',  # 👑
                 'cor': '#fbbf24'
             }
         ]
         
         for nivel_data in niveis:
-            nivel, created = NivelFinanceiro.objects.get_or_create(
+            nivel, created = NivelFinanceiro.objects.update_or_create(
                 numero=nivel_data['numero'],
                 defaults=nivel_data
             )
             if created:
                 self.stdout.write(f'  ✓ Nível {nivel.numero} - {nivel.nome} criado')
             else:
-                self.stdout.write(f'  - Nível {nivel.numero} - {nivel.nome} já existe')
+                self.stdout.write(f'  ✓ Nível {nivel.numero} - {nivel.nome} atualizado')
     
     def popular_tipos_conquista(self):
         """Cria os tipos de conquista"""

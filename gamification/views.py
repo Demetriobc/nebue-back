@@ -91,22 +91,40 @@ def conquistas_list(request):
 
 @login_required
 def ranking_view(request):
-    """Exibe o ranking de usuários"""
+    """Exibe o ranking de usuários COM RESPEITO À PRIVACIDADE"""
     periodo = request.GET.get('periodo', 'geral')
     
     if periodo not in ['semanal', 'mensal', 'geral']:
         periodo = 'geral'
     
-    # Busca ranking usando o service
-    ranking = GamificationService.get_ranking(periodo=periodo, limit=100)
+    # ========================================
+    # MODIFICADO: Busca apenas perfis públicos
+    # ========================================
+    ranking = PerfilGamificacao.objects.filter(
+        perfil_publico=True  # Respeita configuração de privacidade
+    ).select_related('user', 'nivel_atual').order_by('-pontos_totais')[:100]
     
-    # Busca posição do usuário
-    posicao_user = GamificationService.get_posicao_usuario(request.user, periodo=periodo)
+    # Busca posição do usuário atual
+    try:
+        perfil_user = PerfilGamificacao.objects.get(user=request.user)
+        
+        if perfil_user.perfil_publico:
+            # Conta quantos perfis públicos tem mais pontos
+            posicao_user = PerfilGamificacao.objects.filter(
+                perfil_publico=True,
+                pontos_totais__gt=perfil_user.pontos_totais
+            ).count() + 1
+        else:
+            posicao_user = None  # Usuário está no modo privado
+    except PerfilGamificacao.DoesNotExist:
+        posicao_user = None
+    # ========================================
     
     context = {
         'ranking': ranking,
         'periodo': periodo,
         'posicao_user': posicao_user,
+        'perfil_user': perfil_user if 'perfil_user' in locals() else None,
     }
     
     return render(request, 'gamification/ranking.html', context)
@@ -217,6 +235,36 @@ def participar_desafio(request, desafio_id):
         messages.error(request, 'Erro ao participar do desafio.')
     
     return redirect('gamification:desafios_list')
+
+
+# ========================================
+# NOVA VIEW: CONFIGURAÇÕES DE PRIVACIDADE
+# ========================================
+@login_required
+def configuracoes_privacidade(request):
+    """Página de configurações de privacidade do usuário"""
+    perfil, created = PerfilGamificacao.objects.get_or_create(user=request.user)
+    
+    if request.method == 'POST':
+        # Atualiza as configurações
+        perfil.exibir_nome_real = request.POST.get('exibir_nome_real') == 'on'
+        perfil.perfil_publico = request.POST.get('perfil_publico') == 'on'
+        
+        # Se quiser personalizar o apelido
+        apelido_personalizado = request.POST.get('apelido', '').strip()
+        if apelido_personalizado:
+            perfil.apelido = apelido_personalizado
+        
+        perfil.save()
+        
+        messages.success(request, '✅ Configurações de privacidade atualizadas com sucesso!')
+        return redirect('gamification:configuracoes_privacidade')
+    
+    context = {
+        'perfil': perfil,
+    }
+    
+    return render(request, 'gamification/configuracoes_privacidade.html', context)
 
 
 # ========================================

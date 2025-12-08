@@ -501,8 +501,8 @@
                     
                     <!-- Level Icon -->
                     <div class="level-icon-container flex-shrink-0">
-                        <div class="level-icon-bg" style="background: linear-gradient(135deg, {{ nivel.cor }}60, {{ nivel.cor }}30);">
-                            <i class="fas {{ nivel.icone }} text-6xl" style="color: {{ nivel.cor }};"></i>
+                        <div class="level-icon-bg" style="background: linear-gradient(135deg, {{ nivel.cor }}40, {{ nivel.cor }}20);">
+                            <i class="fas {{ nivel.icone }} text-6xl" style="color: white !important; filter: drop-shadow(0 2px 8px {{ nivel.cor }});"></i>
                         </div>
                         
                         <!-- Status Badge -->
@@ -584,13 +584,15 @@
                                 </span>
                             </div>
                             
-                            {% with faltam=nivel.pontos_necessarios|add:"-"|add:perfil.pontos_totais %}
+                            {% with faltam=nivel.pontos_necessarios|add:perfil.pontos_totais|add:"-"|add:perfil.pontos_totais|add:perfil.pontos_totais %}
+                            {% if nivel.pontos_necessarios > perfil.pontos_totais %}
                             <div class="text-center pt-4 border-t border-slate-700/50">
                                 <span class="text-yellow-400 font-bold text-lg">
                                     <i class="fas fa-bolt mr-2"></i>
-                                    Faltam apenas {{ faltam }} pontos para o próximo nível!
+                                    Faltam apenas {{ nivel.pontos_necessarios|add:"-"|add:perfil.pontos_totais }} pontos para o próximo nível!
                                 </span>
                             </div>
+                            {% endif %}
                             {% endwith %}
                         </div>
                         {% endif %}

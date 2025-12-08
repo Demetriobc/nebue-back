@@ -25,6 +25,11 @@ urlpatterns = [
     # Histórico
     path('historico/', views.historico_view, name='historico'),
     
+    # ========================================
+    # NOVA ROTA: Configurações de Privacidade
+    # ========================================
+    path('configuracoes/privacidade/', views.configuracoes_privacidade, name='configuracoes_privacidade'),
+    
     # API endpoints
     path('api/stats/', views.api_stats, name='api_stats'),
     path('api/conquistas-novas/', views.api_conquistas_novas, name='api_conquistas_novas'),

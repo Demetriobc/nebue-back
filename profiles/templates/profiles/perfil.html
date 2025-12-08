@@ -1,0 +1,349 @@
+{% extends 'base.html' %}
+
+{% block title %}Meu Perfil - Nebue{% endblock %}
+
+{% block extra_css %}
+<style>
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .profile-card {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(16px);
+        border: 2px solid rgba(148, 163, 184, 0.2);
+        transition: all 0.3s;
+        animation: fadeInUp 0.6s ease-out;
+    }
+    
+    .profile-card:hover {
+        border-color: rgba(168, 85, 247, 0.5);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        transform: translateY(-4px);
+    }
+    
+    .profile-avatar {
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        border: 6px solid rgba(212, 175, 55, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 64px;
+        font-weight: 900;
+        color: white;
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+    }
+    
+    .profile-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .profile-avatar:hover {
+        transform: scale(1.05) rotate(5deg);
+        border-color: rgba(212, 175, 55, 0.6);
+    }
+    
+    .info-item {
+        background: rgba(100, 116, 139, 0.1);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 12px;
+        padding: 20px;
+        transition: all 0.3s;
+    }
+    
+    .info-item:hover {
+        background: rgba(100, 116, 139, 0.15);
+        border-color: rgba(212, 175, 55, 0.3);
+    }
+    
+    .info-label {
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--gold-light);
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+    
+    .info-value {
+        font-size: 18px;
+        font-weight: 700;
+        color: white;
+    }
+    
+    .badge-username {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(212, 175, 55, 0.2);
+        border: 2px solid rgba(212, 175, 55, 0.4);
+        padding: 8px 20px;
+        border-radius: 50px;
+        font-size: 16px;
+        font-weight: 900;
+        color: var(--gold-primary);
+        margin-top: 12px;
+    }
+    
+    .action-btn {
+        background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+        color: var(--dark-bg);
+        padding: 16px 32px;
+        border-radius: 16px;
+        font-weight: 900;
+        font-size: 16px;
+        text-transform: uppercase;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(212, 175, 55, 0.4);
+    }
+    
+    .action-btn-secondary {
+        background: rgba(100, 116, 139, 0.3);
+        border: 2px solid rgba(148, 163, 184, 0.3);
+        color: white;
+    }
+    
+    .action-btn-secondary:hover {
+        background: rgba(100, 116, 139, 0.4);
+        border-color: rgba(148, 163, 184, 0.5);
+    }
+    
+    .bio-section {
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(184, 148, 30, 0.1));
+        border: 2px solid rgba(212, 175, 55, 0.3);
+        border-radius: 16px;
+        padding: 24px;
+    }
+    
+    .stat-card {
+        background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(56, 142, 60, 0.1));
+        border: 2px solid var(--success);
+        border-radius: 16px;
+        padding: 24px;
+        text-align: center;
+        transition: all 0.3s;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(76, 175, 80, 0.6);
+    }
+    
+    .stat-number {
+        font-size: 48px;
+        font-weight: 900;
+        color: var(--success);
+    }
+    
+    .stat-label {
+        font-size: 14px;
+        font-weight: 700;
+        color: rgba(148, 163, 184, 0.8);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 md:p-8">
+    <div class="max-w-6xl mx-auto">
+        
+        <!-- Header -->
+        <div class="mb-8">
+            <a href="{% url 'dashboard' %}" 
+               class="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 mb-6 transition-all hover:translate-x-[-4px] font-semibold">
+                <i class="fas fa-arrow-left"></i>
+                <span>Voltar ao Dashboard</span>
+            </a>
+            
+            <h1 class="text-5xl md:text-6xl font-black text-white mb-3 flex items-center gap-4">
+                <span class="text-6xl">👤</span>
+                <span style="background: linear-gradient(135deg, var(--gold-primary), var(--gold-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                    Meu Perfil
+                </span>
+            </h1>
+            <p class="text-slate-400 text-xl">Visualize e gerencie suas informações pessoais</p>
+        </div>
+
+        <!-- Main Profile Card -->
+        <div class="profile-card rounded-3xl p-8 mb-6">
+            <div class="flex flex-col lg:flex-row items-center lg:items-start gap-8">
+                
+                <!-- Avatar -->
+                <div class="flex-shrink-0">
+                    <div class="profile-avatar">
+                        {% if user.foto_perfil %}
+                            <img src="{{ user.foto_perfil.url }}" alt="{{ user.get_nome_exibicao }}">
+                        {% else %}
+                            {{ user.get_iniciais }}
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- User Info -->
+                <div class="flex-1 text-center lg:text-left">
+                    <h2 class="text-4xl font-black text-white mb-2">
+                        {% if user.nome_completo %}
+                            {{ user.nome_completo }}
+                        {% else %}
+                            {{ user.get_nome_exibicao }}
+                        {% endif %}
+                    </h2>
+                    
+                    {% if user.nome_usuario %}
+                        <div class="badge-username">
+                            <i class="fas fa-at"></i>
+                            <span>{{ user.nome_usuario }}</span>
+                        </div>
+                    {% endif %}
+                    
+                    <p class="text-slate-400 text-lg mt-4 flex items-center justify-center lg:justify-start gap-2">
+                        <i class="fas fa-envelope"></i>
+                        {{ user.email }}
+                    </p>
+                    
+                    {% if user.telefone %}
+                        <p class="text-slate-400 text-lg mt-2 flex items-center justify-center lg:justify-start gap-2">
+                            <i class="fas fa-phone"></i>
+                            {{ user.telefone }}
+                        </p>
+                    {% endif %}
+                    
+                    <div class="flex flex-wrap gap-3 mt-6 justify-center lg:justify-start">
+                        <a href="{% url 'profile:editar_perfil' %}" class="action-btn">
+                            <i class="fas fa-edit"></i>
+                            <span>Editar Perfil</span>
+                        </a>
+                        <a href="{% url 'profile:trocar_senha' %}" class="action-btn action-btn-secondary">
+                            <i class="fas fa-key"></i>
+                            <span>Trocar Senha</span>
+                        </a>
+                        <a href="{% url 'profile:import_ofx' %}" class="action-btn action-btn-secondary">
+                            <i class="fas fa-file-upload"></i>
+                            <span>Importar OFX</span>
+                        </a>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- Bio Section (if exists) -->
+        {% if user.bio %}
+        <div class="bio-section mb-6">
+            <h3 class="text-2xl font-black text-white mb-4 flex items-center gap-3">
+                <i class="fas fa-quote-left" style="color: var(--gold-primary);"></i>
+                <span>Sobre Mim</span>
+            </h3>
+            <p class="text-slate-300 text-lg leading-relaxed">{{ user.bio }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Account Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div class="stat-card">
+                <i class="fas fa-calendar-alt text-5xl" style="color: var(--success); margin-bottom: 16px;"></i>
+                <div class="stat-number">{{ user.created_at|date:"d" }}</div>
+                <div class="stat-label">Membro desde</div>
+                <p class="text-slate-400 text-sm mt-2">{{ user.created_at|date:"F \d\e Y" }}</p>
+            </div>
+            
+            <div class="stat-card" style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(184, 148, 30, 0.1)); border-color: var(--gold-primary);">
+                <i class="fas fa-shield-alt text-5xl" style="color: var(--gold-primary); margin-bottom: 16px;"></i>
+                <div class="stat-number" style="color: var(--gold-primary);">
+                    {% if user.is_staff %}Admin{% else %}Ativo{% endif %}
+                </div>
+                <div class="stat-label">Status da Conta</div>
+                <p class="text-slate-400 text-sm mt-2">
+                    {% if user.is_staff %}
+                        Acesso administrativo
+                    {% else %}
+                        Conta verificada
+                    {% endif %}
+                </p>
+            </div>
+            
+            <div class="stat-card" style="background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.1)); border-color: #fbbf24;">
+                <i class="fas fa-crown text-5xl" style="color: #fbbf24; margin-bottom: 16px;"></i>
+                <div class="stat-number" style="color: #fbbf24;">Pro</div>
+                <div class="stat-label">Plano Atual</div>
+                <p class="text-slate-400 text-sm mt-2">Todos os recursos</p>
+            </div>
+        </div>
+
+        <!-- Additional Info Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="fas fa-envelope mr-2"></i>
+                    Email de Contato
+                </div>
+                <div class="info-value">{{ user.email }}</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="fas fa-user mr-2"></i>
+                    Nome de Usuário
+                </div>
+                <div class="info-value">
+                    {% if user.nome_usuario %}
+                        @{{ user.nome_usuario }}
+                    {% else %}
+                        <span class="text-slate-500">Não definido</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="fas fa-phone mr-2"></i>
+                    Telefone
+                </div>
+                <div class="info-value">
+                    {% if user.telefone %}
+                        {{ user.telefone }}
+                    {% else %}
+                        <span class="text-slate-500">Não informado</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="fas fa-clock mr-2"></i>
+                    Última Atualização
+                </div>
+                <div class="info-value">{{ user.updated_at|date:"d/m/Y H:i" }}</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

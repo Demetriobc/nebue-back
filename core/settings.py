@@ -11,8 +11,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 from decouple import Csv, config
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=True, cast=bool)
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
 
@@ -59,6 +60,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Serve arquivos estáticos em produção
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -76,6 +78,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -90,12 +93,24 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Verifica se existe DATABASE_URL (produção) ou usa SQLite (desenvolvimento)
+if config('DATABASE_URL', default=None):
+    # Produção - PostgreSQL via Railway
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=config('DATABASE_URL'),
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
-}
+else:
+    # Desenvolvimento - SQLite
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
@@ -139,11 +154,26 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # Para produção
 STATICFILES_DIRS = [BASE_DIR / 'static']
+
+# Configuração do WhiteNoise para servir arquivos estáticos em produção
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 # Tailwind CSS configuration
 TAILWIND_APP_NAME = 'theme'
-NPM_BIN_PATH = r"C:\Program Files\nodejs\npm.cmd"
+
+# NPM_BIN_PATH só é necessário em desenvolvimento local
+# Em produção (Railway) não usamos Tailwind JIT, apenas os arquivos compilados
+if DEBUG:
+    NPM_BIN_PATH = config('NPM_BIN_PATH', default=r"C:\Program Files\nodejs\npm.cmd")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -197,3 +227,13 @@ X_FRAME_OPTIONS = 'DENY'
 # Groq API Key for AI-powered financial assistant
 # Get your free API key at: https://console.groq.com/keys
 GROQ_API_KEY = config('GROQ_API_KEY', default='')
+
+# ========================================
+# CONFIGURAÇÃO DE MEDIA (Upload de Arquivos)
+# ========================================
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Tamanho máximo de upload (5MB)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB em bytes
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB em bytes
