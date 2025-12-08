@@ -1,0 +1,488 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Perfil - Nebue{% endblock %}
+
+{% block extra_css %}
+<style>
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .edit-card {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(16px);
+        border: 2px solid rgba(148, 163, 184, 0.2);
+        transition: all 0.3s;
+        animation: fadeInUp 0.6s ease-out;
+    }
+    
+    .edit-card:hover {
+        border-color: rgba(212, 175, 55, 0.5);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+    
+    .form-group {
+        margin-bottom: 24px;
+    }
+    
+    .form-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--gold-light);
+        letter-spacing: 0.5px;
+        margin-bottom: 12px;
+    }
+    
+    .form-input {
+        width: 100%;
+        padding: 16px 20px;
+        background: rgba(15, 23, 42, 0.6);
+        border: 2px solid rgba(148, 163, 184, 0.2);
+        border-radius: 12px;
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    
+    .form-input:focus {
+        outline: none;
+        border-color: var(--gold-primary);
+        background: rgba(15, 23, 42, 0.8);
+        box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
+    }
+    
+    .form-input::placeholder {
+        color: rgba(148, 163, 184, 0.5);
+    }
+    
+    .form-textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+    
+    .form-hint {
+        font-size: 13px;
+        color: rgba(148, 163, 184, 0.6);
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .avatar-upload-area {
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(184, 148, 30, 0.1));
+        border: 2px solid rgba(212, 175, 55, 0.3);
+        border-radius: 20px;
+        padding: 40px;
+        text-align: center;
+        transition: all 0.3s;
+        cursor: pointer;
+        position: relative;
+    }
+    
+    .avatar-upload-area:hover {
+        border-color: var(--gold-primary);
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(184, 148, 30, 0.15));
+        transform: translateY(-4px);
+    }
+    
+    .avatar-preview {
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        margin: 0 auto 20px;
+        border: 6px solid rgba(212, 175, 55, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 64px;
+        font-weight: 900;
+        color: white;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .avatar-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .avatar-placeholder {
+        background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+    }
+    
+    .file-input-hidden {
+        display: none;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+        color: var(--dark-bg);
+        padding: 18px 40px;
+        border-radius: 16px;
+        font-weight: 900;
+        font-size: 18px;
+        text-transform: uppercase;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(212, 175, 55, 0.4);
+    }
+    
+    .btn-secondary {
+        background: rgba(100, 116, 139, 0.3);
+        border: 2px solid rgba(148, 163, 184, 0.3);
+        color: white;
+        padding: 18px 40px;
+        border-radius: 16px;
+        font-weight: 900;
+        font-size: 18px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .btn-secondary:hover {
+        background: rgba(100, 116, 139, 0.4);
+        border-color: rgba(148, 163, 184, 0.5);
+        transform: translateY(-2px);
+    }
+    
+    .btn-danger {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 14px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
+    }
+    
+    .info-banner {
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(184, 148, 30, 0.1));
+        border: 2px solid rgba(212, 175, 55, 0.3);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 32px;
+    }
+    
+    .character-count {
+        text-align: right;
+        font-size: 13px;
+        color: rgba(148, 163, 184, 0.6);
+        margin-top: 8px;
+        font-weight: 600;
+    }
+    
+    .character-count.warning {
+        color: #f59e0b;
+    }
+    
+    .character-count.danger {
+        color: #ef4444;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 md:p-8">
+    <div class="max-w-4xl mx-auto">
+        
+        <!-- Header -->
+        <div class="mb-8">
+            <a href="{% url 'profile:profile' %}" 
+               class="inline-flex items-center gap-2 hover:translate-x-[-4px] font-semibold transition-all"
+               style="color: var(--gold-primary);">
+                <i class="fas fa-arrow-left"></i>
+                <span>Voltar ao Perfil</span>
+            </a>
+            
+            <h1 class="text-5xl md:text-6xl font-black text-white mb-3 flex items-center gap-4 mt-6">
+                <span class="text-6xl">✏️</span>
+                <span style="background: linear-gradient(135deg, var(--gold-primary), var(--gold-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                    Editar Perfil
+                </span>
+            </h1>
+            <p class="text-slate-400 text-xl">Atualize suas informações pessoais</p>
+        </div>
+
+        <!-- Info Banner -->
+        <div class="info-banner">
+            <div class="flex items-start gap-4">
+                <i class="fas fa-info-circle text-2xl flex-shrink-0" style="color: var(--gold-primary);"></i>
+                <div>
+                    <h4 class="text-white font-black text-lg mb-2">📝 Dica de Preenchimento</h4>
+                    <p class="text-slate-300 leading-relaxed">
+                        Mantenha suas informações atualizadas para melhor experiência no Nebue. 
+                        Seu <strong>nome de usuário</strong> aparecerá nos rankings públicos se você permitir nas configurações de privacidade.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <!-- Avatar Upload Section -->
+            <div class="edit-card rounded-3xl p-8 mb-6">
+                <h2 class="text-2xl font-black text-white mb-6 flex items-center gap-3">
+                    <i class="fas fa-camera" style="color: var(--gold-primary);"></i>
+                    <span>Foto de Perfil</span>
+                </h2>
+                
+                <label for="foto_perfil" class="avatar-upload-area">
+                    <div class="avatar-preview {% if not user.foto_perfil %}avatar-placeholder{% endif %}" id="avatarPreview">
+                        {% if user.foto_perfil %}
+                            <img src="{{ user.foto_perfil.url }}" alt="Foto de perfil" id="avatarImage">
+                        {% else %}
+                            <span id="avatarInitials">{{ user.get_iniciais }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="text-white font-bold text-lg mb-2">
+                        <i class="fas fa-cloud-upload-alt mr-2" style="color: var(--gold-primary);"></i>
+                        Clique para escolher uma foto
+                    </div>
+                    <p class="text-slate-400 text-sm">
+                        JPG, PNG ou GIF • Máximo 5MB
+                    </p>
+                    
+                    <input 
+                        type="file" 
+                        name="foto_perfil" 
+                        id="foto_perfil" 
+                        accept="image/jpeg,image/png,image/gif"
+                        class="file-input-hidden"
+                        onchange="previewImage(this)">
+                </label>
+                
+                {% if user.foto_perfil %}
+                <div class="mt-6 text-center">
+                    <button type="button" onclick="removePhoto()" class="btn-danger">
+                        <i class="fas fa-trash"></i>
+                        <span>Remover Foto</span>
+                    </button>
+                    <input type="hidden" name="remover_foto" id="remover_foto" value="false">
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Personal Information -->
+            <div class="edit-card rounded-3xl p-8 mb-6">
+                <h2 class="text-2xl font-black text-white mb-6 flex items-center gap-3">
+                    <i class="fas fa-user" style="color: var(--gold-primary);"></i>
+                    <span>Informações Pessoais</span>
+                </h2>
+                
+                <div class="form-group">
+                    <label for="nome_completo" class="form-label">
+                        <i class="fas fa-id-card"></i>
+                        Nome Completo
+                    </label>
+                    <input 
+                        type="text" 
+                        name="nome_completo" 
+                        id="nome_completo"
+                        value="{{ user.nome_completo|default:'' }}"
+                        placeholder="Ex: João da Silva"
+                        maxlength="150"
+                        class="form-input">
+                    <div class="form-hint">
+                        <i class="fas fa-lightbulb"></i>
+                        <span>Seu nome real para identificação</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="nome_usuario" class="form-label">
+                        <i class="fas fa-at"></i>
+                        Nome de Usuário
+                    </label>
+                    <input 
+                        type="text" 
+                        name="nome_usuario" 
+                        id="nome_usuario"
+                        value="{{ user.nome_usuario|default:'' }}"
+                        placeholder="Ex: investidor_top"
+                        maxlength="50"
+                        class="form-input"
+                        pattern="[a-zA-Z0-9_]+"
+                        title="Apenas letras, números e underline">
+                    <div class="form-hint">
+                        <i class="fas fa-star"></i>
+                        <span>Seu apelido público (sem espaços ou caracteres especiais)</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email" class="form-label">
+                        <i class="fas fa-envelope"></i>
+                        Email
+                    </label>
+                    <input 
+                        type="email" 
+                        value="{{ user.email }}"
+                        class="form-input"
+                        disabled
+                        style="opacity: 0.6; cursor: not-allowed;">
+                    <div class="form-hint">
+                        <i class="fas fa-lock"></i>
+                        <span>O email não pode ser alterado</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="telefone" class="form-label">
+                        <i class="fas fa-phone"></i>
+                        Telefone
+                    </label>
+                    <input 
+                        type="tel" 
+                        name="telefone" 
+                        id="telefone"
+                        value="{{ user.telefone|default:'' }}"
+                        placeholder="(62) 99999-9999"
+                        maxlength="20"
+                        class="form-input">
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Opcional - Para contato de emergência</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bio Section -->
+            <div class="edit-card rounded-3xl p-8 mb-6">
+                <h2 class="text-2xl font-black text-white mb-6 flex items-center gap-3">
+                    <i class="fas fa-quote-left" style="color: var(--gold-primary);"></i>
+                    <span>Biografia</span>
+                </h2>
+                
+                <div class="form-group">
+                    <label for="bio" class="form-label">
+                        <i class="fas fa-pen"></i>
+                        Conte um pouco sobre você
+                    </label>
+                    <textarea 
+                        name="bio" 
+                        id="bio"
+                        placeholder="Ex: Apaixonado por investimentos e educação financeira. Busco a independência financeira através de uma vida equilibrada e consciente."
+                        maxlength="500"
+                        class="form-input form-textarea"
+                        oninput="updateCharCount()">{{ user.bio|default:'' }}</textarea>
+                    <div class="character-count" id="charCount">
+                        <span id="charCurrent">{{ user.bio|length|default:0 }}</span> / 500 caracteres
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-save"></i>
+                    <span>Salvar Alterações</span>
+                </button>
+                <a href="{% url 'profile:profile' %}" class="btn-secondary">
+                    <i class="fas fa-times"></i>
+                    <span>Cancelar</span>
+                </a>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<script>
+// Preview da imagem
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById('avatarPreview');
+            preview.classList.remove('avatar-placeholder');
+            preview.innerHTML = `<img src="${e.target.result}" alt="Preview" id="avatarImage">`;
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// Remover foto
+function removePhoto() {
+    if (confirm('Tem certeza que deseja remover sua foto de perfil?')) {
+        document.getElementById('remover_foto').value = 'true';
+        document.getElementById('foto_perfil').value = '';
+        const preview = document.getElementById('avatarPreview');
+        preview.classList.add('avatar-placeholder');
+        preview.innerHTML = `<span id="avatarInitials">{{ user.get_iniciais }}</span>`;
+    }
+}
+
+// Contador de caracteres
+function updateCharCount() {
+    const bio = document.getElementById('bio');
+    const charCount = document.getElementById('charCount');
+    const charCurrent = document.getElementById('charCurrent');
+    const count = bio.value.length;
+    
+    charCurrent.textContent = count;
+    charCount.classList.remove('warning', 'danger');
+    if (count > 450) {
+        charCount.classList.add('danger');
+    } else if (count > 400) {
+        charCount.classList.add('warning');
+    }
+}
+
+// Inicializa
+document.addEventListener('DOMContentLoaded', updateCharCount);
+
+// Valida nome de usuário
+document.getElementById('nome_usuario').addEventListener('input', function(e) {
+    this.value = this.value.replace(/[^a-zA-Z0-9_]/g, '');
+});
+
+// Máscara de telefone
+document.getElementById('telefone').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length <= 11) {
+        value = value.replace(/^(\d{2})(\d)/g, '($1) $2');
+        value = value.replace(/(\d)(\d{4})$/, '$1-$2');
+    }
+    e.target.value = value;
+});
+</script>
+{% endblock %}

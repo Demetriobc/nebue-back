@@ -1,0 +1,570 @@
+{% extends 'base.html' %}
+
+{% block title %}Conquistas - Nebue{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ========================================
+       ANIMAÇÕES
+    ======================================== */
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    @keyframes shimmer {
+        0% { background-position: -200% center; }
+        100% { background-position: 200% center; }
+    }
+    
+    @keyframes glow {
+        0%, 100% { 
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+        }
+        50% { 
+            box-shadow: 0 0 40px rgba(251, 191, 36, 0.8);
+        }
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+
+    /* ========================================
+       CARDS BASE
+    ======================================== */
+    .glass-card {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .glass-card:hover {
+        background: rgba(30, 41, 59, 0.85);
+        border-color: rgba(168, 85, 247, 0.5);
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    /* ========================================
+       FILTER BUTTONS
+    ======================================== */
+    .filter-btn {
+        background: rgba(30, 41, 59, 0.6);
+        border: 2px solid rgba(148, 163, 184, 0.2);
+        color: rgba(148, 163, 184, 0.8);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .filter-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(168, 85, 247, 0.2),
+            transparent
+        );
+        transition: left 0.5s;
+    }
+    
+    .filter-btn:hover::before {
+        left: 100%;
+    }
+    
+    .filter-btn:hover {
+        background: rgba(30, 41, 59, 0.8);
+        border-color: rgba(168, 85, 247, 0.5);
+        color: rgb(168, 85, 247);
+        transform: translateY(-2px);
+    }
+    
+    .filter-btn.active {
+        background: linear-gradient(135deg, rgb(168, 85, 247), rgb(124, 58, 237));
+        border-color: rgb(168, 85, 247);
+        color: white;
+        box-shadow: 0 4px 16px rgba(168, 85, 247, 0.4);
+    }
+
+    /* ========================================
+       CONQUISTA CARDS
+    ======================================== */
+    .conquista-card {
+        opacity: 0;
+        animation: slideInUp 0.6s ease-out forwards;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .conquista-card:nth-child(1) { animation-delay: 0.05s; }
+    .conquista-card:nth-child(2) { animation-delay: 0.1s; }
+    .conquista-card:nth-child(3) { animation-delay: 0.15s; }
+    .conquista-card:nth-child(4) { animation-delay: 0.2s; }
+    .conquista-card:nth-child(5) { animation-delay: 0.25s; }
+    .conquista-card:nth-child(6) { animation-delay: 0.3s; }
+    .conquista-card:nth-child(n+7) { animation-delay: 0.35s; }
+    
+    .conquista-card.hidden {
+        display: none;
+    }
+    
+    .conquista-card.desbloqueada {
+        position: relative;
+    }
+    
+    .conquista-card.desbloqueada::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.1),
+            transparent
+        );
+        transition: left 0.5s;
+    }
+    
+    .conquista-card.desbloqueada:hover::after {
+        left: 100%;
+    }
+    
+    .conquista-card.bloqueada {
+        filter: grayscale(100%);
+        opacity: 0.5;
+    }
+    
+    .conquista-card.bloqueada:hover {
+        filter: grayscale(80%);
+        opacity: 0.7;
+    }
+
+    /* ========================================
+       RARIDADE STYLES
+    ======================================== */
+    .rarity-badge {
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 0.5px;
+        padding: 6px 12px;
+        border-radius: 50px;
+        text-transform: uppercase;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    .border-comum { border-color: #6b7280 !important; }
+    .border-rara { border-color: #3b82f6 !important; }
+    .border-epica { border-color: #a855f7 !important; }
+    .border-lendaria { 
+        border-color: #fbbf24 !important;
+        animation: glow 2s ease-in-out infinite;
+    }
+    
+    .bg-comum { 
+        background: linear-gradient(135deg, #6b7280, #4b5563);
+    }
+    .bg-rara { 
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+    }
+    .bg-epica { 
+        background: linear-gradient(135deg, #a855f7, #7c3aed);
+        box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+    }
+    .bg-lendaria { 
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        box-shadow: 0 0 30px rgba(251, 191, 36, 0.5);
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    /* ========================================
+       ICONS
+    ======================================== */
+    .achievement-icon {
+        transition: all 0.3s;
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    }
+    
+    .conquista-card.desbloqueada:hover .achievement-icon {
+        transform: scale(1.1) rotate(5deg);
+    }
+    
+    .sparkle {
+        animation: float 2s ease-in-out infinite;
+        filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.8));
+    }
+
+    /* ========================================
+       STATS SUMMARY
+    ======================================== */
+    .stat-box {
+        background: rgba(30, 41, 59, 0.6);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(148, 163, 184, 0.2);
+        transition: all 0.3s;
+    }
+    
+    .stat-box:hover {
+        border-color: rgba(168, 85, 247, 0.5);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    /* ========================================
+       PROGRESS INDICATOR
+    ======================================== */
+    .progress-circle {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: conic-gradient(
+            rgb(168, 85, 247) 0deg,
+            rgb(168, 85, 247) calc(var(--progress) * 3.6deg),
+            rgba(148, 163, 184, 0.2) calc(var(--progress) * 3.6deg)
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    
+    .progress-circle::before {
+        content: '';
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: rgb(15, 23, 42);
+        position: absolute;
+    }
+    
+    .progress-value {
+        position: relative;
+        z-index: 1;
+        font-size: 32px;
+        font-weight: 900;
+        color: white;
+    }
+
+    /* ========================================
+       RESPONSIVE
+    ======================================== */
+    @media (max-width: 768px) {
+        .progress-circle {
+            width: 100px;
+            height: 100px;
+        }
+        
+        .progress-circle::before {
+            width: 80px;
+            height: 80px;
+        }
+        
+        .progress-value {
+            font-size: 24px;
+        }
+    }
+
+    /* ========================================
+       SCROLLBAR
+    ======================================== */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(15, 23, 42, 0.5);
+        border-radius: 10px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #a855f7, #7c3aed);
+        border-radius: 10px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 md:p-8">
+    <div class="max-w-7xl mx-auto">
+        
+        <!-- ========================================
+             HEADER COM BREADCRUMB
+        ======================================== -->
+        <div class="mb-8">
+            <a href="{% url 'gamification:dashboard' %}" 
+               class="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 mb-6 transition-all hover:translate-x-[-4px] font-semibold">
+                <i class="fas fa-arrow-left"></i>
+                <span>Voltar ao Dashboard</span>
+            </a>
+            
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div>
+                    <h1 class="text-5xl md:text-6xl font-black text-white mb-3 flex items-center gap-4">
+                        <span class="text-6xl">🏆</span>
+                        <span class="bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
+                            Conquistas
+                        </span>
+                    </h1>
+                    <p class="text-slate-400 text-xl">Desbloqueie conquistas e mostre suas habilidades financeiras</p>
+                </div>
+                
+                <!-- Stats Summary com Progress Circle -->
+                <div class="flex items-center gap-6">
+                    <div class="progress-circle" style="--progress: {{ progresso_percentual|default:0 }}">
+                        <span class="progress-value">{{ progresso_percentual|default:0 }}%</span>
+                    </div>
+                    
+                    <div class="flex flex-col gap-3">
+                        <div class="stat-box rounded-xl px-6 py-3">
+                            <div class="text-3xl font-black text-white tabular-nums">{{ conquistas_desbloqueadas_count }}</div>
+                            <div class="text-slate-400 text-sm font-semibold">Desbloqueadas</div>
+                        </div>
+                        <div class="stat-box rounded-xl px-6 py-3">
+                            <div class="text-3xl font-black text-purple-400 tabular-nums">{{ todas_conquistas_count }}</div>
+                            <div class="text-slate-400 text-sm font-semibold">Total</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================
+             FILTERS/TABS
+        ======================================== -->
+        <div class="flex gap-3 mb-8 overflow-x-auto pb-2 custom-scrollbar">
+            <button class="filter-btn active px-8 py-4 rounded-2xl font-black transition-all whitespace-nowrap text-base" 
+                    onclick="filterConquistas('todas')">
+                <i class="fas fa-th mr-2"></i>
+                Todas
+            </button>
+            <button class="filter-btn px-8 py-4 rounded-2xl font-black transition-all whitespace-nowrap text-base" 
+                    onclick="filterConquistas('desbloqueadas')">
+                <i class="fas fa-check-circle mr-2"></i>
+                Desbloqueadas
+            </button>
+            <button class="filter-btn px-8 py-4 rounded-2xl font-black transition-all whitespace-nowrap text-base" 
+                    onclick="filterConquistas('bloqueadas')">
+                <i class="fas fa-lock mr-2"></i>
+                Bloqueadas
+            </button>
+            <button class="filter-btn px-8 py-4 rounded-2xl font-black transition-all whitespace-nowrap text-base" 
+                    onclick="filterConquistas('comum')">
+                <i class="fas fa-circle mr-2 text-gray-400"></i>
+                Comum
+            </button>
+            <button class="filter-btn px-8 py-4 rounded-2xl font-black transition-all whitespace-nowrap text-base" 
+                    onclick="filterConquistas('rara')">
+                <i class="fas fa-circle mr-2 text-blue-400"></i>
+                Rara
+            </button>
+            <button class="filter-btn px-8 py-4 rounded-2xl font-black transition-all whitespace-nowrap text-base" 
+                    onclick="filterConquistas('epica')">
+                <i class="fas fa-circle mr-2 text-purple-400"></i>
+                Épica
+            </button>
+            <button class="filter-btn px-8 py-4 rounded-2xl font-black transition-all whitespace-nowrap text-base" 
+                    onclick="filterConquistas('lendaria')">
+                <i class="fas fa-crown mr-2 text-yellow-400"></i>
+                Lendária
+            </button>
+        </div>
+
+        <!-- ========================================
+             CONQUISTAS GRID
+        ======================================== -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for conquista in todas_conquistas %}
+            {% if conquista.id in conquistas_desbloqueadas_ids %}
+            <div class="conquista-card desbloqueada"
+                 data-raridade="{{ conquista.raridade }}"
+                 data-status="desbloqueada">
+                
+                <div class="relative overflow-hidden glass-card border-2 border-{{ conquista.raridade }} rounded-3xl p-6 h-full">
+                    
+                    <!-- Rarity Badge -->
+                    <div class="absolute top-4 right-4 rarity-badge z-10
+                                {% if conquista.raridade == 'comum' %}bg-gray-600 text-gray-100{% endif %}
+                                {% if conquista.raridade == 'rara' %}bg-blue-600 text-blue-100{% endif %}
+                                {% if conquista.raridade == 'epica' %}bg-purple-600 text-purple-100{% endif %}
+                                {% if conquista.raridade == 'lendaria' %}bg-gradient-to-r from-yellow-500 to-orange-500 text-white{% endif %}">
+                        {{ conquista.get_raridade_display }}
+                    </div>
+                    
+                    <!-- Icon -->
+                    <div class="flex justify-center mb-6 mt-4">
+                        <div class="relative">
+                            <div class="w-28 h-28 rounded-3xl flex items-center justify-center text-6xl shadow-2xl achievement-icon bg-{{ conquista.raridade }}">
+                                <i class="fas {{ conquista.icone }} text-white"></i>
+                            </div>
+                            
+                            {% if conquista.raridade == 'lendaria' %}
+                            <div class="absolute -top-3 -right-3 text-4xl sparkle">✨</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Title -->
+                    <h3 class="text-2xl font-black text-center mb-3 text-white leading-tight">
+                        {{ conquista.titulo }}
+                    </h3>
+                    
+                    <!-- Description -->
+                    <p class="text-sm text-center mb-6 leading-relaxed text-slate-300 min-h-[40px]">
+                        {{ conquista.descricao }}
+                    </p>
+                    
+                    <!-- Points -->
+                    <div class="flex items-center justify-center gap-3 mb-6 bg-slate-800/50 rounded-2xl py-4">
+                        <span class="text-3xl">⭐</span>
+                        <span class="text-3xl font-black text-purple-400 tabular-nums">
+                            {{ conquista.pontos }}
+                        </span>
+                        <span class="text-sm text-slate-400 font-semibold">pontos</span>
+                    </div>
+                    
+                    <!-- Status Footer -->
+                    <div class="pt-4 border-t border-slate-700/50">
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-green-400 flex items-center gap-2 font-bold">
+                                <i class="fas fa-check-circle"></i>
+                                Desbloqueada
+                            </span>
+                            {% for cu in conquista.conquistausuario_set.all %}
+                            <span class="text-slate-500 font-medium">
+                                {{ cu.desbloqueada_em|date:"d/m/Y" }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="conquista-card bloqueada"
+                 data-raridade="{{ conquista.raridade }}"
+                 data-status="bloqueada">
+                
+                <div class="relative overflow-hidden glass-card border-2 border-slate-700 rounded-3xl p-6 h-full">
+                    
+                    <!-- Rarity Badge -->
+                    <div class="absolute top-4 right-4 rarity-badge z-10 bg-slate-700 text-slate-400">
+                        {{ conquista.get_raridade_display }}
+                    </div>
+                    
+                    <!-- Icon -->
+                    <div class="flex justify-center mb-6 mt-4">
+                        <div class="relative">
+                            <div class="w-28 h-28 rounded-3xl flex items-center justify-center text-6xl shadow-2xl bg-slate-700">
+                                <i class="fas fa-lock text-slate-500"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Title -->
+                    <h3 class="text-2xl font-black text-center mb-3 text-slate-500 leading-tight">
+                        {{ conquista.titulo }}
+                    </h3>
+                    
+                    <!-- Description -->
+                    <p class="text-sm text-center mb-6 leading-relaxed text-slate-600 min-h-[40px]">
+                        {{ conquista.descricao }}
+                    </p>
+                    
+                    <!-- Points -->
+                    <div class="flex items-center justify-center gap-3 mb-6 bg-slate-800/30 rounded-2xl py-4">
+                        <span class="text-3xl opacity-50">⭐</span>
+                        <span class="text-3xl font-black text-slate-600 tabular-nums">
+                            {{ conquista.pontos }}
+                        </span>
+                        <span class="text-sm text-slate-600 font-semibold">pontos</span>
+                    </div>
+                    
+                    <!-- Status Footer -->
+                    <div class="pt-4 border-t border-slate-700/30">
+                        <div class="flex items-center justify-center text-sm text-slate-600">
+                            <i class="fas fa-lock mr-2"></i>
+                            <span class="font-medium">Continue jogando para desbloquear</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- ========================================
+             EMPTY STATE
+        ======================================== -->
+        {% if not todas_conquistas %}
+        <div class="text-center py-32">
+            <div class="text-9xl mb-8 opacity-20">🏆</div>
+            <p class="text-slate-400 text-2xl font-bold mb-4">Nenhuma conquista disponível</p>
+            <p class="text-slate-500 text-lg">Continue usando o Nebue para desbloquear conquistas incríveis!</p>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<script>
+function filterConquistas(filtro) {
+    // Remove active de todos os botões
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Adiciona active no botão clicado
+    event.target.classList.add('active');
+    
+    // Filtra conquistas
+    const cards = document.querySelectorAll('.conquista-card');
+    
+    cards.forEach(card => {
+        const status = card.dataset.status;
+        const raridade = card.dataset.raridade;
+        
+        let mostrar = false;
+        
+        if (filtro === 'todas') {
+            mostrar = true;
+        } else if (filtro === 'desbloqueadas') {
+            mostrar = status === 'desbloqueada';
+        } else if (filtro === 'bloqueadas') {
+            mostrar = status === 'bloqueada';
+        } else if (['comum', 'rara', 'epica', 'lendaria'].includes(filtro)) {
+            mostrar = raridade === filtro;
+        }
+        
+        if (mostrar) {
+            card.classList.remove('hidden');
+        } else {
+            card.classList.add('hidden');
+        }
+    });
+}
+</script>
+{% endblock %}

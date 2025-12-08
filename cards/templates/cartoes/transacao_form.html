@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}Nova Compra - {{ cartao.nome }} - Nebue{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6">
+    
+    <!-- Header -->
+    <div class="mb-8">
+        <a href="{% url 'cards:cartao_detail' cartao.id %}" 
+           class="text-gray-400 hover:text-purple-400 transition-colors mb-4 inline-block">
+            <i class="fas fa-arrow-left mr-2"></i>Voltar para {{ cartao.nome }}
+        </a>
+        <h1 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-purple-600">
+            <i class="fas fa-shopping-cart"></i> Nova Compra
+        </h1>
+        <p class="text-gray-400 mt-2">Registre uma nova compra no cartão {{ cartao.nome }}</p>
+    </div>
+
+    <!-- Info do Cartão -->
+    <div class="max-w-3xl mx-auto mb-6">
+        <div class="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700 flex justify-between items-center">
+            <div>
+                <p class="text-gray-400 text-sm">Limite Disponível</p>
+                <p class="text-2xl font-bold text-green-400">R$ {{ cartao.limite_disponivel|floatformat:2 }}</p>
+            </div>
+            <div class="text-right">
+                <p class="text-gray-400 text-sm">Cartão</p>
+                <p class="text-white font-semibold">{{ cartao.nome }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulário -->
+    <div class="max-w-3xl mx-auto">
+        <form method="POST" class="bg-gray-800/50 backdrop-blur-sm rounded-xl p-8 border border-gray-700 space-y-6">
+            {% csrf_token %}
+
+            <!-- Descrição -->
+            <div>
+                <label class="block text-gray-300 font-semibold mb-2">
+                    <i class="fas fa-tag text-purple-400 mr-2"></i>Descrição da Compra *
+                </label>
+                <input type="text" 
+                       name="descricao" 
+                       placeholder="Ex: Supermercado, Restaurante, Amazon, etc."
+                       class="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                       required>
+            </div>
+
+            <!-- Categoria e Valor -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Categoria -->
+                <div>
+                    <label class="block text-gray-300 font-semibold mb-2">
+                        <i class="fas fa-folder text-purple-400 mr-2"></i>Categoria *
+                    </label>
+                    <select name="categoria" 
+                            class="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                            required>
+                        <option value="">Selecione a categoria</option>
+                        {% for value, label in categorias %}
+                        <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Valor -->
+                <div>
+                    <label class="block text-gray-300 font-semibold mb-2">
+                        <i class="fas fa-dollar-sign text-purple-400 mr-2"></i>Valor *
+                    </label>
+                    <input type="number" 
+                           name="valor" 
+                           placeholder="0.00"
+                           step="0.01"
+                           min="0.01"
+                           max="{{ cartao.limite_disponivel }}"
+                           class="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                           required>
+                </div>
+            </div>
+
+            <!-- Data e Parcelas -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Data -->
+                <div>
+                    <label class="block text-gray-300 font-semibold mb-2">
+                        <i class="fas fa-calendar text-purple-400 mr-2"></i>Data da Compra *
+                    </label>
+                    <input type="date" 
+                           name="data" 
+                           value="{% now 'Y-m-d' %}"
+                           class="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                           required>
+                </div>
+
+                <!-- Parcelas -->
+                <div>
+                    <label class="block text-gray-300 font-semibold mb-2">
+                        <i class="fas fa-credit-card text-purple-400 mr-2"></i>Parcelas
+                    </label>
+                    <select name="parcelas" 
+                            id="parcelas"
+                            class="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all">
+                        <option value="1">À vista (1x)</option>
+                        <option value="2">2x sem juros</option>
+                        <option value="3">3x sem juros</option>
+                        <option value="4">4x sem juros</option>
+                        <option value="5">5x sem juros</option>
+                        <option value="6">6x sem juros</option>
+                        <option value="7">7x sem juros</option>
+                        <option value="8">8x sem juros</option>
+                        <option value="9">9x sem juros</option>
+                        <option value="10">10x sem juros</option>
+                        <option value="11">11x sem juros</option>
+                        <option value="12">12x sem juros</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Botões -->
+            <div class="flex gap-4 pt-4">
+                <button type="submit"
+                        class="flex-1 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg font-semibold hover:from-green-600 hover:to-green-700 transition-all shadow-lg hover:shadow-green-500/50">
+                    <i class="fas fa-check mr-2"></i>Confirmar Compra
+                </button>
+                <a href="{% url 'cards:cartao_detail' cartao.id %}"
+                   class="px-6 py-3 bg-gray-700 text-gray-300 rounded-lg font-semibold hover:bg-gray-600 transition-all text-center">
+                    <i class="fas fa-times mr-2"></i>Cancelar
+                </a>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Histórico - Nebue{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-history"></i> Histórico de Atividades
+    </div>
+    
+    {% for item in historico %}
+    <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); transition: background 0.3s;" 
+         onmouseover="this.style.background='rgba(212, 175, 55, 0.05)'" 
+         onmouseout="this.style.background='transparent'">
+        
+        <div style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;
+            {% if item.tipo == 'pontos' %}background: rgba(212, 175, 55, 0.2); color: var(--gold-primary);
+            {% elif item.tipo == 'conquista' %}background: rgba(156, 39, 176, 0.2); color: #9C27B0;
+            {% elif item.tipo == 'nivel_up' %}background: rgba(76, 175, 80, 0.2); color: #4CAF50;
+            {% elif item.tipo == 'desafio' %}background: rgba(33, 150, 243, 0.2); color: #2196F3;
+            {% elif item.tipo == 'streak' %}background: rgba(255, 107, 107, 0.2); color: #FF6B6B;
+            {% endif %}">
+            {% if item.tipo == 'pontos' %}
+                <i class="fas fa-star"></i>
+            {% elif item.tipo == 'conquista' %}
+                <i class="fas fa-trophy"></i>
+            {% elif item.tipo == 'nivel_up' %}
+                <i class="fas fa-arrow-up"></i>
+            {% elif item.tipo == 'desafio' %}
+                <i class="fas fa-bullseye"></i>
+            {% elif item.tipo == 'streak' %}
+                <i class="fas fa-fire"></i>
+            {% endif %}
+        </div>
+        
+        <div style="flex: 1;">
+            <div style="color: var(--text-primary); font-weight: 500;">{{ item.descricao }}</div>
+            <div style="color: var(--text-secondary); font-size: 0.85rem;">{{ item.criado_em|date:"d/m/Y H:i" }}</div>
+        </div>
+        
+        {% if item.pontos > 0 %}
+        <div style="font-weight: bold; color: var(--gold-primary); font-size: 1.1rem;">
+            +{{ item.pontos }}
+        </div>
+        {% endif %}
+    </div>
+    {% empty %}
+    <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+        <i class="fas fa-history" style="font-size: 4rem; color: rgba(212, 175, 55, 0.3); margin-bottom: 1rem;"></i>
+        <p>Nenhuma atividade ainda</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

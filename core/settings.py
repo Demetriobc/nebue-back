@@ -11,8 +11,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 from decouple import Csv, config
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=True, cast=bool)
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
 
@@ -50,10 +51,16 @@ INSTALLED_APPS = [
     'profiles',
     'transactions',
     'users',
+    'cards',
+    'notifications',
+    'analytics',
+    'chatbot',
+    'gamification',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Serve arquivos estáticos em produção
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -71,6 +78,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -85,12 +93,24 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Verifica se existe DATABASE_URL (produção) ou usa SQLite (desenvolvimento)
+if config('DATABASE_URL', default=None):
+    # Produção - PostgreSQL via Railway
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=config('DATABASE_URL'),
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
-}
+else:
+    # Desenvolvimento - SQLite
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
@@ -134,11 +154,26 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # Para produção
 STATICFILES_DIRS = [BASE_DIR / 'static']
+
+# Configuração do WhiteNoise para servir arquivos estáticos em produção
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 # Tailwind CSS configuration
 TAILWIND_APP_NAME = 'theme'
-NPM_BIN_PATH = '/opt/homebrew/bin/npm'
+
+# NPM_BIN_PATH só é necessário em desenvolvimento local
+# Em produção (Railway) não usamos Tailwind JIT, apenas os arquivos compilados
+if DEBUG:
+    NPM_BIN_PATH = config('NPM_BIN_PATH', default=r"C:\Program Files\nodejs\npm.cmd")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -152,29 +187,23 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # These settings protect the application from common web vulnerabilities
 
 if not DEBUG:
-    # HTTPS/SSL Configuration
-    # Force all connections to use HTTPS instead of HTTP
-    SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=True, cast=bool)
-
-    # Cookie Security
-    # Ensure session cookies are only sent over HTTPS
-    SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', default=True, cast=bool)
-
-    # Ensure CSRF cookies are only sent over HTTPS
-    CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=True, cast=bool)
-
-    # HTTP Strict Transport Security (HSTS)
-    # Tells browsers to only access this site via HTTPS for the specified time
-    # 31536000 seconds = 1 year
-    SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', default=31536000, cast=int)
-
-    # Apply HSTS to all subdomains
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = config(
-        'SECURE_HSTS_INCLUDE_SUBDOMAINS', default=True, cast=bool
-    )
-
-    # Allow browser to preload HSTS (submit to browser preload lists)
-    SECURE_HSTS_PRELOAD = config('SECURE_HSTS_PRELOAD', default=True, cast=bool)
+    # Configuração para proxy reverso (Railway, Heroku, etc)
+    # Railway usa proxy, então precisamos confiar no header X-Forwarded-Proto
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    
+    # HTTPS/SSL Configuration - DESABILITADO para evitar loop de redirect
+    # O Railway já fornece HTTPS automaticamente via proxy
+    SECURE_SSL_REDIRECT = False
+    
+    # Cookie Security - DESABILITADO para evitar problemas com proxy
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    
+    # HTTP Strict Transport Security (HSTS) - COMENTADO por enquanto
+    # Pode habilitar depois que tudo estiver funcionando perfeitamente
+    # SECURE_HSTS_SECONDS = 31536000  # 1 ano
+    # SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    # SECURE_HSTS_PRELOAD = True
 
 # Additional Security Headers (enabled in all environments)
 # Prevent browsers from guessing content types
@@ -185,4 +214,272 @@ SECURE_BROWSER_XSS_FILTER = True
 
 # Prevent site from being embedded in frames (clickjacking protection)
 X_FRAME_OPTIONS = 'DENY'
-NPM_BIN_PATH = r"C:\Program Files\nodejs\npm.cmd"
+
+# ============================================================================
+# AI/Chatbot Configuration
+# ============================================================================
+# Groq API Key for AI-powered financial assistant
+# Get your free API key at: https://console.groq.com/keys
+GROQ_API_KEY = config('GROQ_API_KEY', default='')
+
+# ========================================
+# CONFIGURAÇÃO DE MEDIA (Upload de Arquivos)
+# ========================================
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Tamanho máximo de upload (5MB)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB em bytes
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB em bytes
+
+# ============================================================================
+# LOGGING CONFIGURATION - 🔥 CRUCIAL PARA DEBUG
+# ============================================================================
+# Sistema de logs configurado para capturar erros e informações importantes
+# Em produção: mostra INFO e acima
+# Em desenvolvimento: mostra DEBUG e acima
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    
+    # ========================================
+    # FORMATADORES (como as mensagens aparecem)
+    # ========================================
+    'formatters': {
+        'verbose': {
+            'format': '[{levelname}] {asctime} {name} {module}.{funcName} - {message}',
+            'style': '{',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        },
+        'simple': {
+            'format': '[{levelname}] {message}',
+            'style': '{',
+        },
+    },
+    
+    # ========================================
+    # HANDLERS (para onde vão os logs)
+    # ========================================
+    'handlers': {
+        # Console - para Railway/Heroku ver nos logs
+        'console': {
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        
+        # Arquivo de erros (apenas em desenvolvimento)
+        'file_errors': {
+            'level': 'ERROR',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': BASE_DIR / 'logs' / 'errors.log',
+            'maxBytes': 1024 * 1024 * 5,  # 5MB
+            'backupCount': 5,
+            'formatter': 'verbose',
+        } if DEBUG else {
+            'class': 'logging.NullHandler',
+        },
+        
+        # Arquivo de debug (apenas em desenvolvimento)
+        'file_debug': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': BASE_DIR / 'logs' / 'debug.log',
+            'maxBytes': 1024 * 1024 * 10,  # 10MB
+            'backupCount': 3,
+            'formatter': 'verbose',
+        } if DEBUG else {
+            'class': 'logging.NullHandler',
+        },
+    },
+    
+    # ========================================
+    # LOGGERS (o que logar)
+    # ========================================
+    'loggers': {
+        # Logger principal do Django
+        'django': {
+            'handlers': ['console', 'file_errors'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        
+        # Logs de requests HTTP
+        'django.request': {
+            'handlers': ['console', 'file_errors'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        
+        # Logs do servidor de desenvolvimento
+        'django.server': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        
+        # Logs de queries do banco (apenas em DEBUG)
+        'django.db.backends': {
+            'handlers': ['console', 'file_debug'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'propagate': False,
+        },
+        
+        # Logs de segurança
+        'django.security': {
+            'handlers': ['console', 'file_errors'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        
+        # Logs dos apps do projeto
+        'accounts': {
+            'handlers': ['console', 'file_debug'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'propagate': False,
+        },
+        'transactions': {
+            'handlers': ['console', 'file_debug'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'propagate': False,
+        },
+        'categories': {
+            'handlers': ['console', 'file_debug'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'propagate': False,
+        },
+        'gamification': {
+            'handlers': ['console', 'file_debug'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'propagate': False,
+        },
+        'notifications': {
+            'handlers': ['console', 'file_debug'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'propagate': False,
+        },
+        'analytics': {
+            'handlers': ['console', 'file_debug'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'propagate': False,
+        },
+        'chatbot': {
+            'handlers': ['console', 'file_debug'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'propagate': False,
+        },
+        'core': {
+            'handlers': ['console', 'file_debug'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'propagate': False,
+        },
+    },
+    
+    # ========================================
+    # ROOT LOGGER (captura tudo que não tem logger específico)
+    # ========================================
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+}
+
+# ============================================================================
+# Cria pasta de logs se não existir (apenas em desenvolvimento)
+# ============================================================================
+if DEBUG:
+    LOGS_DIR = BASE_DIR / 'logs'
+    LOGS_DIR.mkdir(exist_ok=True)
+
+# ============================================================================
+# CONFIGURAÇÕES ADICIONAIS PARA PRODUÇÃO
+# ============================================================================
+
+# Timeout de sessão (30 dias)
+SESSION_COOKIE_AGE = 2592000  # 30 dias em segundos
+
+# Limpar sessões expiradas automaticamente
+SESSION_SAVE_EVERY_REQUEST = False
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+# CSRF Settings
+CSRF_COOKIE_HTTPONLY = False  # Permite JavaScript acessar (necessário para AJAX)
+CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.railway.app',  # Para Railway
+    'http://localhost:8000',  # Para desenvolvimento
+    'http://127.0.0.1:8000',  # Para desenvolvimento
+]
+
+# Adiciona origens confiáveis do ambiente se existir
+if config('CSRF_TRUSTED_ORIGINS', default=''):
+    CSRF_TRUSTED_ORIGINS.extend(config('CSRF_TRUSTED_ORIGINS', cast=Csv()))
+
+# ============================================================================
+# MESSAGE FRAMEWORK (para alerts/notifications)
+# ============================================================================
+from django.contrib.messages import constants as messages
+
+MESSAGE_TAGS = {
+    messages.DEBUG: 'info',
+    messages.INFO: 'info',
+    messages.SUCCESS: 'success',
+    messages.WARNING: 'warning',
+    messages.ERROR: 'error',
+}
+
+# ============================================================================
+# CACHE CONFIGURATION (opcional, para melhorar performance)
+# ============================================================================
+if not DEBUG:
+    # Em produção, use cache em memória
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'nebue-cache',
+            'TIMEOUT': 300,  # 5 minutos
+            'OPTIONS': {
+                'MAX_ENTRIES': 1000
+            }
+        }
+    }
+else:
+    # Em desenvolvimento, cache dummy (não faz nada)
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        }
+    }
+
+# ============================================================================
+# EMAIL CONFIGURATION (para notificações futuras)
+# ============================================================================
+# Configure quando for implementar envio de emails
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Para desenvolvimento
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # Para produção
+
+if not DEBUG:
+    # Configurações de email para produção (descomente quando configurar)
+    # EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
+    # EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+    # EMAIL_USE_TLS = True
+    # EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
+    # EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+    # DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@nebue.com')
+    pass
+
+# ============================================================================
+# PRINT DE CONFIRMAÇÃO (aparece no console quando o servidor inicia)
+# ============================================================================
+if DEBUG:
+    print("\n" + "="*60)
+    print("🚀 NEBUE - Configurações Carregadas")
+    print("="*60)
+    print(f"✅ DEBUG: {DEBUG}")
+    print(f"✅ DATABASE: {'PostgreSQL' if config('DATABASE_URL', default=None) else 'SQLite'}")
+    print(f"✅ ALLOWED_HOSTS: {ALLOWED_HOSTS}")
+    print(f"✅ STATIC_ROOT: {STATIC_ROOT}")
+    print(f"✅ MEDIA_ROOT: {MEDIA_ROOT}")
+    print(f"✅ LOGGING: {'Habilitado com arquivos' if DEBUG else 'Console only'}")
+    print("="*60 + "\n")

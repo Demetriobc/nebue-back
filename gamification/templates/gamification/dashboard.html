@@ -1,0 +1,1007 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pontuações - Nebue{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ========================================
+       ANIMAÇÕES AVANÇADAS
+    ======================================== */
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-15px) rotate(2deg); }
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.08); }
+    }
+    
+    @keyframes glow {
+        0%, 100% { 
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.4),
+                        0 0 40px rgba(168, 85, 247, 0.2);
+        }
+        50% { 
+            box-shadow: 0 0 40px rgba(168, 85, 247, 0.8),
+                        0 0 80px rgba(168, 85, 247, 0.4);
+        }
+    }
+    
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes shimmer {
+        0% { background-position: -200% center; }
+        100% { background-position: 200% center; }
+    }
+    
+    @keyframes progressFill {
+        from { width: 0%; }
+    }
+    
+    @keyframes sparkle {
+        0%, 100% { opacity: 0; transform: scale(0); }
+        50% { opacity: 1; transform: scale(1); }
+    }
+    
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    /* ========================================
+       CLASSES DE ANIMAÇÃO
+    ======================================== */
+    .float-animation {
+        animation: float 4s ease-in-out infinite;
+    }
+    
+    .pulse-animation {
+        animation: pulse 2s ease-in-out infinite;
+    }
+    
+    .glow-animation {
+        animation: glow 2s ease-in-out infinite;
+    }
+    
+    .slide-in-left {
+        animation: slideInLeft 0.6s ease-out forwards;
+    }
+    
+    .slide-in-right {
+        animation: slideInRight 0.6s ease-out forwards;
+    }
+    
+    .slide-in-up {
+        animation: slideInUp 0.6s ease-out forwards;
+    }
+    
+    .shimmer-effect {
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.15),
+            transparent
+        );
+        background-size: 200% 100%;
+        animation: shimmer 2s infinite;
+    }
+    
+    .sparkle-animation {
+        animation: sparkle 1.5s ease-in-out infinite;
+    }
+    
+    .bounce-animation {
+        animation: bounce 2s ease-in-out infinite;
+    }
+    
+    .rotate-animation {
+        animation: rotate 3s linear infinite;
+    }
+
+    /* ========================================
+       CARDS PERSONALIZADOS
+    ======================================== */
+    .glass-card {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .glass-card:hover {
+        background: rgba(30, 41, 59, 0.85);
+        border-color: rgba(168, 85, 247, 0.5);
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+    
+    .stat-card {
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+            circle,
+            rgba(168, 85, 247, 0.1) 0%,
+            transparent 70%
+        );
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    
+    .stat-card:hover::before {
+        opacity: 1;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-8px) scale(1.02);
+    }
+    
+    .achievement-card {
+        position: relative;
+        overflow: hidden;
+        opacity: 0;
+        animation: slideInUp 0.6s ease-out forwards;
+    }
+    
+    .achievement-card:nth-child(1) { animation-delay: 0.1s; }
+    .achievement-card:nth-child(2) { animation-delay: 0.2s; }
+    .achievement-card:nth-child(3) { animation-delay: 0.3s; }
+    .achievement-card:nth-child(4) { animation-delay: 0.4s; }
+    .achievement-card:nth-child(5) { animation-delay: 0.5s; }
+    
+    .achievement-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.1),
+            transparent
+        );
+        transition: left 0.5s;
+    }
+    
+    .achievement-card:hover::after {
+        left: 100%;
+    }
+
+    /* ========================================
+       PROGRESS BAR ESTILO ANALYTICS - CORRIGIDO
+    ======================================== */
+    .progress-container {
+        position: relative;
+        width: 100%;
+        height: 16px;
+        background: rgba(15, 23, 42, 0.9);
+        border-radius: 100px;
+        overflow: hidden;
+        border: 2px solid rgba(148, 163, 184, 0.3);
+        box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+    
+    .progress-bar-fill {
+        height: 100%;
+        border-radius: 100px;
+        position: relative;
+        transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        animation: progressFill 2s ease-out;
+        box-shadow: 0 0 20px rgba(251, 191, 36, 0.6),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+    
+    .progress-bar-fill.low-progress {
+        background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+    }
+    
+    .progress-bar-fill.medium-progress {
+        background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+    }
+    
+    .progress-bar-fill.high-progress {
+        background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+    }
+    
+    .progress-bar-fill::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.4),
+            transparent
+        );
+        background-size: 200% 100%;
+        animation: shimmer 2s infinite;
+    }
+    
+    .progress-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 12px;
+    }
+    
+    .progress-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    /* ========================================
+       LEVEL BADGE AVANÇADO
+    ======================================== */
+    .level-badge {
+        position: relative;
+        background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-weight: 900;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 16px rgba(168, 85, 247, 0.4),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .level-badge::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(45deg, #a855f7, #7c3aed, #a855f7);
+        background-size: 400% 400%;
+        border-radius: 50px;
+        z-index: -1;
+        opacity: 0;
+        transition: opacity 0.3s;
+        animation: shimmer 3s infinite;
+    }
+    
+    .level-badge:hover::before {
+        opacity: 1;
+    }
+
+    /* ========================================
+       STREAK FLAME EFFECT
+    ======================================== */
+    .streak-container {
+        position: relative;
+    }
+    
+    .streak-flame {
+        filter: drop-shadow(0 0 20px rgba(251, 146, 60, 0.8))
+                drop-shadow(0 0 40px rgba(251, 146, 60, 0.4));
+        animation: bounce 1.5s ease-in-out infinite;
+    }
+    
+    .streak-glow {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 120%;
+        height: 120%;
+        background: radial-gradient(
+            circle,
+            rgba(251, 146, 60, 0.3) 0%,
+            transparent 70%
+        );
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    /* ========================================
+       TOOLTIP CUSTOMIZADO
+    ======================================== */
+    .tooltip {
+        position: relative;
+        cursor: help;
+    }
+    
+    .tooltip::before {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: 120%;
+        left: 50%;
+        transform: translateX(-50%) scale(0);
+        padding: 8px 12px;
+        background: rgba(15, 23, 42, 0.95);
+        color: white;
+        border-radius: 8px;
+        font-size: 12px;
+        white-space: nowrap;
+        opacity: 0;
+        transition: all 0.3s;
+        pointer-events: none;
+        border: 1px solid rgba(168, 85, 247, 0.5);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+    }
+    
+    .tooltip:hover::before {
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+    }
+
+    /* ========================================
+       SCROLLBAR PERSONALIZADO
+    ======================================== */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(15, 23, 42, 0.5);
+        border-radius: 10px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #a855f7, #7c3aed);
+        border-radius: 10px;
+        border: 2px solid rgba(15, 23, 42, 0.5);
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    }
+
+    /* ========================================
+       EMOJI ICONS ESTILIZADOS
+    ======================================== */
+    .emoji-icon {
+        font-size: 2rem;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        transition: transform 0.3s;
+    }
+    
+    .emoji-icon:hover {
+        transform: scale(1.2) rotate(5deg);
+    }
+    
+    .emoji-large {
+        font-size: 3rem;
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    }
+
+    /* ========================================
+       RARIDADE CORES
+    ======================================== */
+    .rarity-comum {
+        background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    }
+    
+    .rarity-rara {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+    }
+    
+    .rarity-epica {
+        background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+        box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+    }
+    
+    .rarity-lendaria {
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        box-shadow: 0 0 30px rgba(251, 191, 36, 0.6);
+        animation: glow 2s ease-in-out infinite;
+    }
+
+    /* ========================================
+       SECTION HEADERS
+    ======================================== */
+    .section-header {
+        position: relative;
+        padding-bottom: 16px;
+        margin-bottom: 24px;
+    }
+    
+    .section-header::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, #a855f7, transparent);
+        border-radius: 3px;
+    }
+
+    /* ========================================
+       RESPONSIVE GRID
+    ======================================== */
+    @media (max-width: 768px) {
+        .emoji-large {
+            font-size: 2rem;
+        }
+        
+        .stat-card {
+            padding: 1rem;
+        }
+        
+        .glass-card {
+            padding: 1rem;
+        }
+    }
+
+    /* ========================================
+       LOADING SKELETON
+    ======================================== */
+    .skeleton {
+        background: linear-gradient(
+            90deg,
+            rgba(30, 41, 59, 0.4) 25%,
+            rgba(51, 65, 85, 0.4) 50%,
+            rgba(30, 41, 59, 0.4) 75%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+        border-radius: 8px;
+    }
+
+    /* ========================================
+       HOVER EFFECTS AVANÇADOS
+    ======================================== */
+    .hover-lift {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .hover-lift:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+    }
+    
+    .hover-glow:hover {
+        box-shadow: 0 0 30px rgba(168, 85, 247, 0.6);
+    }
+
+    /* ========================================
+       CONFETTI EFFECT
+    ======================================== */
+    @keyframes confetti-fall {
+        0% {
+            transform: translateY(-100vh) rotate(0deg);
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(100vh) rotate(720deg);
+            opacity: 0;
+        }
+    }
+    
+    .confetti {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        pointer-events: none;
+        animation: confetti-fall 3s linear forwards;
+    }
+
+    /* ========================================
+       BADGE STYLES
+    ======================================== */
+    .badge-new {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-size: 11px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    /* ========================================
+       GRADIENT TEXT
+    ======================================== */
+    .gradient-text {
+        background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .gradient-text-gold {
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    /* ========================================
+       PRÓXIMO NÍVEL INFO BOX
+    ======================================== */
+    .next-level-box {
+        background: linear-gradient(135deg, rgba(168, 85, 247, 0.15) 0%, rgba(236, 72, 153, 0.15) 100%);
+        border: 2px solid rgba(168, 85, 247, 0.3);
+        border-radius: 16px;
+        padding: 16px 24px;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+    
+    .next-level-box:hover {
+        border-color: rgba(168, 85, 247, 0.6);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(168, 85, 247, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 md:p-8">
+    <div class="max-w-7xl mx-auto">
+        
+        <!-- ========================================
+             HERO HEADER
+        ======================================== -->
+        <div class="mb-8 slide-in-left">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                <div>
+                    <h1 class="text-4xl md:text-6xl font-black mb-2">
+                        <span class="gradient-text">🎮 Seu Progresso Financeiro</span>
+                    </h1>
+                    <p class="text-slate-400 text-lg flex items-center gap-2">
+                        <span>Acompanhe sua evolução e conquiste novos níveis!</span>
+                        <span class="text-2xl bounce-animation">🚀</span>
+                    </p>
+                </div>
+                
+                <div class="flex gap-3">
+                    <button onclick="window.location.reload()" 
+                            class="glass-card px-6 py-3 rounded-xl hover-lift flex items-center gap-2 text-purple-400 hover:text-purple-300">
+                        <i class="fas fa-sync-alt"></i>
+                        <span class="hidden md:inline font-semibold">Atualizar</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================
+             HERO LEVEL CARD - CORRIGIDO
+        ======================================== -->
+        <div class="mb-8 slide-in-up" style="animation-delay: 0.2s;">
+            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-600 via-purple-700 to-purple-900 p-6 md:p-10 shadow-2xl glow-animation">
+                
+                <!-- Decorative Background Elements -->
+                <div class="absolute top-0 right-0 w-96 h-96 bg-purple-500 rounded-full opacity-10 blur-3xl"></div>
+                <div class="absolute bottom-0 left-0 w-96 h-96 bg-pink-500 rounded-full opacity-10 blur-3xl"></div>
+                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full">
+                    <div class="absolute top-10 right-20 text-6xl opacity-5 rotate-12">⭐</div>
+                    <div class="absolute bottom-20 left-10 text-6xl opacity-5 -rotate-12">🏆</div>
+                    <div class="absolute top-1/3 right-1/4 text-4xl opacity-5">💎</div>
+                </div>
+                
+                <div class="relative z-10">
+                    <div class="flex flex-col lg:flex-row items-center justify-between gap-8 mb-8">
+                        
+                        <!-- Level Info Section -->
+                        <div class="flex items-center gap-6">
+                            <div class="relative">
+                                <div class="w-28 h-28 md:w-36 md:h-36 bg-white/20 rounded-3xl flex items-center justify-center backdrop-blur-sm border-4 border-white/30 shadow-2xl float-animation">
+                                    <span class="text-6xl md:text-7xl emoji-large">
+                                        {% if perfil.nivel_atual.icone %}
+                                            <i class="fas {{ perfil.nivel_atual.icone }} text-white"></i>
+                                        {% else %}
+                                            ⭐
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <div class="absolute -bottom-3 -right-3 level-badge">
+                                    LVL {{ perfil.nivel_atual.numero|default:1 }}
+                                </div>
+                            </div>
+                            
+                            <div class="max-w-md">
+                                <h2 class="text-4xl md:text-5xl font-black text-white mb-2 flex items-center gap-3">
+                                    {{ perfil.nivel_atual.nome|default:"Iniciante" }}
+                                </h2>
+                                <p class="text-purple-100 text-lg leading-relaxed">
+                                    {{ perfil.nivel_atual.descricao|default:"Começando sua jornada rumo à estabilidade financeira" }}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Streak Badge -->
+                        <div class="flex-shrink-0">
+                            <div class="relative streak-container bg-gradient-to-br from-orange-500 via-red-500 to-red-600 px-10 py-8 rounded-3xl shadow-2xl border-4 border-orange-400/40">
+                                <div class="streak-glow"></div>
+                                <div class="relative z-10 flex items-center gap-5">
+                                    <div class="text-6xl streak-flame">🔥</div>
+                                    <div class="text-center">
+                                        <div class="text-6xl font-black text-white mb-1 tabular-nums">
+                                            {{ perfil.streak_atual|default:0 }}
+                                        </div>
+                                        <div class="text-orange-100 font-bold text-sm uppercase tracking-widest">
+                                            {% if perfil.streak_atual == 1 %}Dia{% else %}Dias{% endif %}
+                                        </div>
+                                        <div class="text-orange-200 text-xs mt-1 font-medium">
+                                            de sequência
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Informações de Pontos -->
+                    <div class="space-y-4">
+                        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                            <div class="text-white">
+                                <span class="text-5xl font-black tabular-nums">{{ perfil.pontos_totais|default:0 }}</span>
+                                <span class="text-purple-200 text-2xl ml-3">pontos acumulados</span>
+                            </div>
+                            
+                            {% if proximo_nivel %}
+                            <div class="next-level-box">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-purple-100 font-medium">Próximo Nível:</span>
+                                    <span class="font-black text-white text-xl">{{ proximo_nivel.nome }}</span>
+                                    <span class="text-yellow-300 font-bold text-lg">({{ proximo_nivel.pontos_necessarios }} pts)</span>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================
+             STATS GRID
+        ======================================== -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+            
+            <!-- Pontos Totais -->
+            <div class="stat-card glass-card rounded-2xl p-6 border border-slate-700/50 hover:border-purple-500/50 group hover-lift">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                        <span class="text-4xl emoji-icon">⭐</span>
+                    </div>
+                </div>
+                <div class="text-5xl font-black text-white mb-2 tabular-nums">{{ stats.pontos_totais|default:0 }}</div>
+                <div class="text-slate-400 text-sm font-bold uppercase tracking-wider">Pontos Totais</div>
+                <div class="mt-2 text-xs text-purple-400 font-medium">
+                    <i class="fas fa-arrow-up"></i> Continue acumulando!
+                </div>
+            </div>
+
+            <!-- Conquistas -->
+            <div class="stat-card glass-card rounded-2xl p-6 border border-slate-700/50 hover:border-yellow-500/50 group hover-lift">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-16 h-16 bg-gradient-to-br from-yellow-600 to-yellow-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                        <span class="text-4xl emoji-icon">🏆</span>
+                    </div>
+                </div>
+                <div class="text-5xl font-black text-white mb-2 tabular-nums">{{ stats.conquistas.total|default:0 }}</div>
+                <div class="text-slate-400 text-sm font-bold uppercase tracking-wider">Conquistas</div>
+                {% if stats.conquistas.nao_visualizadas > 0 %}
+                <div class="mt-2">
+                    <span class="badge-new">{{ stats.conquistas.nao_visualizadas }} NOVAS!</span>
+                </div>
+                {% else %}
+                <div class="mt-2 text-xs text-yellow-400 font-medium">
+                    <i class="fas fa-trophy"></i> Desbloqueie mais!
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Maior Sequência -->
+            <div class="stat-card glass-card rounded-2xl p-6 border border-slate-700/50 hover:border-orange-500/50 group hover-lift">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-16 h-16 bg-gradient-to-br from-orange-600 to-red-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                        <span class="text-4xl emoji-icon">🔥</span>
+                    </div>
+                </div>
+                <div class="text-5xl font-black text-white mb-2 tabular-nums">{{ stats.streak.maior|default:0 }}</div>
+                <div class="text-slate-400 text-sm font-bold uppercase tracking-wider">Melhor Streak</div>
+                <div class="mt-2 text-xs text-orange-400 font-medium">
+                    <i class="fas fa-fire"></i> Continue assim!
+                </div>
+            </div>
+
+            <!-- Desafios -->
+            <div class="stat-card glass-card rounded-2xl p-6 border border-slate-700/50 hover:border-green-500/50 group hover-lift">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-16 h-16 bg-gradient-to-br from-green-600 to-emerald-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                        <span class="text-4xl emoji-icon">🎯</span>
+                    </div>
+                </div>
+                <div class="text-5xl font-black text-white mb-2 tabular-nums">{{ stats.desafios.completados|default:0 }}</div>
+                <div class="text-slate-400 text-sm font-bold uppercase tracking-wider">Desafios</div>
+                {% if stats.desafios.em_andamento > 0 %}
+                <div class="mt-2 text-xs text-green-400 font-medium">
+                    <i class="fas fa-clock"></i> {{ stats.desafios.em_andamento }} em andamento
+                </div>
+                {% else %}
+                <div class="mt-2 text-xs text-green-400 font-medium">
+                    <i class="fas fa-check"></i> Complete desafios!
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ========================================
+             TWO COLUMN LAYOUT
+        ======================================== -->
+        <div class="grid lg:grid-cols-2 gap-6 md:gap-8 mb-8">
+            
+            <!-- Conquistas Recentes -->
+            <div class="glass-card rounded-2xl p-6 md:p-8 border border-slate-700/50 hover-lift">
+                <div class="section-header">
+                    <div class="flex items-center justify-between mb-2">
+                        <h2 class="text-2xl md:text-3xl font-black text-white flex items-center gap-3">
+                            <span class="text-4xl emoji-icon">🏆</span>
+                            <span>Conquistas Recentes</span>
+                        </h2>
+                        <a href="{% url 'gamification:conquistas_list' %}" 
+                           class="text-purple-400 hover:text-purple-300 text-sm font-bold flex items-center gap-2 bg-purple-500/10 px-4 py-2 rounded-xl hover:bg-purple-500/20 transition-all hover-lift">
+                            Ver Todas
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                {% if conquistas_recentes %}
+                    <div class="space-y-4 max-h-[500px] overflow-y-auto custom-scrollbar">
+                        {% for conquista_user in conquistas_recentes %}
+                        <div class="achievement-card glass-card rounded-xl p-5 flex items-center gap-4 border border-slate-700/50 hover:border-purple-500/50 hover:bg-slate-800/80 transition-all group">
+                            <div class="relative flex-shrink-0">
+                                <div class="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl shadow-2xl
+                                            rarity-{{ conquista_user.conquista.raridade }}
+                                            group-hover:scale-110 transition-transform">
+                                    <i class="fas {{ conquista_user.conquista.icone }} text-white"></i>
+                                </div>
+                                {% if conquista_user.conquista.raridade == 'lendaria' %}
+                                <div class="absolute -top-2 -right-2 text-2xl sparkle-animation">✨</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <h3 class="text-white font-bold text-lg truncate">{{ conquista_user.conquista.titulo }}</h3>
+                                    <span class="flex-shrink-0 text-xs font-black px-3 py-1 rounded-full uppercase
+                                                {% if conquista_user.conquista.raridade == 'comum' %}bg-gray-600 text-gray-100{% endif %}
+                                                {% if conquista_user.conquista.raridade == 'rara' %}bg-blue-600 text-blue-100{% endif %}
+                                                {% if conquista_user.conquista.raridade == 'epica' %}bg-purple-600 text-purple-100{% endif %}
+                                                {% if conquista_user.conquista.raridade == 'lendaria' %}bg-gradient-to-r from-yellow-500 to-orange-500 text-white{% endif %}">
+                                        {{ conquista_user.conquista.raridade }}
+                                    </span>
+                                </div>
+                                <p class="text-slate-400 text-sm line-clamp-2 leading-relaxed">
+                                    {{ conquista_user.conquista.descricao }}
+                                </p>
+                            </div>
+                            
+                            <div class="text-right flex-shrink-0">
+                                <div class="bg-gradient-to-r from-purple-600 to-purple-500 text-white px-5 py-2 rounded-full text-sm font-black shadow-lg">
+                                    +{{ conquista_user.conquista.pontos }}
+                                </div>
+                                <span class="text-slate-500 text-xs mt-2 block font-medium">
+                                    {{ conquista_user.desbloqueada_em|date:"d/m/Y" }}
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-20">
+                        <div class="text-8xl mb-6 opacity-20">🏆</div>
+                        <p class="text-slate-400 text-xl font-semibold mb-3">Nenhuma conquista ainda</p>
+                        <p class="text-slate-500 text-sm max-w-xs mx-auto">
+                            Comece a usar o Nebue para desbloquear conquistas incríveis!
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Atividade Recente -->
+            <div class="glass-card rounded-2xl p-6 md:p-8 border border-slate-700/50 hover-lift">
+                <div class="section-header">
+                    <div class="flex items-center justify-between mb-2">
+                        <h2 class="text-2xl md:text-3xl font-black text-white flex items-center gap-3">
+                            <span class="text-4xl emoji-icon">📊</span>
+                            <span>Atividade Recente</span>
+                        </h2>
+                        <a href="{% url 'gamification:historico' %}" 
+                           class="text-purple-400 hover:text-purple-300 text-sm font-bold flex items-center gap-2 bg-purple-500/10 px-4 py-2 rounded-xl hover:bg-purple-500/20 transition-all hover-lift">
+                            Ver Tudo
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                {% if historico %}
+                    <div class="space-y-3 max-h-[500px] overflow-y-auto custom-scrollbar">
+                        {% for item in historico|slice:":10" %}
+                        <div class="flex items-center gap-4 p-4 rounded-xl hover:bg-slate-800/50 transition-all group border border-transparent hover:border-slate-700/50">
+                            <div class="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 text-2xl
+                                        {% if item.tipo == 'pontos' %}bg-purple-600/20 group-hover:bg-purple-600/30{% endif %}
+                                        {% if item.tipo == 'conquista' %}bg-yellow-600/20 group-hover:bg-yellow-600/30{% endif %}
+                                        {% if item.tipo == 'nivel_up' %}bg-green-600/20 group-hover:bg-green-600/30{% endif %}
+                                        {% if item.tipo == 'desafio' %}bg-blue-600/20 group-hover:bg-blue-600/30{% endif %}
+                                        {% if item.tipo == 'streak' %}bg-orange-600/20 group-hover:bg-orange-600/30{% endif %}
+                                        transition-all">
+                                {% if item.tipo == 'pontos' %}⭐{% endif %}
+                                {% if item.tipo == 'conquista' %}🏆{% endif %}
+                                {% if item.tipo == 'nivel_up' %}📈{% endif %}
+                                {% if item.tipo == 'desafio' %}🎯{% endif %}
+                                {% if item.tipo == 'streak' %}🔥{% endif %}
+                            </div>
+                            
+                            <div class="flex-1 min-w-0">
+                                <p class="text-white text-sm font-semibold truncate leading-relaxed">
+                                    {{ item.descricao }}
+                                </p>
+                                <span class="text-slate-500 text-xs font-medium">
+                                    {{ item.criado_em|date:"d/m/Y H:i" }}
+                                </span>
+                            </div>
+                            
+                            {% if item.pontos > 0 %}
+                            <span class="text-purple-400 font-black text-lg flex-shrink-0 tabular-nums">
+                                +{{ item.pontos }}
+                            </span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-20">
+                        <div class="text-8xl mb-6 opacity-20">📊</div>
+                        <p class="text-slate-400 text-xl font-semibold">Nenhuma atividade ainda</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ========================================
+             DESAFIOS ATIVOS
+        ======================================== -->
+        {% if desafios_ativos %}
+        <div class="glass-card rounded-2xl p-6 md:p-8 border border-slate-700/50 mb-8 hover-lift">
+            <div class="section-header">
+                <div class="flex items-center justify-between mb-2">
+                    <h2 class="text-2xl md:text-3xl font-black text-white flex items-center gap-3">
+                        <span class="text-4xl emoji-icon">🎯</span>
+                        <span>Desafios em Andamento</span>
+                        <span class="bg-green-500 text-white text-sm px-4 py-1 rounded-full font-black">
+                            {{ desafios_ativos.count }} ativo{% if desafios_ativos.count > 1 %}s{% endif %}
+                        </span>
+                    </h2>
+                    <a href="{% url 'gamification:desafios_list' %}" 
+                       class="text-purple-400 hover:text-purple-300 text-sm font-bold flex items-center gap-2 bg-purple-500/10 px-4 py-2 rounded-xl hover:bg-purple-500/20 transition-all hover-lift">
+                        Ver Todos
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                {% for desafio_user in desafios_ativos %}
+                <div class="glass-card rounded-xl p-6 border border-slate-700/50 hover:border-green-500/50 transition-all group hover-lift">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-white font-bold text-xl">{{ desafio_user.desafio.titulo }}</h3>
+                        <span class="text-slate-400 text-sm flex items-center gap-2 bg-slate-700/50 px-3 py-1 rounded-lg">
+                            <i class="fas fa-clock"></i>
+                            {{ desafio_user.desafio.data_fim|date:"d/m" }}
+                        </span>
+                    </div>
+                    
+                    <p class="text-slate-400 text-sm mb-5 leading-relaxed">{{ desafio_user.desafio.descricao }}</p>
+                    
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-400 font-semibold">{{ desafio_user.progresso|default:0 }}% completo</span>
+                            <span class="text-yellow-400 font-bold flex items-center gap-2">
+                                <span class="text-xl">🏆</span>
+                                <span class="text-lg">{{ desafio_user.desafio.pontos_recompensa }} pts</span>
+                            </span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar-fill {% if desafio_user.progresso < 30 %}low-progress{% elif desafio_user.progresso < 70 %}medium-progress{% else %}high-progress{% endif %}"
+                                 style="width: {{ desafio_user.progresso|default:0 }}%">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ========================================
+             ACTION BUTTONS
+        ======================================== -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+            <a href="{% url 'gamification:conquistas_list' %}" 
+               class="group relative overflow-hidden bg-gradient-to-br from-yellow-600 via-yellow-500 to-orange-500 hover:from-yellow-500 hover:via-yellow-400 hover:to-orange-400 text-white font-black py-8 px-10 rounded-3xl flex items-center justify-center gap-4 transition-all shadow-2xl hover:shadow-yellow-500/50 hover-lift">
+                <div class="absolute inset-0 shimmer-effect"></div>
+                <span class="text-5xl relative z-10 emoji-icon">🏆</span>
+                <span class="text-2xl relative z-10">Ver Conquistas</span>
+            </a>
+            
+            <a href="{% url 'gamification:ranking' %}" 
+               class="group relative overflow-hidden bg-gradient-to-br from-purple-600 via-purple-500 to-pink-500 hover:from-purple-500 hover:via-purple-400 hover:to-pink-400 text-white font-black py-8 px-10 rounded-3xl flex items-center justify-center gap-4 transition-all shadow-2xl hover:shadow-purple-500/50 hover-lift">
+                <div class="absolute inset-0 shimmer-effect"></div>
+                <span class="text-5xl relative z-10 emoji-icon">🏅</span>
+                <span class="text-2xl relative z-10">Ver Ranking</span>
+            </a>
+            
+            <a href="{% url 'gamification:niveis' %}" 
+               class="group relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 hover:from-blue-500 hover:via-blue-400 hover:to-cyan-400 text-white font-black py-8 px-10 rounded-3xl flex items-center justify-center gap-4 transition-all shadow-2xl hover:shadow-blue-500/50 hover-lift">
+                <div class="absolute inset-0 shimmer-effect"></div>
+                <span class="text-5xl relative z-10 emoji-icon">📊</span>
+                <span class="text-2xl relative z-10">Sistema de Níveis</span>
+            </a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

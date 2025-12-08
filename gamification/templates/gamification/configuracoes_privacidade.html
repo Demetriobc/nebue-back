@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+
+{% block title %}Configurações de Privacidade - Nebue{% endblock %}
+
+{% block extra_css %}
+<style>
+    .privacy-card {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(16px);
+        border: 2px solid rgba(148, 163, 184, 0.2);
+        transition: all 0.3s;
+    }
+    
+    .privacy-card:hover {
+        border-color: rgba(168, 85, 247, 0.5);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+    
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+    }
+    
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(100, 116, 139, 0.3);
+        transition: .4s;
+        border-radius: 34px;
+    }
+    
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+    
+    input:checked + .toggle-slider {
+        background: linear-gradient(135deg, rgb(168, 85, 247), rgb(124, 58, 237));
+    }
+    
+    input:checked + .toggle-slider:before {
+        transform: translateX(26px);
+    }
+    
+    .info-box {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
+        border: 2px solid rgba(59, 130, 246, 0.3);
+        border-radius: 16px;
+        padding: 20px;
+        margin-top: 24px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 md:p-8">
+    <div class="max-w-4xl mx-auto">
+        
+        <!-- Header -->
+        <div class="mb-8">
+            <a href="{% url 'gamification:ranking' %}" 
+               class="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 mb-6 transition-all hover:translate-x-[-4px] font-semibold">
+                <i class="fas fa-arrow-left"></i>
+                <span>Voltar ao Ranking</span>
+            </a>
+            
+            <h1 class="text-5xl md:text-6xl font-black text-white mb-3 flex items-center gap-4">
+                <span class="text-6xl">🔒</span>
+                <span class="bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
+                    Privacidade
+                </span>
+            </h1>
+            <p class="text-slate-400 text-xl">Controle como você aparece no ranking e em outras áreas públicas</p>
+        </div>
+
+        <!-- Form -->
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- Current Display Name -->
+            <div class="privacy-card rounded-3xl p-8">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 text-white text-2xl font-black">
+                        {{ perfil.get_nome_exibicao|slice:":1"|upper }}
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-black text-white">{{ perfil.get_nome_exibicao }}</h2>
+                        <p class="text-slate-400">Este é como você aparece atualmente</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Option 1: Public Profile -->
+            <div class="privacy-card rounded-3xl p-8">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1 mr-6">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-eye text-purple-400 text-2xl"></i>
+                            <h3 class="text-2xl font-black text-white">Aparecer no Ranking Público</h3>
+                        </div>
+                        <p class="text-slate-400 leading-relaxed">
+                            Quando ativado, você aparece no ranking público do Nebue e pode competir com outros usuários. 
+                            Desative se preferir manter suas estatísticas privadas.
+                        </p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" name="perfil_publico" {% if perfil.perfil_publico %}checked{% endif %}>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Option 2: Real Name -->
+            <div class="privacy-card rounded-3xl p-8">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1 mr-6">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-user text-blue-400 text-2xl"></i>
+                            <h3 class="text-2xl font-black text-white">Exibir Nome Real</h3>
+                        </div>
+                        <p class="text-slate-400 leading-relaxed mb-4">
+                            Quando ativado, seu nome de usuário (<strong class="text-white">{{ user.username }}</strong>) será exibido no ranking. 
+                            Desative para usar um apelido anônimo.
+                        </p>
+                        
+                        {% if not perfil.exibir_nome_real %}
+                        <div class="flex items-center gap-3 p-4 bg-purple-500/10 rounded-xl border border-purple-500/30">
+                            <i class="fas fa-user-secret text-purple-400 text-xl"></i>
+                            <div>
+                                <p class="text-purple-300 font-semibold">Modo Anônimo Ativo</p>
+                                <p class="text-slate-400 text-sm">Apelido atual: <strong class="text-white">{{ perfil.apelido }}</strong></p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" name="exibir_nome_real" {% if perfil.exibir_nome_real %}checked{% endif %}>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Option 3: Custom Nickname -->
+            <div class="privacy-card rounded-3xl p-8">
+                <div class="flex items-center gap-3 mb-4">
+                    <i class="fas fa-edit text-yellow-400 text-2xl"></i>
+                    <h3 class="text-2xl font-black text-white">Personalizar Apelido</h3>
+                </div>
+                <p class="text-slate-400 leading-relaxed mb-6">
+                    Escolha um apelido personalizado para usar quando estiver no modo anônimo. 
+                    Deixe em branco para usar um apelido aleatório.
+                </p>
+                <div class="flex gap-4">
+                    <input 
+                        type="text" 
+                        name="apelido" 
+                        value="{{ perfil.apelido }}"
+                        placeholder="Ex: Investidor Misterioso"
+                        maxlength="100"
+                        class="flex-1 px-6 py-4 bg-slate-800/50 border-2 border-slate-700 rounded-xl text-white font-semibold focus:border-purple-500 focus:outline-none transition-all">
+                    <button 
+                        type="button"
+                        onclick="gerarApelidoAleatorio()"
+                        class="px-6 py-4 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl transition-all flex items-center gap-2">
+                        <i class="fas fa-random"></i>
+                        <span>Gerar Aleatório</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- LGPD Information -->
+            <div class="info-box">
+                <div class="flex items-start gap-4">
+                    <i class="fas fa-shield-alt text-blue-400 text-3xl"></i>
+                    <div>
+                        <h4 class="text-white font-black text-lg mb-2">🇧🇷 Seus Dados, Suas Regras (LGPD)</h4>
+                        <p class="text-slate-300 leading-relaxed">
+                            De acordo com a Lei Geral de Proteção de Dados, você tem total controle sobre suas informações. 
+                            Suas configurações de privacidade são respeitadas em todas as áreas do Nebue. 
+                            Você pode alterar essas preferências a qualquer momento.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Save Button -->
+            <div class="flex justify-center pt-6">
+                <button 
+                    type="submit"
+                    class="px-12 py-5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-black text-xl rounded-2xl transition-all transform hover:scale-105 shadow-2xl flex items-center gap-3">
+                    <i class="fas fa-save"></i>
+                    <span>Salvar Configurações</span>
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<script>
+function gerarApelidoAleatorio() {
+    const adjetivos = [
+        'Rápido', 'Sábio', 'Forte', 'Ágil', 'Valente', 'Calmo', 'Esperto',
+        'Focado', 'Dedicado', 'Persistente', 'Corajoso', 'Astuto', 'Firme',
+        'Estratégico', 'Veloz', 'Inteligente', 'Poupador', 'Disciplinado'
+    ];
+    
+    const animais = [
+        'Leão', 'Águia', 'Lobo', 'Raposa', 'Tigre', 'Falcão', 'Urso',
+        'Pantera', 'Dragão', 'Fênix', 'Coruja', 'Tubarão', 'Gato',
+        'Lince', 'Condor', 'Jaguar', 'Puma', 'Leopardo', 'Gavião'
+    ];
+    
+    const adjetivo = adjetivos[Math.floor(Math.random() * adjetivos.length)];
+    const animal = animais[Math.floor(Math.random() * animais.length)];
+    
+    document.querySelector('input[name="apelido"]').value = `${adjetivo} ${animal}`;
+}
+</script>
+{% endblock %}

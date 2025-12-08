@@ -27,7 +27,6 @@ media
 .Python
 build/
 develop-eggs/
-dist/
 downloads/
 eggs/
 .eggs/
@@ -268,7 +267,6 @@ pyrightconfig.json
 # Tailwind CSS
 theme/static_src/node_modules/
 theme/static_src/package-lock.json
-theme/static/css/dist/
 
 .claude
 .gemini-clipboard

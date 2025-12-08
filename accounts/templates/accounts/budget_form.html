@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if budget %}Editar{% else %}Novo{% endif %} Orçamento - Nebue{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-3xl">
+    <!-- Breadcrumb -->
+    <nav class="flex mb-6" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <li class="inline-flex items-center">
+                <a href="{% url 'dashboard' %}" class="text-slate-400 hover:text-purple-400 transition-colors">
+                    Dashboard
+                </a>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <svg class="w-6 h-6 text-slate-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    <a href="{% url 'accounts:budget_list' %}" class="ml-1 text-slate-400 hover:text-purple-400 transition-colors">
+                        Orçamentos
+                    </a>
+                </div>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <svg class="w-6 h-6 text-slate-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span class="ml-1 text-slate-100 font-medium">{% if budget %}Editar{% else %}Novo{% endif %}</span>
+                </div>
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Título -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-slate-100 mb-2">
+            {% if budget %}Editar Orçamento{% else %}Novo Orçamento{% endif %}
+        </h1>
+        <p class="text-slate-400">Defina limites de gastos para suas categorias</p>
+    </div>
+
+    <!-- Formulário -->
+    <div class="bg-slate-800 border border-slate-700 rounded-lg p-6">
+        <form method="POST">
+            {% csrf_token %}
+            
+            <!-- Orçamento Geral -->
+            <div class="mb-6">
+                <label class="flex items-center space-x-3 cursor-pointer">
+                    <input type="checkbox" 
+                           id="is_general" 
+                           name="is_general" 
+                           {% if budget.is_general %}checked{% endif %}
+                           onchange="toggleCategory()"
+                           class="w-5 h-5 text-purple-600 bg-slate-700 border-slate-600 rounded focus:ring-purple-500 focus:ring-2">
+                    <span class="text-slate-100 font-medium">Orçamento Geral (aplica a todas as categorias)</span>
+                </label>
+                <p class="text-sm text-slate-400 mt-2 ml-8">
+                    Use esta opção para definir um limite total de gastos
+                </p>
+            </div>
+
+            <!-- Categoria -->
+            <div class="mb-6" id="category-group">
+                <label for="category" class="block text-sm font-medium text-slate-300 mb-2">
+                    Categoria <span class="text-red-400">*</span>
+                </label>
+                <select name="category" 
+                        id="category" 
+                        class="w-full bg-slate-700 border border-slate-600 text-slate-100 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    <option value="">Selecione uma categoria</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.id }}" 
+                            {% if budget and budget.category.id == cat.id %}selected{% endif %}>
+                        {{ cat.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Valor Limite -->
+            <div class="mb-6">
+                <label for="amount_limit" class="block text-sm font-medium text-slate-300 mb-2">
+                    Valor Limite <span class="text-red-400">*</span>
+                </label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span class="text-slate-400">R$</span>
+                    </div>
+                    <input type="number" 
+                           name="amount_limit" 
+                           id="amount_limit" 
+                           step="0.01" 
+                           min="0.01"
+                           value="{% if budget %}{{ budget.amount_limit }}{% endif %}"
+                           placeholder="1500.00"
+                           required
+                           class="w-full bg-slate-700 border border-slate-600 text-slate-100 rounded-lg pl-12 pr-4 py-2.5 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+                <p class="text-sm text-slate-400 mt-2">
+                    Defina o valor máximo que deseja gastar
+                </p>
+            </div>
+
+            <!-- Mês e Ano -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label for="month" class="block text-sm font-medium text-slate-300 mb-2">
+                        Mês <span class="text-red-400">*</span>
+                    </label>
+                    <select name="month" 
+                            id="month" 
+                            required
+                            class="w-full bg-slate-700 border border-slate-600 text-slate-100 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        {% for month_num, month_name in months %}
+                        <option value="{{ month_num }}" 
+                                {% if budget %}
+                                    {% if budget.month == month_num %}selected{% endif %}
+                                {% else %}
+                                    {% if current_month == month_num %}selected{% endif %}
+                                {% endif %}>
+                            {{ month_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="year" class="block text-sm font-medium text-slate-300 mb-2">
+                        Ano <span class="text-red-400">*</span>
+                    </label>
+                    <select name="year" 
+                            id="year" 
+                            required
+                            class="w-full bg-slate-700 border border-slate-600 text-slate-100 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        {% for year in years %}
+                        <option value="{{ year }}" 
+                                {% if budget %}
+                                    {% if budget.year == year %}selected{% endif %}
+                                {% else %}
+                                    {% if current_year == year %}selected{% endif %}
+                                {% endif %}>
+                            {{ year }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Botões -->
+            <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-slate-700">
+                <button type="submit" 
+                        class="flex-1 inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-700 text-white font-medium rounded-lg hover:from-purple-600 hover:to-purple-800 transition-all">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Salvar Orçamento
+                </button>
+                <a href="{% url 'accounts:budget_list' %}" 
+                   class="flex-1 inline-flex items-center justify-center px-6 py-3 bg-slate-700 hover:bg-slate-600 text-slate-100 font-medium rounded-lg transition-colors">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function toggleCategory() {
+    const isGeneral = document.getElementById('is_general').checked;
+    const categoryGroup = document.getElementById('category-group');
+    const categorySelect = document.getElementById('category');
+    
+    if (isGeneral) {
+        categoryGroup.style.display = 'none';
+        categorySelect.required = false;
+        categorySelect.value = '';
+    } else {
+        categoryGroup.style.display = 'block';
+        categorySelect.required = true;
+    }
+}
+
+// Executar ao carregar a página
+document.addEventListener('DOMContentLoaded', function() {
+    toggleCategory();
+});
+</script>
+{% endblock %}

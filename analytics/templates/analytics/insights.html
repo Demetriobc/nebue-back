@@ -1,0 +1,790 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load currency_filters %}
+{% load l10n %}
+
+{% block title %}Insights Financeiros{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-900 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-slate-100">📊 Insights Financeiros</h1>
+            <p class="text-slate-300 mt-2">Análises inteligentes das suas finanças</p>
+        </div>
+
+        <!-- Health Score Section -->
+        <div class="bg-gradient-to-br from-slate-800 to-slate-700 rounded-lg shadow-lg p-8 mb-8 border border-slate-600">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="flex-1">
+                    <h2 class="text-2xl font-bold text-slate-100 mb-2">Score de Saúde Financeira</h2>
+                    <p class="text-slate-300 mb-4">Avaliação geral das suas finanças</p>
+                    
+                    <div class="space-y-2">
+                        {% for detail in health_score.details %}
+                        <div class="flex items-center space-x-2 text-sm">
+                            {% if detail.type == 'positive' %}
+                                <span class="text-emerald-400">✓</span>
+                                <span class="text-slate-300">{{ detail.text }}</span>
+                            {% elif detail.type == 'warning' %}
+                                <span class="text-amber-400">⚠</span>
+                                <span class="text-slate-300">{{ detail.text }}</span>
+                            {% else %}
+                                <span class="text-red-400">✗</span>
+                                <span class="text-slate-300">{{ detail.text }}</span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div class="mt-6 md:mt-0 md:ml-8 text-center">
+                    <div class="relative inline-flex items-center justify-center w-40 h-40">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="text-center">
+                                <div class="text-5xl font-bold text-{% if health_score.color == 'emerald' %}emerald{% elif health_score.color == 'blue' %}blue{% elif health_score.color == 'amber' %}amber{% else %}red{% endif %}-500">
+                                    {{ health_score.score }}
+                                </div>
+                                <div class="text-slate-400 text-sm">de 10</div>
+                            </div>
+                        </div>
+                        <svg class="transform -rotate-90 w-40 h-40" viewBox="0 0 160 160">
+                            <circle cx="80" cy="80" r="70" stroke="#334155" stroke-width="12" fill="none"/>
+                            <circle cx="80" cy="80" r="70" 
+                                    stroke="{% if health_score.color == 'emerald' %}#10b981{% elif health_score.color == 'blue' %}#3b82f6{% elif health_score.color == 'amber' %}#f59e0b{% else %}#ef4444{% endif %}" 
+                                    stroke-width="12" 
+                                    fill="none" 
+                                    stroke-dasharray="439.8" 
+                                    stroke-dashoffset="calc(439.8 - (439.8 * {{ health_score.score }} / 10))"
+                                    stroke-linecap="round"
+                                    style="transition: stroke-dashoffset 1s ease;"/>
+                        </svg>
+                    </div>
+                    <p class="mt-4 text-lg font-semibold text-{% if health_score.color == 'emerald' %}emerald{% elif health_score.color == 'blue' %}blue{% elif health_score.color == 'amber' %}amber{% else %}red{% endif %}-500">
+                        {{ health_score.status }}
+                    </p>
+                    {% if health_score.streak > 0 %}
+                    <p class="mt-2 text-sm text-slate-300">
+                        🔥 Streak de <span class="font-bold text-orange-400">{{ health_score.streak }}</span> dias!
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Smart Alerts -->
+        {% if smart_alerts %}
+        <div class="bg-slate-800 rounded-lg shadow-lg p-6 mb-8 border border-slate-700">
+            <h2 class="text-xl font-semibold text-slate-100 mb-4">⚠️ Alertas Inteligentes</h2>
+            <div class="space-y-3">
+                {% for alert in smart_alerts %}
+                <div class="bg-slate-700/50 rounded-lg p-4 border-l-4 
+                            {% if alert.type == 'danger' %}border-red-500
+                            {% elif alert.type == 'warning' %}border-amber-500
+                            {% else %}border-blue-500{% endif %}">
+                    <div class="flex items-start">
+                        <span class="text-2xl mr-3">{{ alert.icon }}</span>
+                        <div class="flex-1">
+                            <p class="text-slate-100 font-medium">{{ alert.message }}</p>
+                            {% if alert.current %}
+                            <div class="mt-2 flex items-center space-x-4 text-sm text-slate-400">
+                                <span>Atual: <span class="font-bold text-slate-200">{{ alert.current|currency }}</span></span>
+                                {% if alert.last %}
+                                <span>•</span>
+                                <span>Anterior: <span class="font-bold text-slate-200">{{ alert.last|currency }}</span></span>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            
+            <!-- Spending Projection -->
+            <div class="bg-slate-800 rounded-lg shadow-lg p-6 border border-slate-700">
+                <h2 class="text-xl font-semibold text-slate-100 mb-4">📊 Projeção de Gastos</h2>
+                <p class="text-slate-400 text-sm mb-6">
+                    Baseado nos últimos {{ projections.based_on_months }} meses
+                </p>
+                
+                <div class="space-y-4">
+                    <div class="bg-slate-700/50 rounded-lg p-4">
+                        <p class="text-slate-400 text-sm">Gasto médio mensal</p>
+                        <p class="text-2xl font-bold text-purple-400">{{ projections.avg_monthly|currency }}</p>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-300">Em 3 meses:</span>
+                            <span class="font-bold text-slate-100">{{ projections.projection_3_months|currency }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-300">Em 6 meses:</span>
+                            <span class="font-bold text-slate-100">{{ projections.projection_6_months|currency }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-300">Em 12 meses:</span>
+                            <span class="font-bold text-slate-100">{{ projections.projection_12_months|currency }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monthly Comparison Card -->
+            <div class="bg-slate-800 rounded-lg shadow-lg p-6 border border-slate-700">
+                <h2 class="text-xl font-semibold text-slate-100 mb-4">📅 Mês Atual vs Anterior</h2>
+                <p class="text-slate-400 text-sm mb-6">Comparação de gastos</p>
+                
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-4 bg-slate-700/50 rounded-lg">
+                        <div>
+                            <p class="text-slate-400 text-sm">Mês Atual</p>
+                            <p class="text-2xl font-bold text-slate-100">{{ current_vs_last.current|currency }}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-slate-400 text-sm">Mês Anterior</p>
+                            <p class="text-xl font-bold text-slate-300">{{ current_vs_last.last|currency }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-{% if current_vs_last.is_increase %}red{% else %}emerald{% endif %}-500/10 border border-{% if current_vs_last.is_increase %}red{% else %}emerald{% endif %}-500/30 rounded-lg p-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-2xl">{% if current_vs_last.is_increase %}📈{% else %}📉{% endif %}</span>
+                                <div>
+                                    <p class="text-sm text-slate-300">Variação</p>
+                                    <p class="text-lg font-bold text-{% if current_vs_last.is_increase %}red{% else %}emerald{% endif %}-400">
+                                        {% if current_vs_last.is_increase %}+{% endif %}{{ current_vs_last.change_percentage|floatformat:1 }}%
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-slate-400">Diferença</p>
+                                <p class="font-bold text-{% if current_vs_last.is_increase %}red{% else %}emerald{% endif %}-400">
+                                    {% if current_vs_last.is_increase %}+{% endif %}{{ current_vs_last.change|currency }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Forecast and Weekday Analysis -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Month End Forecast -->
+            <div class="bg-slate-800 rounded-lg shadow-lg p-6 border border-slate-700">
+                <h2 class="text-xl font-semibold text-slate-100 mb-4">🔮 Previsão de Fim de Mês</h2>
+                <p class="text-slate-400 text-sm mb-6">Projeção baseada no ritmo atual</p>
+                
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-slate-700/50 rounded-lg p-3 text-center">
+                            <p class="text-slate-400 text-xs">Dias passados</p>
+                            <p class="text-2xl font-bold text-blue-400">{{ forecast.days_passed }}</p>
+                        </div>
+                        <div class="bg-slate-700/50 rounded-lg p-3 text-center">
+                            <p class="text-slate-400 text-xs">Dias restantes</p>
+                            <p class="text-2xl font-bold text-purple-400">{{ forecast.days_remaining }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-4">
+                        <p class="text-emerald-400 text-sm mb-2">Gasto até agora</p>
+                        <p class="text-2xl font-bold text-emerald-400">{{ forecast.current_spent|currency }}</p>
+                        <p class="text-xs text-slate-400 mt-1">Média: {{ forecast.daily_average|currency }}/dia</p>
+                    </div>
+                    
+                    <div class="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
+                        <p class="text-amber-400 text-sm mb-2">Previsão até fim do mês</p>
+                        <p class="text-2xl font-bold text-amber-400">{{ forecast.forecast_total|currency }}</p>
+                        <p class="text-xs text-slate-400 mt-1">Ainda vai gastar ~{{ forecast.forecast_remaining|currency }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weekday Analysis -->
+            {% if weekday_analysis.data %}
+            <div class="bg-slate-800 rounded-lg shadow-lg p-6 border border-slate-700">
+                <h2 class="text-xl font-semibold text-slate-100 mb-4">📆 Gastos por Dia da Semana</h2>
+                <p class="text-slate-400 text-sm mb-6">Últimos 3 meses</p>
+                
+                <div class="relative mb-4" style="height: 200px;">
+                    <canvas id="weekdayChart"></canvas>
+                </div>
+                
+                <div class="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
+                    <p class="text-sm text-slate-300 mb-1">Dia que você mais gasta:</p>
+                    <p class="text-xl font-bold text-purple-400">{{ weekday_analysis.max_day }}</p>
+                    <p class="text-sm text-slate-400 mt-1">Total: {{ weekday_analysis.max_amount|currency }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Recurring Transactions -->
+        {% if recurring %}
+        <div class="bg-slate-800 rounded-lg shadow-lg p-6 mb-8 border border-slate-700">
+            <h2 class="text-xl font-semibold text-slate-100 mb-4">🔁 Transações Recorrentes</h2>
+            <p class="text-slate-400 text-sm mb-6">Gastos que se repetem</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for rec in recurring %}
+                <div class="bg-slate-700/50 rounded-lg p-4 border-l-4 border-blue-500">
+                    <p class="font-semibold text-slate-100 mb-2">{{ rec.description|truncatewords:5 }}</p>
+                    <p class="text-sm text-slate-400 mb-2">{{ rec.category }}</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-lg font-bold text-blue-400">{{ rec.amount|currency }}</span>
+                        <span class="text-xs px-2 py-1 bg-blue-500/20 text-blue-400 rounded">
+                            {{ rec.frequency }}x nos últimos 3 meses
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            
+            <!-- Spending Projection -->
+            <div class="bg-slate-800 rounded-lg shadow-lg p-6 border border-slate-700">
+                <h2 class="text-xl font-semibold text-slate-100 mb-4">📊 Projeção de Gastos</h2>
+                <p class="text-slate-400 text-sm mb-6">
+                    Baseado nos últimos {{ projections.based_on_months }} meses
+                </p>
+                
+                <div class="space-y-4">
+                    <div class="bg-slate-700/50 rounded-lg p-4">
+                        <p class="text-slate-400 text-sm">Gasto médio mensal</p>
+                        <p class="text-2xl font-bold text-purple-400">{{ projections.avg_monthly|currency }}</p>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-300">Em 3 meses:</span>
+                            <span class="font-bold text-slate-100">{{ projections.projection_3_months|currency }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-300">Em 6 meses:</span>
+                            <span class="font-bold text-slate-100">{{ projections.projection_6_months|currency }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-300">Em 12 meses:</span>
+                            <span class="font-bold text-slate-100">{{ projections.projection_12_months|currency }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Savings Simulator -->
+            <div class="bg-slate-800 rounded-lg shadow-lg p-6 border border-slate-700">
+                <h2 class="text-xl font-semibold text-slate-100 mb-4">💡 Simulador "E se..."</h2>
+                <p class="text-slate-400 text-sm mb-6">
+                    Se você economizar mensalmente
+                </p>
+                
+                <form id="simulatorForm" class="space-y-4">
+                    <div>
+                        <label class="text-slate-300 text-sm font-medium">Valor mensal (R$)</label>
+                        <input type="number" 
+                               id="savingAmount" 
+                               value="300" 
+                               min="1" 
+                               step="10"
+                               class="w-full mt-1 px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    
+                    <div>
+                        <label class="text-slate-300 text-sm font-medium">Período (meses)</label>
+                        <input type="number" 
+                               id="savingMonths" 
+                               value="6" 
+                               min="1" 
+                               max="60"
+                               class="w-full mt-1 px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    
+                    <button type="button" 
+                            onclick="calculateSavings()"
+                            class="w-full px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-700 text-white font-semibold rounded-lg hover:from-purple-600 hover:to-purple-800 transition-all">
+                        Calcular
+                    </button>
+                </form>
+                
+                <div id="simulationResult" class="mt-6 space-y-3">
+                    <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-4">
+                        <p class="text-emerald-400 text-sm">Economia simples</p>
+                        <p class="text-2xl font-bold text-emerald-400" id="simpleTotal">
+                            {{ default_simulation.simple_total|currency }}
+                        </p>
+                    </div>
+                    
+                    <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+                        <p class="text-blue-400 text-sm">Investido a 8% a.a.</p>
+                        <p class="text-2xl font-bold text-blue-400" id="investedTotal">
+                            {{ default_simulation.invested_total|currency }}
+                        </p>
+                        <p class="text-sm text-slate-400 mt-1">
+                            Ganho de <span id="difference" class="font-bold text-blue-300">
+                                {{ default_simulation.difference|currency }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Trends -->
+        {% if category_trends %}
+        <div class="bg-slate-800 rounded-lg shadow-lg p-6 mb-8 border border-slate-700">
+            <h2 class="text-xl font-semibold text-slate-100 mb-4">📈 Tendências por Categoria</h2>
+            <p class="text-slate-400 text-sm mb-6">Onde seu dinheiro está indo</p>
+            
+            <div class="space-y-5">
+                {% for trend in category_trends %}
+                <div class="bg-slate-700/50 rounded-lg p-5 hover:bg-slate-700/70 transition-all duration-300">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-lg flex items-center justify-center" 
+                                 style="background-color: {{ trend.category_color }}20;">
+                                <div class="w-4 h-4 rounded-full" style="background-color: {{ trend.category_color }};"></div>
+                            </div>
+                            <div>
+                                <span class="font-semibold text-slate-100 text-base">{{ trend.category_name }}</span>
+                                <p class="text-xs text-slate-400">{{ trend.transaction_count }} transaç{{ trend.transaction_count|pluralize:"ão,ões" }}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-slate-100 font-bold text-lg">{{ trend.total|currency }}</span>
+                            <p class="text-xs text-slate-400">{{ trend.avg_monthly|currency }}/mês</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Texto da porcentagem acima da barra -->
+                    <div class="text-xs text-slate-400 mb-2">
+                        {{ trend.percentage|floatformat:1 }}% do total
+                    </div>
+                    
+                    <!-- Barra proporcional mais fiel -->
+                    <div class="flex items-center gap-3">
+                        <div class="category-progress-track">
+                            <div
+                                class="category-progress-bar"
+                                style="--p: {{ trend.percentage|unlocalize }}; --bar-color: {{ trend.category_color }};">
+                            </div>
+                        </div>
+
+                        <!-- Percentual ao lado da barra -->
+                        <span class="text-xs font-bold text-slate-200 w-12 text-right">
+                            {{ trend.percentage|floatformat:1 }}%
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Recommendations -->
+        {% if recommendations %}
+        <div class="bg-slate-800 rounded-lg shadow-lg p-6 mb-8 border border-slate-700">
+            <h2 class="text-xl font-semibold text-slate-100 mb-4">💰 Oportunidades de Economia</h2>
+            <p class="text-slate-400 text-sm mb-6">Recomendações personalizadas</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {% for rec in recommendations %}
+                <div class="bg-slate-700/50 rounded-lg p-4 border-l-4" style="border-color: {{ rec.color }};">
+                    <h3 class="font-semibold text-slate-100 mb-2">{{ rec.category }}</h3>
+                    <p class="text-sm text-slate-300 mb-3">{{ rec.message }}</p>
+                    <div class="space-y-1 text-xs text-slate-400">
+                        <p>Atual: <span class="font-bold text-slate-200">{{ rec.current_monthly|currency }}/mês</span></p>
+                        <p>Economia potencial: <span class="font-bold text-emerald-400">{{ rec.potential_saving|currency }}/mês</span></p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Savings Tips with Impact -->
+        {% if savings_tips %}
+        <div class="bg-slate-800 rounded-lg shadow-lg p-6 mb-8 border border-slate-700">
+            <h2 class="text-xl font-semibold text-slate-100 mb-4">💡 Dicas de Economia Personalizadas</h2>
+            <p class="text-slate-400 text-sm mb-6">Veja o impacto de pequenas reduções</p>
+            
+            <div class="space-y-6">
+                {% for tip in savings_tips %}
+                <div class="bg-slate-700/50 rounded-lg p-6 border-l-4" style="border-color: {{ tip.color }};">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 rounded-lg flex items-center justify-center" 
+                                 style="background-color: {{ tip.color }}20;">
+                                <div class="w-6 h-6 rounded-full" style="background-color: {{ tip.color }};"></div>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-slate-100 text-lg">{{ tip.category }}</h3>
+                                <p class="text-sm text-slate-400">Gasto atual: {{ tip.current_monthly|currency }}/mês</p>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 text-xs font-bold rounded-full" 
+                              style="background-color: {{ tip.color }}20; color: {{ tip.color }};">
+                            {{ tip.percentage|floatformat:0 }}% dos gastos
+                        </span>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {% for option in tip.options %}
+                        <div class="bg-slate-800/50 rounded-lg p-4 border border-slate-600 hover:border-{{ tip.color|slice:1 }} transition-all">
+                            <div class="text-center mb-3">
+                                <span class="inline-block px-3 py-1 rounded-full text-xs font-bold text-white"
+                                      style="background-color: {{ tip.color }};">
+                                    Reduzir {{ option.reduction }}
+                                </span>
+                            </div>
+                            
+                            <div class="space-y-2 text-center">
+                                <div>
+                                    <p class="text-xs text-slate-400">Economia mensal</p>
+                                    <p class="text-xl font-bold" style="color: {{ tip.color }};">
+                                        {{ option.amount|currency }}
+                                    </p>
+                                </div>
+                                
+                                <div class="pt-2 border-t border-slate-600">
+                                    <p class="text-xs text-slate-400">Em 6 meses</p>
+                                    <p class="text-lg font-bold text-emerald-400">
+                                        {{ option.impact_6m|currency }}
+                                    </p>
+                                </div>
+                                
+                                <div class="pt-2 border-t border-slate-600">
+                                    <p class="text-xs text-slate-400">Em 1 ano</p>
+                                    <p class="text-lg font-bold text-blue-400">
+                                        {{ option.impact_12m|currency }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mt-4 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg">
+                        <p class="text-sm text-emerald-400 text-center">
+                            💰 Com 20% de redução, você teria <span class="font-bold">{{ tip.options.1.impact_12m|currency }}</span> extras no ano!
+                        </p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Monthly Comparison Chart -->
+        <div class="bg-slate-800 rounded-lg shadow-lg p-6 mb-8 border border-slate-700">
+            <h2 class="text-xl font-semibold text-slate-100 mb-4">📅 Comparação Mensal</h2>
+            <p class="text-slate-400 text-sm mb-6">Evolução dos últimos 6 meses</p>
+            
+            <div class="relative" style="height: 300px;">
+                <canvas id="comparisonChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Net Worth Evolution Chart -->
+        <div class="bg-slate-800 rounded-lg shadow-lg p-6 border border-slate-700">
+            <h2 class="text-xl font-semibold text-slate-100 mb-4">📈 Evolução do Patrimônio</h2>
+            <p class="text-slate-400 text-sm mb-6">Crescimento do seu saldo acumulado</p>
+            
+            <div class="relative" style="height: 300px;">
+                <canvas id="netWorthChart"></canvas>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 mt-6">
+                <div class="bg-slate-700/50 rounded-lg p-4 text-center">
+                    <p class="text-slate-400 text-sm mb-1">Patrimônio Inicial</p>
+                    <p class="text-2xl font-bold text-slate-100" id="initialNetWorth">-</p>
+                </div>
+                <div class="bg-slate-700/50 rounded-lg p-4 text-center">
+                    <p class="text-slate-400 text-sm mb-1">Patrimônio Atual</p>
+                    <p class="text-2xl font-bold text-emerald-400" id="currentNetWorth">-</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const monthlyData = {{ monthly_comparison_json|safe }};
+const weekdayData = {{ weekday_json|safe }};
+const netWorthData = {{ net_worth_json|safe }};
+
+Chart.defaults.color = '#cbd5e1';
+Chart.defaults.borderColor = '#334155';
+
+const ctx = document.getElementById('comparisonChart');
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: monthlyData.map(m => m.month),
+        datasets: [
+            {
+                label: 'Entradas',
+                data: monthlyData.map(m => m.income),
+                backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                borderColor: '#10b981',
+                borderWidth: 2,
+                borderRadius: 8,
+            },
+            {
+                label: 'Saídas',
+                data: monthlyData.map(m => m.expenses),
+                backgroundColor: 'rgba(239, 68, 68, 0.7)',
+                borderColor: '#ef4444',
+                borderWidth: 2,
+                borderRadius: 8,
+            },
+            {
+                label: 'Balanço',
+                data: monthlyData.map(m => m.balance),
+                type: 'line',
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                borderWidth: 3,
+                tension: 0.4,
+                fill: true,
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+            mode: 'index',
+            intersect: false
+        },
+        plugins: {
+            legend: {
+                position: 'top',
+                labels: {
+                    color: '#cbd5e1',
+                    padding: 15,
+                    font: { size: 12, family: 'Inter' }
+                }
+            },
+            tooltip: {
+                backgroundColor: '#0f172a',
+                titleColor: '#f1f5f9',
+                bodyColor: '#cbd5e1',
+                borderColor: '#334155',
+                borderWidth: 1,
+                padding: 12,
+                callbacks: {
+                    label: function(context) {
+                        return context.dataset.label + ': R$ ' + context.parsed.y.toFixed(2);
+                    }
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: { color: '#334155' },
+                ticks: {
+                    color: '#94a3b8',
+                    callback: value => 'R$ ' + value.toFixed(0)
+                }
+            },
+            x: {
+                grid: { color: '#334155' },
+                ticks: { color: '#94a3b8' }
+            }
+        }
+    }
+});
+
+if (weekdayData.length > 0) {
+    const weekdayCtx = document.getElementById('weekdayChart');
+    if (weekdayCtx) {
+        new Chart(weekdayCtx, {
+            type: 'bar',
+            data: {
+                labels: weekdayData.map(d => d.day),
+                datasets: [{
+                    label: 'Total Gasto',
+                    data: weekdayData.map(d => d.total),
+                    backgroundColor: 'rgba(139, 92, 246, 0.7)',
+                    borderColor: '#8b5cf6',
+                    borderWidth: 2,
+                    borderRadius: 8,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#0f172a',
+                        titleColor: '#f1f5f9',
+                        bodyColor: '#cbd5e1',
+                        borderColor: '#334155',
+                        borderWidth: 1,
+                        padding: 12,
+                        callbacks: {
+                            label: context => 'R$ ' + context.parsed.y.toFixed(2)
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#334155' },
+                        ticks: {
+                            color: '#94a3b8',
+                            callback: value => 'R$ ' + value.toFixed(0)
+                        }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#94a3b8' }
+                    }
+                }
+            }
+        });
+    }
+}
+
+if (netWorthData.length > 0) {
+    const netWorthCtx = document.getElementById('netWorthChart');
+    if (netWorthCtx) {
+        const values = netWorthData.map(d => d.net_worth);
+        const maxValue = Math.max(...values);
+        const minValue = Math.min(...values);
+        
+        document.getElementById('initialNetWorth').textContent = 
+            'R$ ' + netWorthData[0].net_worth.toFixed(2);
+        document.getElementById('currentNetWorth').textContent = 
+            'R$ ' + netWorthData[netWorthData.length - 1].net_worth.toFixed(2);
+        
+        new Chart(netWorthCtx, {
+            type: 'line',
+            data: {
+                labels: netWorthData.map(d => d.month),
+                datasets: [{
+                    label: 'Patrimônio Líquido',
+                    data: values,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: '#10b981',
+                    pointBorderColor: '#f1f5f9',
+                    pointBorderWidth: 2,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#0f172a',
+                        titleColor: '#f1f5f9',
+                        bodyColor: '#cbd5e1',
+                        borderColor: '#334155',
+                        borderWidth: 1,
+                        padding: 12,
+                        callbacks: {
+                            label: context => 'R$ ' + context.parsed.y.toFixed(2)
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        grid: { color: '#334155' },
+                        ticks: {
+                            color: '#94a3b8',
+                            callback: value => 'R$ ' + value.toFixed(0)
+                        }
+                    },
+                    x: {
+                        grid: { color: '#334155' },
+                        ticks: { color: '#94a3b8' }
+                    }
+                }
+            }
+        });
+    }
+}
+
+function calculateSavings() {
+    const amount = parseFloat(document.getElementById('savingAmount').value);
+    const months = parseInt(document.getElementById('savingMonths').value);
+    const annualRate = 0.08;
+    
+    const simpleTotal = amount * months;
+    
+    const monthlyRate = Math.pow(1 + annualRate, 1/12) - 1;
+    let investedTotal = 0;
+    
+    for (let i = 0; i < months; i++) {
+        investedTotal = (investedTotal + amount) * (1 + monthlyRate);
+    }
+    
+    const difference = investedTotal - simpleTotal;
+    
+    document.getElementById('simpleTotal').textContent = 'R$ ' + simpleTotal.toFixed(2);
+    document.getElementById('investedTotal').textContent = 'R$ ' + investedTotal.toFixed(2);
+    document.getElementById('difference').textContent = 'R$ ' + difference.toFixed(2);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const progressBars = document.querySelectorAll('.progress-bar');
+    progressBars.forEach((bar, index) => {
+        setTimeout(() => {
+            bar.style.width = bar.style.width;
+        }, index * 100);
+    });
+});
+</script>
+
+<style>
+@keyframes progressAnimation {
+    from {
+        transform: scaleX(0);
+    }
+}
+
+/* trilho da barra de categoria */
+.category-progress-track {
+    width: 100%;
+    height: 0.5rem;              /* mais fininha e clean */
+    border-radius: 9999px;
+    overflow: hidden;
+    background-color: #1e293b;   /* slate-800 */
+}
+
+/* preenchimento proporcional à porcentagem */
+.category-progress-bar {
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    background-color: var(--bar-color, #22c55e);
+    transform-origin: left;
+    transform: scaleX(calc(var(--p, 0) / 100));
+    animation: progressAnimation 0.8s ease-out;
+}
+</style>
+{% endblock %}

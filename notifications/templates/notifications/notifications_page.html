@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Notificações{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-100 mb-2">🔔 Notificações</h1>
+            <p class="text-slate-400">Gerencie todas as suas notificações</p>
+        </div>
+        
+        <!-- Actions -->
+        <div class="flex items-center space-x-3">
+            {% if unread_count > 0 %}
+            <form method="POST" action="{% url 'notifications:mark_all_read' %}">
+                {% csrf_token %}
+                <button type="submit" 
+                        class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium">
+                    ✓ Marcar todas como lidas
+                </button>
+            </form>
+            {% endif %}
+            
+            {% if read_count > 0 %}
+            <form method="POST" action="{% url 'notifications:delete_all_read' %}" 
+                  onsubmit="return confirm('Tem certeza que deseja deletar todas as notificações lidas?')">
+                {% csrf_token %}
+                <button type="submit" 
+                        class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium">
+                    🗑️ Deletar lidas
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-slate-400 text-sm mb-1">Total</p>
+                    <p class="text-3xl font-bold text-slate-100">{{ total_count }}</p>
+                </div>
+                <div class="w-12 h-12 bg-blue-500 bg-opacity-20 rounded-lg flex items-center justify-center">
+                    <span class="text-2xl">📊</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-slate-400 text-sm mb-1">Não Lidas</p>
+                    <p class="text-3xl font-bold text-purple-400">{{ unread_count }}</p>
+                </div>
+                <div class="w-12 h-12 bg-purple-500 bg-opacity-20 rounded-lg flex items-center justify-center">
+                    <span class="text-2xl">🔔</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-slate-400 text-sm mb-1">Lidas</p>
+                    <p class="text-3xl font-bold text-emerald-400">{{ read_count }}</p>
+                </div>
+                <div class="w-12 h-12 bg-emerald-500 bg-opacity-20 rounded-lg flex items-center justify-center">
+                    <span class="text-2xl">✅</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-slate-800 rounded-xl p-6 border border-slate-700 mb-6">
+        <form method="GET" class="flex flex-col md:flex-row gap-4">
+            <!-- Status Filter -->
+            <div class="flex-1">
+                <label class="block text-sm font-medium text-slate-300 mb-2">Status</label>
+                <select name="type" 
+                        class="w-full bg-slate-700 border border-slate-600 text-slate-100 rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        onchange="this.form.submit()">
+                    <option value="all" {% if filter_type == 'all' %}selected{% endif %}>Todas</option>
+                    <option value="unread" {% if filter_type == 'unread' %}selected{% endif %}>Não lidas</option>
+                    <option value="read" {% if filter_type == 'read' %}selected{% endif %}>Lidas</option>
+                </select>
+            </div>
+
+            <!-- Type Filter -->
+            <div class="flex-1">
+                <label class="block text-sm font-medium text-slate-300 mb-2">Tipo</label>
+                <select name="notif_type" 
+                        class="w-full bg-slate-700 border border-slate-600 text-slate-100 rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        onchange="this.form.submit()">
+                    <option value="">Todos os tipos</option>
+                    {% for value, label in notification_types %}
+                    <option value="{{ value }}" {% if notification_type == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Reset Button -->
+            <div class="flex items-end">
+                <a href="{% url 'notifications:notifications_page' %}" 
+                   class="px-6 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-colors font-medium">
+                    🔄 Limpar
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Notifications List -->
+    <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
+        {% if page_obj %}
+            {% for notification in page_obj %}
+            <div class="{% if not notification.is_read %}bg-slate-700 bg-opacity-30{% endif %} border-b border-slate-700 last:border-b-0 hover:bg-slate-700 transition-colors">
+                <div class="p-6 flex items-start space-x-4">
+                    <!-- Icon -->
+                    <div class="{{ notification.get_color_class }} bg-opacity-20 w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span class="text-2xl">{{ notification.get_icon }}</span>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-start justify-between mb-2">
+                            <h3 class="text-lg font-semibold text-slate-100">{{ notification.title }}</h3>
+                            {% if not notification.is_read %}
+                            <span class="w-3 h-3 bg-purple-500 rounded-full flex-shrink-0 ml-2"></span>
+                            {% endif %}
+                        </div>
+                        <p class="text-slate-300 mb-3">{{ notification.message }}</p>
+                        <div class="flex items-center space-x-4 text-sm text-slate-400">
+                            <span>📅 {{ notification.created_at|date:"d/m/Y H:i" }}</span>
+                            <span>•</span>
+                            <span class="{{ notification.get_color_class }}">{{ notification.get_notification_type_display }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex flex-col space-y-2">
+                        {% if notification.link and notification.link != '#' %}
+                        <a href="{{ notification.link }}" 
+                           class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors text-sm font-medium text-center">
+                            Ver
+                        </a>
+                        {% endif %}
+                        
+                        {% if not notification.is_read %}
+                        <form method="POST" action="{% url 'notifications:mark_read' notification.id %}">
+                            {% csrf_token %}
+                            <button type="submit" 
+                                    class="w-full px-4 py-2 bg-slate-600 hover:bg-slate-500 text-slate-100 rounded-lg transition-colors text-sm font-medium">
+                                ✓ Lida
+                            </button>
+                        </form>
+                        {% endif %}
+                        
+                        <form method="POST" action="{% url 'notifications:delete' notification.id %}"
+                              onsubmit="return confirm('Deletar esta notificação?')">
+                            {% csrf_token %}
+                            <button type="submit" 
+                                    class="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm font-medium">
+                                🗑️
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="p-12 text-center">
+                <div class="w-20 h-20 mx-auto mb-4 bg-slate-700 rounded-full flex items-center justify-center">
+                    <span class="text-4xl">🔕</span>
+                </div>
+                <p class="text-xl font-medium text-slate-300 mb-2">Nenhuma notificação</p>
+                <p class="text-slate-400">Você não tem notificações no momento</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="mt-8 flex justify-center">
+        <nav class="flex items-center space-x-2">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if filter_type != 'all' %}&type={{ filter_type }}{% endif %}{% if notification_type %}&notif_type={{ notification_type }}{% endif %}" 
+               class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-colors">
+                ← Anterior
+            </a>
+            {% endif %}
+
+            <span class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg border border-slate-700">
+                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if filter_type != 'all' %}&type={{ filter_type }}{% endif %}{% if notification_type %}&notif_type={{ notification_type }}{% endif %}" 
+               class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-colors">
+                Próxima →
+            </a>
+            {% endif %}
+        </nav>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Auto-submit form on select change
+document.querySelectorAll('select[onchange*="submit"]').forEach(select => {
+    select.addEventListener('change', function() {
+        this.form.submit();
+    });
+});
+</script>
+{% endblock %}

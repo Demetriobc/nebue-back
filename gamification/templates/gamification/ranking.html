@@ -1,0 +1,883 @@
+{% extends 'base.html' %}
+
+{% block title %}Ranking - Nebue{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ========================================
+       ANIMAÇÕES
+    ======================================== */
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    @keyframes shine {
+        0% { background-position: -200% center; }
+        100% { background-position: 200% center; }
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    @keyframes glow {
+        0%, 100% { 
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.4),
+                        0 0 40px rgba(251, 191, 36, 0.2);
+        }
+        50% { 
+            box-shadow: 0 0 40px rgba(251, 191, 36, 0.8),
+                        0 0 80px rgba(251, 191, 36, 0.4);
+        }
+    }
+    
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    /* ========================================
+       GLASS CARDS
+    ======================================== */
+    .glass-card {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .glass-card:hover {
+        background: rgba(30, 41, 59, 0.85);
+        border-color: rgba(168, 85, 247, 0.5);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    /* ========================================
+       PERIOD FILTERS
+    ======================================== */
+    .period-btn {
+        background: rgba(30, 41, 59, 0.6);
+        border: 2px solid rgba(148, 163, 184, 0.2);
+        color: rgba(148, 163, 184, 0.8);
+        padding: 14px 32px;
+        border-radius: 16px;
+        font-weight: 900;
+        font-size: 16px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .period-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(168, 85, 247, 0.2),
+            transparent
+        );
+        transition: left 0.5s;
+    }
+    
+    .period-btn:hover::before {
+        left: 100%;
+    }
+    
+    .period-btn:hover {
+        background: rgba(30, 41, 59, 0.8);
+        border-color: rgba(168, 85, 247, 0.5);
+        color: rgb(168, 85, 247);
+        transform: translateY(-2px);
+    }
+    
+    .period-btn.active {
+        background: linear-gradient(135deg, rgb(168, 85, 247), rgb(124, 58, 237));
+        border-color: rgb(168, 85, 247);
+        color: white;
+        box-shadow: 0 4px 16px rgba(168, 85, 247, 0.4);
+    }
+
+    /* ========================================
+       PRIVACY BANNER
+    ======================================== */
+    .privacy-banner {
+        background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(236, 72, 153, 0.15));
+        border: 2px solid rgba(168, 85, 247, 0.3);
+        border-radius: 20px;
+        padding: 24px;
+        margin-bottom: 32px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s;
+    }
+    
+    .privacy-banner:hover {
+        border-color: rgba(168, 85, 247, 0.5);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(168, 85, 247, 0.2);
+    }
+    
+    .privacy-icon {
+        font-size: 48px;
+        flex-shrink: 0;
+    }
+    
+    .privacy-content {
+        flex: 1;
+    }
+    
+    .privacy-title {
+        font-size: 20px;
+        font-weight: 900;
+        color: white;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .privacy-text {
+        color: rgba(148, 163, 184, 0.8);
+        font-size: 15px;
+        line-height: 1.6;
+    }
+    
+    .privacy-btn {
+        background: linear-gradient(135deg, rgb(168, 85, 247), rgb(124, 58, 237));
+        color: white;
+        padding: 12px 28px;
+        border-radius: 12px;
+        font-weight: 900;
+        font-size: 14px;
+        text-transform: uppercase;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+    
+    .privacy-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(168, 85, 247, 0.4);
+    }
+
+    /* ========================================
+       PODIUM (Top 3)
+    ======================================== */
+    .podium-container {
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 16px;
+        margin: 48px 0;
+    }
+    
+    .podium-place {
+        flex: 1;
+        max-width: 280px;
+        text-align: center;
+        opacity: 0;
+        animation: slideInUp 0.6s ease-out forwards;
+        position: relative;
+    }
+    
+    .podium-place:nth-child(1) { animation-delay: 0.2s; } /* 2º */
+    .podium-place:nth-child(2) { animation-delay: 0s; }   /* 1º */
+    .podium-place:nth-child(3) { animation-delay: 0.4s; } /* 3º */
+    
+    .podium-avatar {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 16px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 48px;
+        font-weight: 900;
+        border: 4px solid;
+        position: relative;
+        transition: all 0.3s;
+    }
+    
+    .podium-place:hover .podium-avatar {
+        transform: scale(1.1) rotate(5deg);
+    }
+    
+    /* 1st Place */
+    .podium-place.first .podium-avatar {
+        width: 140px;
+        height: 140px;
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        border-color: #fbbf24;
+        box-shadow: 0 0 40px rgba(251, 191, 36, 0.6);
+        animation: glow 2s ease-in-out infinite;
+    }
+    
+    .podium-place.first .podium-medal {
+        font-size: 72px;
+        animation: float 3s ease-in-out infinite;
+    }
+    
+    /* 2nd Place */
+    .podium-place.second .podium-avatar {
+        background: linear-gradient(135deg, #94a3b8, #64748b);
+        border-color: #94a3b8;
+        box-shadow: 0 0 30px rgba(148, 163, 184, 0.4);
+    }
+    
+    /* 3rd Place */
+    .podium-place.third .podium-avatar {
+        background: linear-gradient(135deg, #ea580c, #c2410c);
+        border-color: #ea580c;
+        box-shadow: 0 0 30px rgba(234, 88, 12, 0.4);
+    }
+    
+    .podium-medal {
+        font-size: 56px;
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    }
+    
+    .podium-crown {
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 40px;
+        animation: float 2s ease-in-out infinite;
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    }
+    
+    .podium-name {
+        font-size: 20px;
+        font-weight: 900;
+        color: white;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    
+    .anonymous-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: rgba(100, 116, 139, 0.3);
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        padding: 2px 8px;
+        border-radius: 20px;
+        font-size: 11px;
+        color: rgba(148, 163, 184, 0.8);
+    }
+    
+    .podium-level {
+        font-size: 14px;
+        color: rgba(168, 85, 247, 0.8);
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
+    
+    .podium-points {
+        font-size: 32px;
+        font-weight: 900;
+        background: linear-gradient(135deg, #a855f7, #ec4899);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .podium-base {
+        height: 120px;
+        border-radius: 16px 16px 0 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: 900;
+        margin-top: 16px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .podium-place.first .podium-base {
+        background: linear-gradient(135deg, rgba(251, 191, 36, 0.3), rgba(245, 158, 11, 0.3));
+        border: 2px solid rgba(251, 191, 36, 0.5);
+        height: 140px;
+    }
+    
+    .podium-place.second .podium-base {
+        background: linear-gradient(135deg, rgba(148, 163, 184, 0.3), rgba(100, 116, 139, 0.3));
+        border: 2px solid rgba(148, 163, 184, 0.5);
+        height: 100px;
+    }
+    
+    .podium-place.third .podium-base {
+        background: linear-gradient(135deg, rgba(234, 88, 12, 0.3), rgba(194, 65, 12, 0.3));
+        border: 2px solid rgba(234, 88, 12, 0.5);
+        height: 80px;
+    }
+
+    /* ========================================
+       RANKING TABLE
+    ======================================== */
+    .ranking-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 8px;
+    }
+    
+    .ranking-row {
+        background: rgba(30, 41, 59, 0.6);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s;
+        opacity: 0;
+        animation: slideInUp 0.6s ease-out forwards;
+    }
+    
+    .ranking-row:nth-child(1) { animation-delay: 0.05s; }
+    .ranking-row:nth-child(2) { animation-delay: 0.1s; }
+    .ranking-row:nth-child(3) { animation-delay: 0.15s; }
+    .ranking-row:nth-child(4) { animation-delay: 0.2s; }
+    .ranking-row:nth-child(5) { animation-delay: 0.25s; }
+    .ranking-row:nth-child(n+6) { animation-delay: 0.3s; }
+    
+    .ranking-row:hover {
+        background: rgba(30, 41, 59, 0.8);
+        transform: translateX(8px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    }
+    
+    .ranking-row.user-row {
+        background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(236, 72, 153, 0.2));
+        border: 2px solid rgba(168, 85, 247, 0.5);
+    }
+    
+    .ranking-row.user-row:hover {
+        background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(236, 72, 153, 0.3));
+        border-color: rgba(168, 85, 247, 0.7);
+    }
+    
+    .ranking-row td {
+        padding: 20px 24px;
+        color: white;
+    }
+    
+    .ranking-row td:first-child {
+        border-radius: 16px 0 0 16px;
+        font-weight: 900;
+        font-size: 20px;
+    }
+    
+    .ranking-row td:last-child {
+        border-radius: 0 16px 16px 0;
+    }
+    
+    .position-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        background: rgba(100, 116, 139, 0.3);
+        border-radius: 12px;
+        font-weight: 900;
+        color: rgba(148, 163, 184, 0.8);
+    }
+    
+    .username {
+        font-size: 18px;
+        font-weight: 700;
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .user-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(236, 72, 153, 0.3));
+        border: 1px solid rgba(168, 85, 247, 0.5);
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 900;
+        text-transform: uppercase;
+        color: rgb(168, 85, 247);
+    }
+    
+    .level-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.2));
+        border: 1px solid rgba(251, 191, 36, 0.3);
+        padding: 6px 16px;
+        border-radius: 50px;
+        font-size: 14px;
+        font-weight: 700;
+        color: rgb(251, 191, 36);
+    }
+    
+    .points-display {
+        font-size: 24px;
+        font-weight: 900;
+        background: linear-gradient(135deg, #a855f7, #ec4899);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    /* ========================================
+       USER POSITION CARD
+    ======================================== */
+    .user-position-card {
+        background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(236, 72, 153, 0.15));
+        border: 2px solid rgba(168, 85, 247, 0.4);
+        backdrop-filter: blur(16px);
+        border-radius: 24px;
+        padding: 48px;
+        text-align: center;
+        margin-top: 32px;
+        transition: all 0.3s;
+    }
+    
+    .user-position-card:hover {
+        border-color: rgba(168, 85, 247, 0.6);
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(168, 85, 247, 0.3);
+    }
+    
+    .position-number-large {
+        font-size: 96px;
+        font-weight: 900;
+        background: linear-gradient(135deg, #a855f7, #ec4899, #f59e0b);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 16px;
+        line-height: 1;
+    }
+    
+    .position-message {
+        font-size: 20px;
+        color: rgba(148, 163, 184, 0.8);
+        font-weight: 600;
+    }
+
+    /* ========================================
+       PRIVATE MODE NOTICE
+    ======================================== */
+    .private-notice {
+        background: linear-gradient(135deg, rgba(100, 116, 139, 0.15), rgba(71, 85, 105, 0.15));
+        border: 2px solid rgba(148, 163, 184, 0.3);
+        border-radius: 20px;
+        padding: 40px;
+        text-align: center;
+        margin-top: 32px;
+    }
+    
+    .private-icon {
+        font-size: 80px;
+        margin-bottom: 20px;
+        opacity: 0.6;
+    }
+    
+    .private-title {
+        font-size: 28px;
+        font-weight: 900;
+        color: white;
+        margin-bottom: 12px;
+    }
+    
+    .private-text {
+        font-size: 18px;
+        color: rgba(148, 163, 184, 0.8);
+        margin-bottom: 24px;
+        line-height: 1.6;
+    }
+
+    /* ========================================
+       EMPTY STATE
+    ======================================== */
+    .empty-state {
+        text-align: center;
+        padding: 80px 32px;
+    }
+    
+    .empty-icon {
+        font-size: 120px;
+        opacity: 0.2;
+        margin-bottom: 24px;
+    }
+    
+    .empty-title {
+        font-size: 28px;
+        font-weight: 900;
+        color: rgba(148, 163, 184, 0.6);
+        margin-bottom: 12px;
+    }
+    
+    .empty-message {
+        font-size: 18px;
+        color: rgba(148, 163, 184, 0.5);
+    }
+
+    /* ========================================
+       RESPONSIVE
+    ======================================== */
+    @media (max-width: 768px) {
+        .podium-container {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .podium-place {
+            max-width: 100%;
+        }
+        
+        .podium-base {
+            height: auto !important;
+            padding: 24px;
+        }
+        
+        .period-btn {
+            padding: 12px 20px;
+            font-size: 14px;
+        }
+        
+        .ranking-row td {
+            padding: 16px 12px;
+            font-size: 14px;
+        }
+        
+        .position-number-large {
+            font-size: 64px;
+        }
+        
+        .privacy-banner {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .username {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 md:p-8">
+    <div class="max-w-7xl mx-auto">
+        
+        <!-- ========================================
+             HEADER
+        ======================================== -->
+        <div class="mb-8">
+            <a href="{% url 'gamification:dashboard' %}" 
+               class="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 mb-6 transition-all hover:translate-x-[-4px] font-semibold">
+                <i class="fas fa-arrow-left"></i>
+                <span>Voltar ao Dashboard</span>
+            </a>
+            
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div>
+                    <h1 class="text-5xl md:text-6xl font-black text-white mb-3 flex items-center gap-4">
+                        <span class="text-6xl">🏆</span>
+                        <span class="bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-400 bg-clip-text text-transparent">
+                            Ranking
+                        </span>
+                    </h1>
+                    <p class="text-slate-400 text-xl">Veja os melhores investidores do Nebue</p>
+                </div>
+                
+                <!-- Period Filters -->
+                <div class="flex flex-wrap gap-3">
+                    <a href="?periodo=semanal" class="period-btn {% if periodo == 'semanal' %}active{% endif %}">
+                        <i class="fas fa-calendar-week mr-2"></i>
+                        Semanal
+                    </a>
+                    <a href="?periodo=mensal" class="period-btn {% if periodo == 'mensal' %}active{% endif %}">
+                        <i class="fas fa-calendar-alt mr-2"></i>
+                        Mensal
+                    </a>
+                    <a href="?periodo=geral" class="period-btn {% if periodo == 'geral' %}active{% endif %}">
+                        <i class="fas fa-infinity mr-2"></i>
+                        Geral
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================
+             PRIVACY BANNER (informativo)
+        ======================================== -->
+        <div class="privacy-banner">
+            <div class="privacy-icon">🔒</div>
+            <div class="privacy-content">
+                <div class="privacy-title">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Privacidade Protegida</span>
+                </div>
+                <p class="privacy-text">
+                    Você controla como aparece no ranking! Por padrão, usamos apelidos anônimos para proteger sua identidade. 
+                    Configure suas preferências de privacidade a qualquer momento.
+                </p>
+            </div>
+            <a href="{% url 'gamification:configuracoes_privacidade' %}" class="privacy-btn">
+                <i class="fas fa-cog"></i>
+                <span>Configurar</span>
+            </a>
+        </div>
+
+        <!-- ========================================
+             PODIUM (Top 3)
+        ======================================== -->
+        {% if ranking|length >= 3 %}
+        <div class="podium-container">
+            <!-- 2nd Place -->
+            <div class="podium-place second">
+                <div class="podium-avatar">
+                    <span class="podium-medal">🥈</span>
+                </div>
+                <div class="podium-name">
+                    {{ ranking.1.get_nome_exibicao }}
+                    {% if not ranking.1.exibir_nome_real %}
+                        <span class="anonymous-badge">
+                            <i class="fas fa-user-secret"></i>
+                            <span>Anônimo</span>
+                        </span>
+                    {% endif %}
+                    {% if ranking.1.user == user %}
+                        <span class="user-badge">
+                            <i class="fas fa-user"></i>
+                            você
+                        </span>
+                    {% endif %}
+                </div>
+                <div class="podium-level">
+                    <i class="fas fa-star mr-1"></i>
+                    {{ ranking.1.nivel_atual.nome|default:"Iniciante" }}
+                </div>
+                <div class="podium-points">{{ ranking.1.pontos_totais }} pts</div>
+                <div class="podium-base">
+                    <span style="color: #94a3b8;">2º</span>
+                </div>
+            </div>
+            
+            <!-- 1st Place -->
+            <div class="podium-place first">
+                <div class="podium-crown">👑</div>
+                <div class="podium-avatar">
+                    <span class="podium-medal">🥇</span>
+                </div>
+                <div class="podium-name">
+                    {{ ranking.0.get_nome_exibicao }}
+                    {% if not ranking.0.exibir_nome_real %}
+                        <span class="anonymous-badge">
+                            <i class="fas fa-user-secret"></i>
+                            <span>Anônimo</span>
+                        </span>
+                    {% endif %}
+                    {% if ranking.0.user == user %}
+                        <span class="user-badge">
+                            <i class="fas fa-user"></i>
+                            você
+                        </span>
+                    {% endif %}
+                </div>
+                <div class="podium-level">
+                    <i class="fas fa-crown mr-1"></i>
+                    {{ ranking.0.nivel_atual.nome|default:"Iniciante" }}
+                </div>
+                <div class="podium-points">{{ ranking.0.pontos_totais }} pts</div>
+                <div class="podium-base">
+                    <span style="color: #fbbf24;">1º</span>
+                </div>
+            </div>
+            
+            <!-- 3rd Place -->
+            <div class="podium-place third">
+                <div class="podium-avatar">
+                    <span class="podium-medal">🥉</span>
+                </div>
+                <div class="podium-name">
+                    {{ ranking.2.get_nome_exibicao }}
+                    {% if not ranking.2.exibir_nome_real %}
+                        <span class="anonymous-badge">
+                            <i class="fas fa-user-secret"></i>
+                            <span>Anônimo</span>
+                        </span>
+                    {% endif %}
+                    {% if ranking.2.user == user %}
+                        <span class="user-badge">
+                            <i class="fas fa-user"></i>
+                            você
+                        </span>
+                    {% endif %}
+                </div>
+                <div class="podium-level">
+                    <i class="fas fa-star mr-1"></i>
+                    {{ ranking.2.nivel_atual.nome|default:"Iniciante" }}
+                </div>
+                <div class="podium-points">{{ ranking.2.pontos_totais }} pts</div>
+                <div class="podium-base">
+                    <span style="color: #ea580c;">3º</span>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ========================================
+             RANKING TABLE
+        ======================================== -->
+        <div class="glass-card rounded-3xl p-6 md:p-8 mt-12">
+            <div class="mb-6">
+                <h2 class="text-3xl font-black text-white flex items-center gap-3">
+                    <i class="fas fa-list-ol text-purple-400"></i>
+                    <span>Classificação Completa</span>
+                </h2>
+            </div>
+
+            {% if ranking %}
+            <div class="overflow-x-auto">
+                <table class="ranking-table">
+                    <tbody>
+                        {% for perfil in ranking %}
+                        <tr class="ranking-row {% if perfil.user == user %}user-row{% endif %}">
+                            <td style="width: 100px;">
+                                {% if forloop.counter == 1 %}
+                                    <span style="font-size: 32px;">🥇</span>
+                                {% elif forloop.counter == 2 %}
+                                    <span style="font-size: 32px;">🥈</span>
+                                {% elif forloop.counter == 3 %}
+                                    <span style="font-size: 32px;">🥉</span>
+                                {% else %}
+                                    <span class="position-number">{{ forloop.counter }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="flex items-center gap-3">
+                                    <div class="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 font-black text-white text-lg">
+                                        {% if perfil.exibir_nome_real %}
+                                            {{ perfil.user.email|slice:":1"|upper }}
+                                        {% else %}
+                                            <i class="fas fa-user-secret"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <div class="username">
+                                            <span>{{ perfil.get_nome_exibicao }}</span>
+                                            {% if not perfil.exibir_nome_real %}
+                                                <span class="anonymous-badge">
+                                                    <i class="fas fa-lock"></i>
+                                                </span>
+                                            {% endif %}
+                                            {% if perfil.user == user %}
+                                                <span class="user-badge">
+                                                    <i class="fas fa-user"></i>
+                                                    você
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="level-badge">
+                                    <i class="fas fa-trophy"></i>
+                                    {{ perfil.nivel_atual.nome|default:"Iniciante" }}
+                                </span>
+                            </td>
+                            <td style="text-align: right;">
+                                <div class="flex flex-col items-end">
+                                    <span class="points-display">{{ perfil.pontos_totais }}</span>
+                                    <span style="font-size: 12px; color: rgba(148, 163, 184, 0.6); font-weight: 600;">pontos</span>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">🏆</div>
+                <div class="empty-title">Nenhum usuário no ranking ainda</div>
+                <div class="empty-message">Seja o primeiro a aparecer aqui!</div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- ========================================
+             USER POSITION (se público e fora do top 10)
+        ======================================== -->
+        {% if posicao_user and posicao_user > 10 %}
+        <div class="user-position-card">
+            <div class="mb-4">
+                <i class="fas fa-medal text-6xl text-purple-400"></i>
+            </div>
+            <div class="position-number-large">{{ posicao_user }}º</div>
+            <div class="position-message">
+                <p class="mb-2 text-white font-bold text-xl">Esta é a sua posição!</p>
+                <p>Continue assim! Você está entre os <strong style="color: rgb(168, 85, 247);">top {{ posicao_user }}</strong> usuários do Nebue.</p>
+            </div>
+            <div class="mt-6">
+                <div class="inline-flex items-center gap-2 bg-purple-500/20 border border-purple-500/40 px-6 py-3 rounded-full">
+                    <i class="fas fa-fire text-orange-400"></i>
+                    <span class="text-white font-bold">Continue acumulando pontos para subir no ranking!</span>
+                </div>
+            </div>
+        </div>
+        {% elif posicao_user is None and perfil_user and not perfil_user.perfil_publico %}
+        <!-- ========================================
+             PRIVATE MODE NOTICE (perfil privado)
+        ======================================== -->
+        <div class="private-notice">
+            <div class="private-icon">🔒</div>
+            <div class="private-title">Você está no Modo Privado</div>
+            <p class="private-text">
+                Seu perfil não aparece nos rankings públicos. 
+                Se quiser competir com outros usuários, ative a exibição pública nas configurações de privacidade.
+            </p>
+            <a href="{% url 'gamification:configuracoes_privacidade' %}" class="privacy-btn">
+                <i class="fas fa-cog"></i>
+                <span>Alterar Configurações</span>
+            </a>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}
