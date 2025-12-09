@@ -31,11 +31,6 @@
         to { opacity: 1; transform: translateY(0); }
     }
     
-    @keyframes counter {
-        from { opacity: 0; transform: scale(0.5); }
-        to { opacity: 1; transform: scale(1); }
-    }
-    
     .animate-float { animation: float 6s ease-in-out infinite; }
     .animate-float-delayed { animation: float-delayed 5s ease-in-out infinite 1s; }
     .animate-glow { animation: glow 3s ease-in-out infinite; }
@@ -73,11 +68,6 @@
     .main-content.sidebar-expanded { margin-left: 0 !important; }
     .main-content.sidebar-collapsed { margin-left: 0 !important; }
     
-    /* Counter animation */
-    .counter-value {
-        animation: counter 1s ease-out forwards;
-    }
-    
     /* Feature card hover effect */
     .feature-card::before {
         content: '';
@@ -113,20 +103,21 @@
             </a>
             
             <!-- Desktop Menu -->
-            <div class="hidden md:flex items-center gap-8">
+            <div class="hidden md:flex items-center gap-10">
                 <a href="#recursos" class="text-slate-300 hover:text-white font-medium transition-colors">Recursos</a>
                 <a href="#como-funciona" class="text-slate-300 hover:text-white font-medium transition-colors">Como Funciona</a>
-                <a href="#faq" class="text-slate-300 hover:text-white font-medium transition-colors">FAQ</a>
+                <a href="#perguntas" class="text-slate-300 hover:text-white font-medium transition-colors">Dúvidas</a>
             </div>
             
-            <!-- CTA Buttons -->
+            <!-- Auth Buttons -->
             <div class="flex items-center gap-4">
-                <a href="{% url 'users:login' %}" class="hidden sm:inline-flex text-slate-300 hover:text-white font-semibold transition-colors">
+                <a href="{% url 'users:login' %}" 
+                   class="px-5 py-2.5 text-slate-300 hover:text-white font-semibold transition-colors">
                     Entrar
                 </a>
                 <a href="{% url 'users:signup' %}" 
-                   class="px-5 py-2.5 bg-gradient-to-r from-violet-500 to-indigo-600 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-violet-500/30 transition-all hover:scale-105">
-                    Começar Grátis
+                   class="px-5 py-2.5 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl transition-all">
+                    Criar Conta
                 </a>
             </div>
         </div>
@@ -147,21 +138,21 @@
 
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
         <div class="max-w-7xl mx-auto">
-            <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            <div class="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
                 <!-- Left Content -->
-                <div class="space-y-8 text-center lg:text-left">
+                <div class="text-center lg:text-left">
                     <!-- Badge -->
-                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-violet-500/10 border border-violet-500/30 rounded-full backdrop-blur-sm animate-slide-up">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-violet-500/10 border border-violet-500/30 rounded-full backdrop-blur-sm animate-slide-up mb-8">
                         <span class="relative flex h-2 w-2">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-2 w-2 bg-violet-500"></span>
                         </span>
-                        <span class="text-violet-300 text-sm font-medium">Sistema de Gestão Financeira com IA</span>
+                        <span class="text-violet-300 text-sm font-medium">Gestão Financeira com IA</span>
                     </div>
 
                     <!-- Headline -->
-                    <div class="space-y-4" style="animation: slide-up 0.8s ease-out 0.1s forwards; opacity: 0;">
-                        <h1 class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold leading-[1.1] tracking-tight">
+                    <div style="animation: slide-up 0.8s ease-out 0.1s forwards; opacity: 0;">
+                        <h1 class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold leading-[1.1] tracking-tight mb-8">
                             <span class="text-slate-100">Domine suas</span>
                             <br>
                             <span class="bg-gradient-to-r from-violet-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent animate-gradient">
@@ -169,17 +160,17 @@
                             </span>
                         </h1>
 
-                        <p class="text-lg sm:text-xl lg:text-2xl text-slate-300 leading-relaxed max-w-xl mx-auto lg:mx-0">
+                        <p class="text-lg sm:text-xl text-slate-300 leading-relaxed max-w-xl mx-auto lg:mx-0 mb-10">
                             Controle suas contas, categorize gastos e tome decisões inteligentes com 
                             <span class="text-violet-400 font-semibold">assistente IA</span> integrado.
                         </p>
                     </div>
 
                     <!-- CTAs -->
-                    <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start" style="animation: slide-up 0.8s ease-out 0.2s forwards; opacity: 0;">
+                    <div class="flex flex-col sm:flex-row gap-5 justify-center lg:justify-start mb-12" style="animation: slide-up 0.8s ease-out 0.2s forwards; opacity: 0;">
                         <a href="{% url 'users:signup' %}" 
-                           class="group relative inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-violet-500 to-indigo-600 text-white font-bold text-lg rounded-2xl shadow-2xl shadow-violet-500/30 hover:shadow-violet-500/50 transition-all duration-300 hover:scale-[1.02] overflow-hidden">
-                            <span class="relative z-10">Criar Conta Gratuita</span>
+                           class="group relative inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-violet-500 to-indigo-600 text-white font-bold text-lg rounded-2xl shadow-2xl shadow-violet-500/30 hover:shadow-violet-500/50 transition-all duration-300 hover:scale-[1.02] overflow-hidden">
+                            <span class="relative z-10">Começar Gratuitamente</span>
                             <svg class="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
                             </svg>
@@ -187,39 +178,39 @@
                         </a>
                         
                         <a href="{% url 'users:login' %}" 
-                           class="inline-flex items-center justify-center gap-2 px-8 py-4 glass border border-slate-700/50 text-slate-100 font-bold text-lg rounded-2xl hover:border-violet-500/50 hover:bg-slate-800/50 transition-all duration-300">
+                           class="inline-flex items-center justify-center gap-3 px-8 py-4 glass border border-slate-700/50 text-slate-100 font-bold text-lg rounded-2xl hover:border-violet-500/50 hover:bg-slate-800/50 transition-all duration-300">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
                             </svg>
-                            Fazer Login
+                            Já tenho conta
                         </a>
                     </div>
 
                     <!-- Trust Indicators -->
-                    <div class="flex flex-wrap items-center justify-center lg:justify-start gap-6 pt-4" style="animation: slide-up 0.8s ease-out 0.3s forwards; opacity: 0;">
-                        <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 bg-emerald-500/20 rounded-full flex items-center justify-center">
-                                <svg class="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                    <div class="flex flex-wrap items-center justify-center lg:justify-start gap-8" style="animation: slide-up 0.8s ease-out 0.3s forwards; opacity: 0;">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center">
+                                <svg class="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                                 </svg>
                             </div>
-                            <span class="text-slate-300 text-sm font-medium">100% Gratuito</span>
+                            <span class="text-slate-300 font-medium">100% Gratuito</span>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center">
-                                <svg class="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">
+                                <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                                 </svg>
                             </div>
-                            <span class="text-slate-300 text-sm font-medium">Dados Protegidos</span>
+                            <span class="text-slate-300 font-medium">Dados Seguros</span>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 bg-violet-500/20 rounded-full flex items-center justify-center">
-                                <svg class="w-4 h-4 text-violet-400" fill="currentColor" viewBox="0 0 20 20">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-violet-500/20 rounded-full flex items-center justify-center">
+                                <svg class="w-5 h-5 text-violet-400" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
                                 </svg>
                             </div>
-                            <span class="text-slate-300 text-sm font-medium">IA Integrada</span>
+                            <span class="text-slate-300 font-medium">IA Integrada</span>
                         </div>
                     </div>
                 </div>
@@ -250,7 +241,7 @@
                             </div>
                             
                             <!-- Balance Card -->
-                            <div class="bg-gradient-to-r from-violet-500 to-indigo-600 rounded-2xl p-5 mb-5 relative overflow-hidden">
+                            <div class="bg-gradient-to-r from-violet-500 to-indigo-600 rounded-2xl p-5 mb-6 relative overflow-hidden">
                                 <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
                                 <p class="text-white/80 text-sm mb-1">Saldo Total</p>
                                 <p class="text-3xl font-bold text-white mb-4">R$ 12.450,00</p>
@@ -276,8 +267,8 @@
                                 </div>
                             </div>
 
-                            <!-- Mini Chart Representation -->
-                            <div class="bg-slate-800/50 rounded-xl p-4 mb-4">
+                            <!-- Mini Chart -->
+                            <div class="bg-slate-800/50 rounded-xl p-4 mb-5">
                                 <div class="flex items-center justify-between mb-3">
                                     <p class="text-slate-400 text-sm">Últimos 6 meses</p>
                                     <span class="px-2 py-1 bg-emerald-500/20 text-emerald-400 text-xs rounded-lg font-medium">+24%</span>
@@ -294,7 +285,7 @@
 
                             <!-- Recent Transactions -->
                             <div class="space-y-3">
-                                <div class="flex items-center justify-between p-3 bg-slate-800/30 rounded-xl hover:bg-slate-800/50 transition-colors">
+                                <div class="flex items-center justify-between p-3 bg-slate-800/30 rounded-xl">
                                     <div class="flex items-center gap-3">
                                         <div class="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center">
                                             <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -309,7 +300,7 @@
                                     <p class="text-emerald-400 font-bold">+R$ 5.000</p>
                                 </div>
 
-                                <div class="flex items-center justify-between p-3 bg-slate-800/30 rounded-xl hover:bg-slate-800/50 transition-colors">
+                                <div class="flex items-center justify-between p-3 bg-slate-800/30 rounded-xl">
                                     <div class="flex items-center gap-3">
                                         <div class="w-10 h-10 bg-red-500/20 rounded-lg flex items-center justify-center">
                                             <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -328,10 +319,10 @@
                     </div>
 
                     <!-- Floating Elements -->
-                    <div class="absolute -left-8 top-1/4 animate-float-delayed">
-                        <div class="glass-light rounded-2xl p-4 border border-slate-700/30 shadow-xl">
-                            <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 bg-gradient-to-br from-emerald-500/20 to-emerald-500/10 rounded-xl flex items-center justify-center">
+                    <div class="absolute -left-4 top-20 animate-float-delayed">
+                        <div class="glass-light rounded-2xl px-5 py-4 border border-slate-700/30 shadow-xl">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-gradient-to-br from-emerald-500/20 to-emerald-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
                                     <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
@@ -344,17 +335,17 @@
                         </div>
                     </div>
 
-                    <div class="absolute -right-4 bottom-1/4 animate-float">
-                        <div class="glass-light rounded-2xl p-4 border border-slate-700/30 shadow-xl">
-                            <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 bg-gradient-to-br from-violet-500/20 to-violet-500/10 rounded-xl flex items-center justify-center">
+                    <div class="absolute -right-2 bottom-32 animate-float">
+                        <div class="glass-light rounded-2xl px-5 py-4 border border-slate-700/30 shadow-xl">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-gradient-to-br from-violet-500/20 to-violet-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
                                     <svg class="w-6 h-6 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
                                     </svg>
                                 </div>
                                 <div>
                                     <p class="text-slate-400 text-xs">Assistente IA</p>
-                                    <p class="text-violet-400 font-bold text-sm">Online 24/7</p>
+                                    <p class="text-violet-400 font-bold">Online 24/7</p>
                                 </div>
                             </div>
                         </div>
@@ -368,8 +359,8 @@
     </div>
 
     <!-- Scroll Indicator -->
-    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-        <span class="text-slate-500 text-xs font-medium tracking-wider">SCROLL</span>
+    <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+        <span class="text-slate-500 text-xs font-medium tracking-wider uppercase">Role para ver mais</span>
         <div class="w-6 h-10 rounded-full border-2 border-slate-600 flex justify-center pt-2">
             <div class="w-1.5 h-3 bg-slate-500 rounded-full animate-bounce"></div>
         </div>
@@ -377,39 +368,39 @@
 </section>
 
 <!-- Stats Section -->
-<section class="py-20 bg-slate-950 relative overflow-hidden">
+<section class="py-24 bg-slate-950 relative overflow-hidden">
     <div class="absolute inset-0 bg-grid-pattern opacity-50"></div>
     
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div class="max-w-6xl mx-auto">
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+        <div class="max-w-5xl mx-auto">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
                 <!-- Stat 1 -->
-                <div class="text-center p-6 glass rounded-2xl border border-slate-800/50">
-                    <div class="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent mb-2">
+                <div class="text-center p-8 glass rounded-2xl border border-slate-800/50">
+                    <div class="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent mb-3">
                         100%
                     </div>
                     <p class="text-slate-400 font-medium">Gratuito</p>
                 </div>
                 
                 <!-- Stat 2 -->
-                <div class="text-center p-6 glass rounded-2xl border border-slate-800/50">
-                    <div class="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent mb-2">
+                <div class="text-center p-8 glass rounded-2xl border border-slate-800/50">
+                    <div class="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent mb-3">
                         24/7
                     </div>
                     <p class="text-slate-400 font-medium">Assistente IA</p>
                 </div>
                 
                 <!-- Stat 3 -->
-                <div class="text-center p-6 glass rounded-2xl border border-slate-800/50">
-                    <div class="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-2">
+                <div class="text-center p-8 glass rounded-2xl border border-slate-800/50">
+                    <div class="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-3">
                         256bit
                     </div>
                     <p class="text-slate-400 font-medium">Criptografia</p>
                 </div>
                 
                 <!-- Stat 4 -->
-                <div class="text-center p-6 glass rounded-2xl border border-slate-800/50">
-                    <div class="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent mb-2">
+                <div class="text-center p-8 glass rounded-2xl border border-slate-800/50">
+                    <div class="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent mb-3">
                         &lt;1min
                     </div>
                     <p class="text-slate-400 font-medium">Para começar</p>
@@ -419,18 +410,18 @@
     </div>
 </section>
 
-<!-- Features Section (Bento Grid) -->
-<section id="recursos" class="py-24 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 relative">
+<!-- Features Section -->
+<section id="recursos" class="py-28 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 relative">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="max-w-7xl mx-auto">
+        <div class="max-w-6xl mx-auto">
             <!-- Header -->
-            <div class="text-center mb-16">
-                <span class="inline-block px-4 py-2 bg-violet-500/10 border border-violet-500/30 rounded-full text-violet-300 text-sm font-semibold mb-6">
+            <div class="text-center mb-20">
+                <span class="inline-block px-4 py-2 bg-violet-500/10 border border-violet-500/30 rounded-full text-violet-300 text-sm font-semibold mb-8">
                     RECURSOS PODEROSOS
                 </span>
-                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-100 mb-6">
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-100 mb-8">
                     Tudo que você precisa para
-                    <span class="bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent block mt-2">
+                    <span class="bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent block mt-3">
                         dominar suas finanças
                     </span>
                 </h2>
@@ -439,125 +430,125 @@
                 </p>
             </div>
 
-            <!-- Bento Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Feature 1 - Large Card -->
-                <div class="feature-card lg:col-span-2 group relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-3xl p-8 border border-slate-700/50 hover:border-violet-500/50 transition-all duration-500 overflow-hidden">
+            <!-- Features Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 - Dashboard -->
+                <div class="feature-card lg:col-span-2 group relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-3xl p-10 border border-slate-700/50 hover:border-violet-500/50 transition-all duration-500 overflow-hidden">
                     <div class="relative z-10">
-                        <div class="flex items-start justify-between mb-6">
-                            <div class="w-14 h-14 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-violet-500/30 group-hover:scale-110 transition-transform duration-300">
-                                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="flex items-start justify-between mb-8">
+                            <div class="w-16 h-16 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-violet-500/30 group-hover:scale-110 transition-transform duration-300">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                                 </svg>
                             </div>
                             <span class="px-3 py-1 bg-violet-500/20 text-violet-300 text-xs font-semibold rounded-full">PRINCIPAL</span>
                         </div>
-                        <h3 class="text-2xl lg:text-3xl font-bold text-slate-100 mb-4">Dashboard Completo</h3>
-                        <p class="text-slate-400 text-lg leading-relaxed mb-6">
-                            Visualize todas as suas finanças em um único lugar. Gráficos interativos, resumos mensais e análises detalhadas para você tomar as melhores decisões.
+                        <h3 class="text-2xl lg:text-3xl font-bold text-slate-100 mb-5">Dashboard Completo</h3>
+                        <p class="text-slate-400 text-lg leading-relaxed mb-8">
+                            Visualize todas as suas finanças em um único lugar. Gráficos interativos, resumos mensais e análises detalhadas.
                         </p>
                         <div class="flex flex-wrap gap-3">
-                            <span class="px-3 py-1.5 bg-slate-700/50 text-slate-300 text-sm rounded-lg">Gráficos</span>
-                            <span class="px-3 py-1.5 bg-slate-700/50 text-slate-300 text-sm rounded-lg">Relatórios</span>
-                            <span class="px-3 py-1.5 bg-slate-700/50 text-slate-300 text-sm rounded-lg">Análises</span>
+                            <span class="px-4 py-2 bg-slate-700/50 text-slate-300 text-sm rounded-xl">Gráficos</span>
+                            <span class="px-4 py-2 bg-slate-700/50 text-slate-300 text-sm rounded-xl">Relatórios</span>
+                            <span class="px-4 py-2 bg-slate-700/50 text-slate-300 text-sm rounded-xl">Análises</span>
                         </div>
                     </div>
                     <div class="absolute -bottom-20 -right-20 w-64 h-64 bg-violet-500/10 rounded-full blur-3xl group-hover:bg-violet-500/20 transition-colors duration-500"></div>
                 </div>
 
-                <!-- Feature 2 -->
-                <div class="feature-card group relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-3xl p-8 border border-slate-700/50 hover:border-emerald-500/50 transition-all duration-500">
+                <!-- Feature 2 - Contas -->
+                <div class="feature-card group relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-3xl p-10 border border-slate-700/50 hover:border-emerald-500/50 transition-all duration-500">
                     <div class="relative z-10">
-                        <div class="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform duration-300">
-                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform duration-300">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
                             </svg>
                         </div>
-                        <h3 class="text-xl font-bold text-slate-100 mb-3">Múltiplas Contas</h3>
+                        <h3 class="text-xl font-bold text-slate-100 mb-4">Múltiplas Contas</h3>
                         <p class="text-slate-400 leading-relaxed">
                             Gerencie todas as suas contas bancárias em um único lugar com visão consolidada.
                         </p>
                     </div>
                 </div>
 
-                <!-- Feature 3 -->
-                <div class="feature-card group relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-3xl p-8 border border-slate-700/50 hover:border-blue-500/50 transition-all duration-500">
+                <!-- Feature 3 - Categorias -->
+                <div class="feature-card group relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-3xl p-10 border border-slate-700/50 hover:border-blue-500/50 transition-all duration-500">
                     <div class="relative z-10">
-                        <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform duration-300">
-                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform duration-300">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
                             </svg>
                         </div>
-                        <h3 class="text-xl font-bold text-slate-100 mb-3">Categorias Personalizadas</h3>
+                        <h3 class="text-xl font-bold text-slate-100 mb-4">Categorias Personalizadas</h3>
                         <p class="text-slate-400 leading-relaxed">
                             Organize gastos em categorias próprias e entenda para onde seu dinheiro vai.
                         </p>
                     </div>
                 </div>
 
-                <!-- Feature 4 - AI Card -->
-                <div class="feature-card lg:col-span-2 group relative bg-gradient-to-br from-purple-900/30 to-slate-900/50 rounded-3xl p-8 border border-purple-500/30 hover:border-purple-500/50 transition-all duration-500 overflow-hidden">
-                    <div class="relative z-10 flex flex-col md:flex-row gap-6 items-start">
-                        <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-fuchsia-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform duration-300 shrink-0">
+                <!-- Feature 4 - IA -->
+                <div class="feature-card lg:col-span-2 group relative bg-gradient-to-br from-purple-900/30 to-slate-900/50 rounded-3xl p-10 border border-purple-500/30 hover:border-purple-500/50 transition-all duration-500 overflow-hidden">
+                    <div class="relative z-10 flex flex-col md:flex-row gap-8 items-start">
+                        <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-fuchsia-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
                             <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
                             </svg>
                         </div>
                         <div>
-                            <div class="flex items-center gap-3 mb-3">
+                            <div class="flex items-center gap-4 mb-4">
                                 <h3 class="text-2xl font-bold text-slate-100">Assistente com IA</h3>
-                                <span class="px-2 py-1 bg-purple-500/20 text-purple-300 text-xs font-semibold rounded-full flex items-center gap-1">
+                                <span class="px-3 py-1 bg-purple-500/20 text-purple-300 text-xs font-semibold rounded-full flex items-center gap-2">
                                     <span class="w-1.5 h-1.5 bg-purple-400 rounded-full animate-pulse"></span>
                                     NOVO
                                 </span>
                             </div>
                             <p class="text-slate-400 text-lg leading-relaxed">
-                                Converse com nosso assistente inteligente para tirar dúvidas, receber orientações financeiras personalizadas e entender melhor seus gastos.
+                                Converse com nosso assistente inteligente para tirar dúvidas e receber orientações financeiras personalizadas.
                             </p>
                         </div>
                     </div>
                     <div class="absolute -bottom-32 -right-32 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl group-hover:bg-purple-500/20 transition-colors duration-500"></div>
                 </div>
 
-                <!-- Feature 5 -->
-                <div class="feature-card group relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-3xl p-8 border border-slate-700/50 hover:border-amber-500/50 transition-all duration-500">
+                <!-- Feature 5 - Histórico -->
+                <div class="feature-card group relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-3xl p-10 border border-slate-700/50 hover:border-amber-500/50 transition-all duration-500">
                     <div class="relative z-10">
-                        <div class="w-14 h-14 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-amber-500/30 group-hover:scale-110 transition-transform duration-300">
-                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-amber-500/30 group-hover:scale-110 transition-transform duration-300">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                         </div>
-                        <h3 class="text-xl font-bold text-slate-100 mb-3">Histórico Completo</h3>
+                        <h3 class="text-xl font-bold text-slate-100 mb-4">Histórico Completo</h3>
                         <p class="text-slate-400 leading-relaxed">
                             Acesse todo seu histórico financeiro com filtros avançados e busca inteligente.
                         </p>
                     </div>
                 </div>
 
-                <!-- Feature 6 -->
-                <div class="feature-card group relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-3xl p-8 border border-slate-700/50 hover:border-pink-500/50 transition-all duration-500">
+                <!-- Feature 6 - Metas -->
+                <div class="feature-card group relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-3xl p-10 border border-slate-700/50 hover:border-pink-500/50 transition-all duration-500">
                     <div class="relative z-10">
-                        <div class="w-14 h-14 bg-gradient-to-br from-pink-500 to-rose-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-pink-500/30 group-hover:scale-110 transition-transform duration-300">
-                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="w-16 h-16 bg-gradient-to-br from-pink-500 to-rose-600 rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-pink-500/30 group-hover:scale-110 transition-transform duration-300">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                         </div>
-                        <h3 class="text-xl font-bold text-slate-100 mb-3">Metas Financeiras</h3>
+                        <h3 class="text-xl font-bold text-slate-100 mb-4">Metas Financeiras</h3>
                         <p class="text-slate-400 leading-relaxed">
                             Defina objetivos e acompanhe seu progresso rumo à estabilidade financeira.
                         </p>
                     </div>
                 </div>
 
-                <!-- Feature 7 -->
-                <div class="feature-card group relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-3xl p-8 border border-slate-700/50 hover:border-cyan-500/50 transition-all duration-500">
+                <!-- Feature 7 - Segurança -->
+                <div class="feature-card group relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-3xl p-10 border border-slate-700/50 hover:border-cyan-500/50 transition-all duration-500">
                     <div class="relative z-10">
-                        <div class="w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-cyan-500/30 group-hover:scale-110 transition-transform duration-300">
-                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-cyan-500/30 group-hover:scale-110 transition-transform duration-300">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                             </svg>
                         </div>
-                        <h3 class="text-xl font-bold text-slate-100 mb-3">Segurança Total</h3>
+                        <h3 class="text-xl font-bold text-slate-100 mb-4">Segurança Total</h3>
                         <p class="text-slate-400 leading-relaxed">
                             Seus dados protegidos com criptografia de ponta e autenticação segura.
                         </p>
@@ -569,17 +560,17 @@
 </section>
 
 <!-- How it Works Section -->
-<section id="como-funciona" class="py-24 bg-slate-950 relative overflow-hidden">
+<section id="como-funciona" class="py-28 bg-slate-950 relative overflow-hidden">
     <div class="absolute inset-0 bg-grid-pattern opacity-30"></div>
     
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div class="max-w-6xl mx-auto">
+        <div class="max-w-5xl mx-auto">
             <!-- Header -->
-            <div class="text-center mb-16">
-                <span class="inline-block px-4 py-2 bg-emerald-500/10 border border-emerald-500/30 rounded-full text-emerald-300 text-sm font-semibold mb-6">
+            <div class="text-center mb-20">
+                <span class="inline-block px-4 py-2 bg-emerald-500/10 border border-emerald-500/30 rounded-full text-emerald-300 text-sm font-semibold mb-8">
                     SIMPLES E RÁPIDO
                 </span>
-                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-100 mb-6">
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-100 mb-8">
                     Comece em 
                     <span class="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">3 passos</span>
                 </h2>
@@ -589,22 +580,20 @@
             </div>
 
             <!-- Steps -->
-            <div class="grid md:grid-cols-3 gap-8">
+            <div class="grid md:grid-cols-3 gap-12">
                 <!-- Step 1 -->
-                <div class="relative">
-                    <div class="text-center">
-                        <div class="relative inline-flex mb-6">
-                            <div class="w-20 h-20 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-xl shadow-violet-500/30">
-                                <span class="text-3xl font-bold text-white">1</span>
-                            </div>
+                <div class="relative text-center">
+                    <div class="relative inline-flex mb-8">
+                        <div class="w-24 h-24 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-3xl flex items-center justify-center shadow-xl shadow-violet-500/30">
+                            <span class="text-4xl font-bold text-white">1</span>
                         </div>
-                        <h3 class="text-xl font-bold text-slate-100 mb-3">Crie sua conta</h3>
-                        <p class="text-slate-400">
-                            Cadastro rápido e gratuito. Basta um e-mail e uma senha para começar.
-                        </p>
                     </div>
+                    <h3 class="text-xl font-bold text-slate-100 mb-4">Crie sua conta</h3>
+                    <p class="text-slate-400 leading-relaxed">
+                        Cadastro rápido e gratuito. Basta um e-mail e uma senha para começar.
+                    </p>
                     <!-- Arrow -->
-                    <div class="hidden md:block absolute top-10 -right-4 w-8">
+                    <div class="hidden md:block absolute top-12 -right-6 w-12">
                         <svg class="w-full text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
                         </svg>
@@ -612,20 +601,18 @@
                 </div>
 
                 <!-- Step 2 -->
-                <div class="relative">
-                    <div class="text-center">
-                        <div class="relative inline-flex mb-6">
-                            <div class="w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-xl shadow-emerald-500/30">
-                                <span class="text-3xl font-bold text-white">2</span>
-                            </div>
+                <div class="relative text-center">
+                    <div class="relative inline-flex mb-8">
+                        <div class="w-24 h-24 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl flex items-center justify-center shadow-xl shadow-emerald-500/30">
+                            <span class="text-4xl font-bold text-white">2</span>
                         </div>
-                        <h3 class="text-xl font-bold text-slate-100 mb-3">Configure suas contas</h3>
-                        <p class="text-slate-400">
-                            Adicione suas contas bancárias e crie categorias personalizadas.
-                        </p>
                     </div>
+                    <h3 class="text-xl font-bold text-slate-100 mb-4">Configure suas contas</h3>
+                    <p class="text-slate-400 leading-relaxed">
+                        Adicione suas contas bancárias e crie categorias personalizadas.
+                    </p>
                     <!-- Arrow -->
-                    <div class="hidden md:block absolute top-10 -right-4 w-8">
+                    <div class="hidden md:block absolute top-12 -right-6 w-12">
                         <svg class="w-full text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
                         </svg>
@@ -634,13 +621,13 @@
 
                 <!-- Step 3 -->
                 <div class="text-center">
-                    <div class="relative inline-flex mb-6">
-                        <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl flex items-center justify-center shadow-xl shadow-blue-500/30">
-                            <span class="text-3xl font-bold text-white">3</span>
+                    <div class="relative inline-flex mb-8">
+                        <div class="w-24 h-24 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-3xl flex items-center justify-center shadow-xl shadow-blue-500/30">
+                            <span class="text-4xl font-bold text-white">3</span>
                         </div>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-100 mb-3">Controle suas finanças</h3>
-                    <p class="text-slate-400">
+                    <h3 class="text-xl font-bold text-slate-100 mb-4">Controle suas finanças</h3>
+                    <p class="text-slate-400 leading-relaxed">
                         Registre transações, acompanhe gráficos e tome decisões inteligentes.
                     </p>
                 </div>
@@ -650,108 +637,80 @@
 </section>
 
 <!-- FAQ Section -->
-<section id="faq" class="py-24 bg-gradient-to-b from-slate-950 to-slate-900 relative">
+<section id="perguntas" class="py-28 bg-gradient-to-b from-slate-950 to-slate-900 relative">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="max-w-3xl mx-auto">
+        <div class="max-w-4xl mx-auto">
             <!-- Header -->
             <div class="text-center mb-16">
-                <span class="inline-block px-4 py-2 bg-blue-500/10 border border-blue-500/30 rounded-full text-blue-300 text-sm font-semibold mb-6">
-                    TIRE SUAS DÚVIDAS
+                <span class="inline-block px-4 py-2 bg-blue-500/10 border border-blue-500/30 rounded-full text-blue-300 text-sm font-semibold mb-8">
+                    DÚVIDAS FREQUENTES
                 </span>
-                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-100 mb-6">
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-100">
                     Perguntas 
-                    <span class="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">Frequentes</span>
+                    <span class="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">Comuns</span>
                 </h2>
             </div>
 
-            <!-- FAQ Items -->
-            <div class="space-y-4" x-data="{ openFaq: null }">
+            <!-- FAQ Grid -->
+            <div class="grid md:grid-cols-2 gap-8">
                 <!-- FAQ 1 -->
-                <div class="glass rounded-2xl border border-slate-700/50 overflow-hidden">
-                    <button @click="openFaq = openFaq === 1 ? null : 1" 
-                            class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-slate-800/30 transition-colors">
-                        <span class="text-lg font-semibold text-slate-100">O Nebue é realmente gratuito?</span>
-                        <svg class="w-5 h-5 text-slate-400 transition-transform duration-300" 
-                             :class="{ 'rotate-180': openFaq === 1 }" 
-                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </button>
-                    <div x-show="openFaq === 1" 
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0 -translate-y-2"
-                         x-transition:enter-end="opacity-100 translate-y-0"
-                         class="px-6 pb-5">
-                        <p class="text-slate-400 leading-relaxed">
-                            Sim! O Nebue é 100% gratuito. Todas as funcionalidades estão disponíveis sem nenhum custo. Nosso objetivo é ajudar você a ter controle financeiro de forma simples e acessível.
-                        </p>
+                <div class="glass rounded-2xl p-8 border border-slate-700/50">
+                    <div class="flex items-start gap-4 mb-4">
+                        <div class="w-10 h-10 bg-violet-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-slate-100">O Nebue é realmente gratuito?</h3>
                     </div>
+                    <p class="text-slate-400 leading-relaxed pl-14">
+                        Sim! O Nebue é 100% gratuito. Todas as funcionalidades estão disponíveis sem nenhum custo.
+                    </p>
                 </div>
 
                 <!-- FAQ 2 -->
-                <div class="glass rounded-2xl border border-slate-700/50 overflow-hidden">
-                    <button @click="openFaq = openFaq === 2 ? null : 2" 
-                            class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-slate-800/30 transition-colors">
-                        <span class="text-lg font-semibold text-slate-100">Meus dados estão seguros?</span>
-                        <svg class="w-5 h-5 text-slate-400 transition-transform duration-300" 
-                             :class="{ 'rotate-180': openFaq === 2 }" 
-                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </button>
-                    <div x-show="openFaq === 2" 
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0 -translate-y-2"
-                         x-transition:enter-end="opacity-100 translate-y-0"
-                         class="px-6 pb-5">
-                        <p class="text-slate-400 leading-relaxed">
-                            Absolutamente! Utilizamos criptografia de ponta a ponta e seguimos as melhores práticas de segurança. Seus dados financeiros são privados e nunca são compartilhados com terceiros.
-                        </p>
+                <div class="glass rounded-2xl p-8 border border-slate-700/50">
+                    <div class="flex items-start gap-4 mb-4">
+                        <div class="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-slate-100">Meus dados estão seguros?</h3>
                     </div>
+                    <p class="text-slate-400 leading-relaxed pl-14">
+                        Absolutamente! Utilizamos criptografia de ponta e seguimos as melhores práticas de segurança.
+                    </p>
                 </div>
 
                 <!-- FAQ 3 -->
-                <div class="glass rounded-2xl border border-slate-700/50 overflow-hidden">
-                    <button @click="openFaq = openFaq === 3 ? null : 3" 
-                            class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-slate-800/30 transition-colors">
-                        <span class="text-lg font-semibold text-slate-100">Como funciona o assistente de IA?</span>
-                        <svg class="w-5 h-5 text-slate-400 transition-transform duration-300" 
-                             :class="{ 'rotate-180': openFaq === 3 }" 
-                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </button>
-                    <div x-show="openFaq === 3" 
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0 -translate-y-2"
-                         x-transition:enter-end="opacity-100 translate-y-0"
-                         class="px-6 pb-5">
-                        <p class="text-slate-400 leading-relaxed">
-                            O assistente de IA está disponível 24 horas para ajudar você com dúvidas sobre finanças pessoais, dicas de economia e orientações sobre como usar o sistema. Basta clicar no ícone de chat!
-                        </p>
+                <div class="glass rounded-2xl p-8 border border-slate-700/50">
+                    <div class="flex items-start gap-4 mb-4">
+                        <div class="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-slate-100">Como funciona o assistente IA?</h3>
                     </div>
+                    <p class="text-slate-400 leading-relaxed pl-14">
+                        O assistente está disponível 24h para ajudar com dúvidas sobre finanças e dicas de economia.
+                    </p>
                 </div>
 
                 <!-- FAQ 4 -->
-                <div class="glass rounded-2xl border border-slate-700/50 overflow-hidden">
-                    <button @click="openFaq = openFaq === 4 ? null : 4" 
-                            class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-slate-800/30 transition-colors">
-                        <span class="text-lg font-semibold text-slate-100">Posso usar em dispositivos móveis?</span>
-                        <svg class="w-5 h-5 text-slate-400 transition-transform duration-300" 
-                             :class="{ 'rotate-180': openFaq === 4 }" 
-                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </button>
-                    <div x-show="openFaq === 4" 
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0 -translate-y-2"
-                         x-transition:enter-end="opacity-100 translate-y-0"
-                         class="px-6 pb-5">
-                        <p class="text-slate-400 leading-relaxed">
-                            Sim! O Nebue é totalmente responsivo e funciona perfeitamente em smartphones, tablets e computadores. Acesse de qualquer lugar e gerencie suas finanças quando quiser.
-                        </p>
+                <div class="glass rounded-2xl p-8 border border-slate-700/50">
+                    <div class="flex items-start gap-4 mb-4">
+                        <div class="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-slate-100">Posso usar no celular?</h3>
                     </div>
+                    <p class="text-slate-400 leading-relaxed pl-14">
+                        Sim! O Nebue é totalmente responsivo e funciona perfeitamente em smartphones e tablets.
+                    </p>
                 </div>
             </div>
         </div>
@@ -759,7 +718,7 @@
 </section>
 
 <!-- Final CTA Section -->
-<section class="py-24 bg-gradient-to-br from-slate-900 via-violet-950/30 to-slate-950 relative overflow-hidden">
+<section class="py-28 bg-gradient-to-br from-slate-900 via-violet-950/30 to-slate-950 relative overflow-hidden">
     <!-- Background Decorations -->
     <div class="absolute inset-0">
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-violet-600/10 rounded-full blur-[150px]"></div>
@@ -767,19 +726,20 @@
 
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="max-w-4xl mx-auto text-center">
-            <h2 class="text-3xl sm:text-4xl lg:text-6xl font-bold text-slate-100 mb-8">
+            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-100 mb-8">
                 Pronto para transformar
-                <span class="bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent block mt-2">
+                <span class="bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent block mt-3">
                     sua vida financeira?
                 </span>
             </h2>
-            <p class="text-lg sm:text-xl text-slate-300 mb-10 max-w-2xl mx-auto">
+            
+            <p class="text-lg sm:text-xl text-slate-300 mb-12 max-w-2xl mx-auto">
                 Comece gratuitamente agora e dê o primeiro passo rumo à liberdade financeira.
             </p>
 
-            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-10">
+            <div class="flex flex-col sm:flex-row gap-5 justify-center mb-12">
                 <a href="{% url 'users:signup' %}" 
-                   class="group relative inline-flex items-center justify-center gap-2 px-10 py-5 bg-gradient-to-r from-violet-500 to-indigo-600 text-white font-bold text-xl rounded-2xl shadow-2xl shadow-violet-500/40 hover:shadow-violet-500/60 transition-all duration-300 hover:scale-[1.02] overflow-hidden">
+                   class="group relative inline-flex items-center justify-center gap-3 px-10 py-5 bg-gradient-to-r from-violet-500 to-indigo-600 text-white font-bold text-xl rounded-2xl shadow-2xl shadow-violet-500/40 hover:shadow-violet-500/60 transition-all duration-300 hover:scale-[1.02] overflow-hidden">
                     <span class="relative z-10">Criar Conta Gratuita</span>
                     <svg class="w-6 h-6 relative z-10 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
@@ -787,25 +747,25 @@
                     <div class="absolute inset-0 bg-gradient-to-r from-violet-600 to-indigo-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </a>
                 <a href="{% url 'users:login' %}" 
-                   class="inline-flex items-center justify-center gap-2 px-10 py-5 glass border border-slate-700/50 text-slate-100 font-bold text-xl rounded-2xl hover:border-violet-500/50 hover:bg-slate-800/50 transition-all duration-300">
+                   class="inline-flex items-center justify-center gap-3 px-10 py-5 glass border border-slate-700/50 text-slate-100 font-bold text-xl rounded-2xl hover:border-violet-500/50 hover:bg-slate-800/50 transition-all duration-300">
                     Fazer Login
                 </a>
             </div>
 
-            <div class="flex flex-wrap items-center justify-center gap-8 text-slate-400">
-                <div class="flex items-center gap-2">
+            <div class="flex flex-wrap items-center justify-center gap-10 text-slate-400">
+                <div class="flex items-center gap-3">
                     <svg class="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                     </svg>
                     <span>Sem cartão de crédito</span>
                 </div>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-3">
                     <svg class="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                     </svg>
                     <span>Sem compromisso</span>
                 </div>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-3">
                     <svg class="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                     </svg>
@@ -817,13 +777,13 @@
 </section>
 
 <!-- Footer -->
-<footer class="bg-slate-950 border-t border-slate-800 py-12">
+<footer class="bg-slate-950 border-t border-slate-800/50 py-16">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
         <div class="max-w-6xl mx-auto">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
                 <!-- Brand -->
                 <div class="md:col-span-2">
-                    <div class="flex items-center gap-3 mb-4">
+                    <div class="flex items-center gap-3 mb-6">
                         <div class="w-10 h-10 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-xl flex items-center justify-center">
                             <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -831,25 +791,25 @@
                         </div>
                         <span class="text-2xl font-bold text-slate-100">Nebue</span>
                     </div>
-                    <p class="text-slate-400 max-w-sm">
+                    <p class="text-slate-400 leading-relaxed max-w-sm">
                         Sistema de gestão financeira pessoal com inteligência artificial. Controle suas finanças de forma simples e inteligente.
                     </p>
                 </div>
 
                 <!-- Links -->
                 <div>
-                    <h4 class="text-slate-100 font-semibold mb-4">Navegação</h4>
-                    <ul class="space-y-3">
+                    <h4 class="text-slate-100 font-semibold mb-6">Navegação</h4>
+                    <ul class="space-y-4">
                         <li><a href="#recursos" class="text-slate-400 hover:text-violet-400 transition-colors">Recursos</a></li>
                         <li><a href="#como-funciona" class="text-slate-400 hover:text-violet-400 transition-colors">Como Funciona</a></li>
-                        <li><a href="#faq" class="text-slate-400 hover:text-violet-400 transition-colors">FAQ</a></li>
+                        <li><a href="#perguntas" class="text-slate-400 hover:text-violet-400 transition-colors">Dúvidas</a></li>
                     </ul>
                 </div>
 
                 <!-- Account -->
                 <div>
-                    <h4 class="text-slate-100 font-semibold mb-4">Conta</h4>
-                    <ul class="space-y-3">
+                    <h4 class="text-slate-100 font-semibold mb-6">Conta</h4>
+                    <ul class="space-y-4">
                         <li><a href="{% url 'users:login' %}" class="text-slate-400 hover:text-violet-400 transition-colors">Entrar</a></li>
                         <li><a href="{% url 'users:signup' %}" class="text-slate-400 hover:text-violet-400 transition-colors">Criar Conta</a></li>
                     </ul>
@@ -857,12 +817,12 @@
             </div>
 
             <!-- Bottom -->
-            <div class="border-t border-slate-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="border-t border-slate-800/50 pt-10 flex flex-col sm:flex-row items-center justify-between gap-6">
                 <p class="text-slate-500 text-sm">
                     &copy; {% now 'Y' %} Nebue. Todos os direitos reservados.
                 </p>
                 <p class="text-slate-500 text-sm">
-                    Desenvolvido com 💜 para seu TCC
+                    Projeto de TCC - Gestão Financeira Inteligente
                 </p>
             </div>
         </div>
